@@ -1,0 +1,35 @@
+#pragma once
+
+#include <type_traits>
+
+#include "vec2.h"
+#include "vec3.h"
+#include "vec4.h"
+
+AGZM_BEGIN
+
+namespace swizzle_impl
+{
+    
+    template<int A0>                     constexpr int axis_list_length() { return 1;                               }
+    template<int A0, int A1, int...A123> constexpr int axis_list_length() { return 1 + axis_list_length<A1, A123...>(); }
+
+    template<typename T, int D> struct dim_2_vec { };
+    template<typename T> struct dim_2_vec<T, 1> { using type = T;        };
+    template<typename T> struct dim_2_vec<T, 2> { using type = tvec2<T>; };
+    template<typename T> struct dim_2_vec<T, 3> { using type = tvec3<T>; };
+    template<typename T> struct dim_2_vec<T, 4> { using type = tvec4<T>; };
+
+    template<typename V, int I> auto idx_2_mem(const V &vec) noexcept { return vec[I]; }
+
+} // namespace swizzle_impl
+
+template<int...Is, typename V>
+auto swizzle_vec(const V &vec) noexcept
+{
+    using ret_t = typename swizzle_impl::dim_2_vec<
+        typename V::elem_t, swizzle_impl::axis_list_length<Is...>()>::type;
+    return ret_t(swizzle_impl::idx_2_mem<V, Is>(vec)...);
+}
+
+AGZM_END
