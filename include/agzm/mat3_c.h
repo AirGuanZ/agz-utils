@@ -81,7 +81,17 @@ public:
 
     self_t adj()     const noexcept;
     self_t adjoint() const noexcept;
+
+    self_t &operator+=(const self_t &rhs) noexcept;
+    self_t &operator-=(const self_t &rhs) noexcept;
+    self_t &operator*=(const self_t &rhs) noexcept;
+
+    self_t &operator*=(T rhs) noexcept;
+    self_t &operator/=(T rhs) noexcept;
 };
+
+template<typename T> tmat3_c<T> operator+(const tmat3_c<T> &lhs, const tmat3_c<T> &rhs) noexcept;
+template<typename T> tmat3_c<T> operator-(const tmat3_c<T> &lhs, const tmat3_c<T> &rhs) noexcept;
 
 template<typename T> tmat3_c<T> operator*(const tmat3_c<T> &lhs, const tmat3_c<T> &rhs) noexcept;
 template<typename T> tvec3<T>   operator*(const tmat3_c<T> &lhs, const tvec3<T>   &rhs) noexcept;

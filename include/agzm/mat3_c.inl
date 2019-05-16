@@ -276,6 +276,52 @@ typename tmat3_c<T>::self_t tmat3_c<T>::adjoint() const noexcept
 }
 
 template<typename T>
+typename tmat3_c<T>::self_t &tmat3_c<T>::operator+=(const self_t &rhs) noexcept
+{
+    return *this = *this + rhs;
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t &tmat3_c<T>::operator-=(const self_t &rhs) noexcept
+{
+    return *this = *this - rhs;
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t &tmat3_c<T>::operator*=(const self_t &rhs) noexcept
+{
+    return *this = *this * rhs;
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t &tmat3_c<T>::operator*=(T rhs) noexcept
+{
+    return *this = *this * rhs;
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t &tmat3_c<T>::operator/=(T rhs) noexcept
+{
+    return *this = *this / rhs;
+}
+
+template<typename T>
+tmat3_c<T> operator+(const tmat3_c<T> &lhs, const tmat3_c<T> &rhs) noexcept
+{
+    return tmat3_c<T>::from_cols(lhs[0] + rhs[0],
+                                 lhs[1] + rhs[1],
+                                 lhs[2] + rhs[2]);
+}
+
+template<typename T>
+tmat3_c<T> operator-(const tmat3_c<T> &lhs, const tmat3_c<T> &rhs) noexcept
+{
+    return tmat3_c<T>::from_cols(lhs[0] - rhs[0],
+                                 lhs[1] - rhs[1],
+                                 lhs[2] - rhs[2]);
+}
+
+template<typename T>
 tmat3_c<T> operator*(const tmat3_c<T> &lhs, const tmat3_c<T> &rhs) noexcept
 {
     tmat3_c<T> ret(UNINIT);

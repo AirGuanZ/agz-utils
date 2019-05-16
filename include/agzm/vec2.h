@@ -19,9 +19,6 @@ public:
     explicit tvec2(T val)           noexcept;
     explicit tvec2(uninitialized_t) noexcept;
 
-    tvec2(const self_t&)             = default;
-    self_t &operator=(const self_t&) = default;
-
     bool is_zero() const noexcept;
     auto length()        const noexcept;
     auto length_square() const noexcept;
