@@ -3,6 +3,13 @@
 AGZM_BEGIN
 
 template<typename T>
+tmat4_c<T>::tmat4_c(const tvec4<T> &c0, const tvec4<T> &c1, const tvec4<T> &c2, const tvec4<T> &c3) noexcept
+    : data{ c0, c1, c2, c3 }
+{
+
+}
+
+template<typename T>
 tmat4_c<T>::tmat4_c() noexcept
     : tmat4_c(identity())
 {
@@ -11,7 +18,7 @@ tmat4_c<T>::tmat4_c() noexcept
 
 template <typename T>
 tmat4_c<T>::tmat4_c(uninitialized_t) noexcept
-    : data{ UNINIT, UNINIT, UNINIT, UNINIT }
+    : data{ col_t(UNINIT), col_t(UNINIT), col_t(UNINIT), col_t(UNINIT) }
 {
     
 }
@@ -47,8 +54,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::from_cols(const col_t &c0,
                                                   const col_t &c2,
                                                   const col_t &c3) noexcept
 {
-    self_t ret = { { c0, c1, c2, c3 } };
-    return ret;
+    return self_t(c0, c1, c2, c3);
 }
 
 template<typename T>
@@ -203,7 +209,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::look_at(const tvec3<T> &eye, const tvec3
     return self_t(R.x, U.x, D.x, eye.x,
                   R.y, U.y, D.y, eye.y,
                   R.z, U.z, D.z, eye.z,
-                  0,   0,   0,   1).inv();
+                  0,   0,   0,   1).inverse();
 }
 
 template<typename T>
@@ -239,7 +245,7 @@ const tvec4<T> &tmat4_c<T>::get_col(size_t idx) const noexcept
 template<typename T>
 tvec4<T> tmat4_c<T>::get_row(size_t idx) const noexcept
 {
-    return tmat4_c<T>(data[0][idx], data[1][idx], data[2][idx], data[3][idx]);
+    return tvec4<T>(data[0][idx], data[1][idx], data[2][idx], data[3][idx]);
 }
 
 template<typename T>
@@ -260,18 +266,26 @@ auto tmat4_c<T>::determinant() const noexcept
 template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::inv() const noexcept
 {
-    self_t adj_mat = adj();
-    tvec4<T> row0(adj_mat[0][0], adj_mat[1][0],
-                  adj_mat[2][0], adj_mat[3][0]);
-    T inv_det = 1 / (data[0] * row0).sum();
-
-    return adj * inv_det;
+    self_t a = adj();
+    return a / dot(data[0], a.get_row(0));
 }
 
 template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::inverse() const noexcept
 {
     return inv();
+}
+
+template<typename T>
+typename tmat4_c<T>::self_t tmat4_c<T>::t() const noexcept
+{
+    return self_t::from_rows(data[0], data[1], data[2], data[3]);
+}
+
+template<typename T>
+typename tmat4_c<T>::self_t tmat4_c<T>::transpose() const noexcept
+{
+    return t();
 }
 
 template<typename T>
@@ -320,7 +334,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::adj() const noexcept
 
     tvec4<T> sign_a(+1, -1, +1, -1);
     tvec4<T> sign_b(-1, +1, -1, +1);
-    
+
     return from_cols(inv0 * sign_a, inv1 * sign_b, inv2 * sign_a, inv3 * sign_b);
 }
 
@@ -328,18 +342,6 @@ template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::adjoint() const noexcept
 {
     return adj();
-}
-
-template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::t() const noexcept
-{
-    return self_t::from_rows(data[0], data[1], data[2], data[3]);
-}
-
-template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::transpose() const noexcept
-{
-    return t();
 }
 
 template<typename T>
@@ -357,19 +359,34 @@ tmat4_c<T> operator*(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
 template<typename T>
 tvec4<T> operator*(const tmat4_c<T> &lhs, const tvec4<T> &rhs) noexcept
 {
-    return tmat4_c<T>(dot(lhs.get_row(0), rhs),
-                      dot(lhs.get_row(1), rhs),
-                      dot(lhs.get_row(2), rhs),
-                      dot(lhs.get_row(3), rhs));
+    return tvec4<T>(dot(lhs.get_row(0), rhs),
+                    dot(lhs.get_row(1), rhs),
+                    dot(lhs.get_row(2), rhs),
+                    dot(lhs.get_row(3), rhs));
 }
 
 template<typename T>
 tvec4<T> operator*(const tvec4<T> &lhs, const tmat4_c<T> &rhs) noexcept
 {
-    return tmat4_c<T>(dot(lhs, rhs.get_col(0)),
-                      dot(lhs, rhs.get_col(1)),
-                      dot(lhs, rhs.get_col(2)),
-                      dot(lhs, rhs.get_col(3)));
+    return tvec4<T>(dot(lhs, rhs.get_col(0)),
+                    dot(lhs, rhs.get_col(1)),
+                    dot(lhs, rhs.get_col(2)),
+                    dot(lhs, rhs.get_col(3)));
+}
+
+template<typename T> tmat4_c<T> operator*(const tmat4_c<T> &lhs, T rhs) noexcept
+{
+    return tmat4_c<T>::from_cols(lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs, lhs[3] * rhs);
+}
+
+template<typename T> tmat4_c<T> operator/(const tmat4_c<T> &lhs, T rhs) noexcept
+{
+    return tmat4_c<T>::from_cols(lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs, lhs[3] / rhs);
+}
+
+template<typename T> tmat4_c<T> operator*(T lhs, const tmat4_c<T> &rhs) noexcept
+{
+    return rhs * lhs;
 }
 
 AGZM_END

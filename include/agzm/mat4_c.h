@@ -12,6 +12,8 @@ AGZM_BEGIN
 template<typename T>
 class tmat4_c
 {
+    tmat4_c(const tvec4<T> &c0, const tvec4<T> &c1, const tvec4<T> &c2, const tvec4<T> &c3) noexcept;
+
 public:
 
     using row_t  = tvec4<T>;
@@ -79,16 +81,20 @@ public:
     self_t inv()     const noexcept;
     self_t inverse() const noexcept;
 
-    self_t adj()     const noexcept;
-    self_t adjoint() const noexcept;
-
     self_t t()         const noexcept;
     self_t transpose() const noexcept;
+
+    self_t adj()     const noexcept;
+    self_t adjoint() const noexcept;
 };
 
 template<typename T> tmat4_c<T> operator*(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept;
 template<typename T> tvec4<T>   operator*(const tmat4_c<T> &lhs, const tvec4<T>   &rhs) noexcept;
 template<typename T> tvec4<T>   operator*(const tvec4<T>   &lhs, const tmat4_c<T> &rhs) noexcept;
+
+template<typename T> tmat4_c<T> operator*(const tmat4_c<T> &lhs, T rhs) noexcept;
+template<typename T> tmat4_c<T> operator/(const tmat4_c<T> &lhs, T rhs) noexcept;
+template<typename T> tmat4_c<T> operator*(T lhs, const tmat4_c<T> &rhs) noexcept;
 
 using mat4f_c = tmat4_c<float>;
 using mat4d_c = tmat4_c<double>;

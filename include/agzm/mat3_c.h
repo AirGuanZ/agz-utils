@@ -6,9 +6,14 @@
 
 AGZM_BEGIN
 
+/**
+ * @brief column-major 3x3 matrix
+ */
 template<typename T>
 class tmat3_c
 {
+    tmat3_c(const tvec3<T> &c0, const tvec3<T> &c1, const tvec3<T> &c2) noexcept;
+
 public:
 
     using row_t  = tvec3<T>;
@@ -71,11 +76,24 @@ public:
     self_t inv()     const noexcept;
     self_t inverse() const noexcept;
 
-    self_t adj()     const noexcept;
-    self_t adjoint() const noexcept;
-
     self_t t()         const noexcept;
     self_t transpose() const noexcept;
+
+    self_t adj()     const noexcept;
+    self_t adjoint() const noexcept;
 };
 
+template<typename T> tmat3_c<T> operator*(const tmat3_c<T> &lhs, const tmat3_c<T> &rhs) noexcept;
+template<typename T> tvec3<T>   operator*(const tmat3_c<T> &lhs, const tvec3<T>   &rhs) noexcept;
+template<typename T> tvec3<T>   operator*(const tvec3<T>   &lhs, const tmat3_c<T> &rhs) noexcept;
+
+template<typename T> tmat3_c<T> operator*(const tmat3_c<T> &lhs, T rhs) noexcept;
+template<typename T> tmat3_c<T> operator/(const tmat3_c<T> &lhs, T rhs) noexcept;
+template<typename T> tmat3_c<T> operator*(T lhs, const tmat3_c<T> &rhs) noexcept;
+
+using mat3f_c = tmat3_c<float>;
+using mat3d_c = tmat3_c<double>;
+
 AGZM_END
+
+#include "mat3_c.inl"

@@ -1,8 +1,13 @@
 #pragma once
 
-#include "mat3_c.h"
-
 AGZM_BEGIN
+
+template<typename T>
+tmat3_c<T>::tmat3_c(const tvec3<T> &c0, const tvec3<T> &c1, const tvec3<T> &c2) noexcept
+    : data{ c0, c1, c2 }
+{
+    
+}
 
 template<typename T>
 tmat3_c<T>::tmat3_c() noexcept
@@ -13,6 +18,7 @@ tmat3_c<T>::tmat3_c() noexcept
 
 template<typename T>
 tmat3_c<T>::tmat3_c(uninitialized_t) noexcept
+    : data{ col_t(UNINIT), col_t(UNINIT), col_t(UNINIT) }
 {
     
 }
@@ -43,8 +49,7 @@ typename tmat3_c<T>::self_t tmat3_c<T>::from_cols(const col_t &c0,
                                                   const col_t &c1,
                                                   const col_t &c2) noexcept
 {
-    self_t ret = { c0, c1, c2 };
-    return ret;
+    return self_t(c0, c1, c2);
 }
 
 template<typename T>
@@ -210,6 +215,107 @@ template<typename T>
 auto tmat3_c<T>::determinant() const noexcept
 {
     return det();
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t tmat3_c<T>::inv() const noexcept
+{
+    self_t a = adj();
+    return a / dot(data[0], a.get_row(0));
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t tmat3_c<T>::inverse() const noexcept
+{
+    return inv();
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t tmat3_c<T>::t() const noexcept
+{
+    return from_rows(data[0], data[1], data[2]);
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t tmat3_c<T>::transpose() const noexcept
+{
+    return t();
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t tmat3_c<T>::adj() const noexcept
+{
+    self_t adj(UNINIT);
+
+    adj.data[0][0] = +::agzm::determinant(data[1][1], data[2][1],
+        data[1][2], data[2][2]);
+    adj.data[0][1] = -::agzm::determinant(data[1][0], data[2][0],
+        data[1][2], data[2][2]);
+    adj.data[0][2] = +::agzm::determinant(data[1][0], data[2][0],
+        data[1][1], data[2][1]);
+    adj.data[1][0] = -::agzm::determinant(data[0][1], data[2][1],
+        data[0][2], data[2][2]);
+    adj.data[1][1] = +::agzm::determinant(data[0][0], data[2][0],
+        data[0][2], data[2][2]);
+    adj.data[1][2] = -::agzm::determinant(data[0][0], data[2][0],
+        data[0][1], data[2][1]);
+    adj.data[2][0] = +::agzm::determinant(data[0][1], data[1][1],
+        data[0][2], data[1][2]);
+    adj.data[2][1] = -::agzm::determinant(data[0][0], data[1][0],
+        data[0][2], data[1][2]);
+    adj.data[2][2] = +::agzm::determinant(data[0][0], data[1][0],
+        data[0][1], data[1][1]);
+
+    return adj.t();
+}
+
+template<typename T>
+typename tmat3_c<T>::self_t tmat3_c<T>::adjoint() const noexcept
+{
+    return adj();
+}
+
+template<typename T>
+tmat3_c<T> operator*(const tmat3_c<T> &lhs, const tmat3_c<T> &rhs) noexcept
+{
+    tmat3_c<T> ret(UNINIT);
+    for(int c = 0; c != 3; ++c)
+    {
+        for(int r = 0; r != 3; ++r)
+            ret(r, c) = dot(lhs.get_row(r), rhs.get_col(c));
+    }
+    return ret;
+}
+
+template<typename T>
+tvec3<T> operator*(const tmat3_c<T> &lhs, const tvec3<T> &rhs) noexcept
+{
+    return tvec3<T>(dot(lhs.get_row(0), rhs),
+                    dot(lhs.get_row(1), rhs),
+                    dot(lhs.get_row(2), rhs));
+}
+
+template<typename T>
+tvec3<T> operator*(const tvec3<T> &lhs, const tmat3_c<T> &rhs) noexcept
+{
+    return tvec3<T>(dot(lhs, rhs.get_col(0)),
+                    dot(lhs, rhs.get_col(1)),
+                    dot(lhs, rhs.get_col(2)));
+}
+
+template<typename T> tmat3_c<T> operator*(const tmat3_c<T> &lhs, T rhs) noexcept
+{
+    return tmat3_c<T>::from_cols(lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs);
+}
+
+template<typename T> tmat3_c<T> operator/(const tmat3_c<T> &lhs, T rhs) noexcept
+{
+    return tmat3_c<T>::from_cols(lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs);
+}
+
+template<typename T> tmat3_c<T> operator*(T lhs, const tmat3_c<T> &rhs) noexcept
+{
+    return rhs * lhs;
 }
 
 AGZM_END
