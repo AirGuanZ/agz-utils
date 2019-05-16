@@ -77,4 +77,4 @@ using vec4i = tvec4<float>;
 
 AGZM_END
 
-#include "vec4.inl"
+#include "impl/vec4.inl"

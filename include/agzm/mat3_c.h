@@ -106,4 +106,4 @@ using mat3d_c = tmat3_c<double>;
 
 AGZM_END
 
-#include "mat3_c.inl"
+#include "impl/mat3_c.inl"

@@ -247,24 +247,15 @@ typename tmat3_c<T>::self_t tmat3_c<T>::adj() const noexcept
 {
     self_t adj(UNINIT);
 
-    adj.data[0][0] = +::agzm::determinant(data[1][1], data[2][1],
-        data[1][2], data[2][2]);
-    adj.data[0][1] = -::agzm::determinant(data[1][0], data[2][0],
-        data[1][2], data[2][2]);
-    adj.data[0][2] = +::agzm::determinant(data[1][0], data[2][0],
-        data[1][1], data[2][1]);
-    adj.data[1][0] = -::agzm::determinant(data[0][1], data[2][1],
-        data[0][2], data[2][2]);
-    adj.data[1][1] = +::agzm::determinant(data[0][0], data[2][0],
-        data[0][2], data[2][2]);
-    adj.data[1][2] = -::agzm::determinant(data[0][0], data[2][0],
-        data[0][1], data[2][1]);
-    adj.data[2][0] = +::agzm::determinant(data[0][1], data[1][1],
-        data[0][2], data[1][2]);
-    adj.data[2][1] = -::agzm::determinant(data[0][0], data[1][0],
-        data[0][2], data[1][2]);
-    adj.data[2][2] = +::agzm::determinant(data[0][0], data[1][0],
-        data[0][1], data[1][1]);
+    adj.data[0][0] = +agzm::determinant(data[1][1], data[2][1], data[1][2], data[2][2]);
+    adj.data[0][1] = -agzm::determinant(data[1][0], data[2][0], data[1][2], data[2][2]);
+    adj.data[0][2] = +agzm::determinant(data[1][0], data[2][0], data[1][1], data[2][1]);
+    adj.data[1][0] = -agzm::determinant(data[0][1], data[2][1], data[0][2], data[2][2]);
+    adj.data[1][1] = +agzm::determinant(data[0][0], data[2][0], data[0][2], data[2][2]);
+    adj.data[1][2] = -agzm::determinant(data[0][0], data[2][0], data[0][1], data[2][1]);
+    adj.data[2][0] = +agzm::determinant(data[0][1], data[1][1], data[0][2], data[1][2]);
+    adj.data[2][1] = -agzm::determinant(data[0][0], data[1][0], data[0][2], data[1][2]);
+    adj.data[2][2] = +agzm::determinant(data[0][0], data[1][0], data[0][1], data[1][1]);
 
     return adj.t();
 }

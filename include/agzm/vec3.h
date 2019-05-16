@@ -78,4 +78,4 @@ using vec3i = tvec3<float>;
 
 AGZM_END
 
-#include "vec3.inl"
+#include "impl/vec3.inl"

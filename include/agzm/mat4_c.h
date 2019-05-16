@@ -111,4 +111,4 @@ using mat4d_c = tmat4_c<double>;
 
 AGZM_END
 
-#include "mat4_c.inl"
+#include "impl/mat4_c.inl"
