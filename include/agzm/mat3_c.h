@@ -105,5 +105,3 @@ using mat3f_c = tmat3_c<float>;
 using mat3d_c = tmat3_c<double>;
 
 AGZM_END
-
-#include "impl/mat3_c.inl"

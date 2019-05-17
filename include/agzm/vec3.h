@@ -14,10 +14,11 @@ public:
 
     T x, y, z;
 
-    tvec3()                         noexcept;
-    tvec3(T x, T y, T z)            noexcept;
-    explicit tvec3(T val)           noexcept;
-    explicit tvec3(uninitialized_t) noexcept;
+    tvec3()                             noexcept;
+    tvec3(T x, T y, T z)                noexcept;
+    explicit tvec3(T val)               noexcept;
+    explicit tvec3(uninitialized_t)     noexcept;
+    explicit tvec3(const tcolor3<T> &c) noexcept;
 
     bool is_zero() const noexcept;
 
@@ -77,5 +78,3 @@ using vec3d = tvec3<float>;
 using vec3i = tvec3<float>;
 
 AGZM_END
-
-#include "impl/vec3.inl"

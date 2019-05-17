@@ -37,6 +37,13 @@ tcolor4<T>::tcolor4(uninitialized_t) noexcept
 }
 
 template<typename T>
+tcolor4<T>::tcolor4(const tvec4<T> &c) noexcept
+    : tcolor3(c.x, c.y, c.z, c.w)
+{
+
+}
+
+template<typename T>
 bool tcolor4<T>::is_black() const noexcept
 {
     return !r && !g && !b && !a;

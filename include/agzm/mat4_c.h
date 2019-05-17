@@ -110,5 +110,3 @@ using mat4f_c = tmat4_c<float>;
 using mat4d_c = tmat4_c<double>;
 
 AGZM_END
-
-#include "impl/mat4_c.inl"

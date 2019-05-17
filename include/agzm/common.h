@@ -78,4 +78,12 @@ T deg2rad(T deg) noexcept
     static_assert(std::is_floating_point_v<T>); return deg / 180 * PI;
 }
 
+template<typename T> class tcolor3;
+template<typename T> class tcolor4;
+template<typename T> class tmat3_c;
+template<typename T> class tmat4_c;
+template<typename T> class tvec2;
+template<typename T> class tvec3;
+template<typename T> class tvec4;
+
 AGZM_END

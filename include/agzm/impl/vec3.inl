@@ -32,6 +32,13 @@ tvec3<T>::tvec3(uninitialized_t) noexcept
 }
 
 template<typename T>
+tvec3<T>::tvec3(const tcolor3<T> &c) noexcept
+    : tvec3(c.r, c.g, c.b)
+{
+    
+}
+
+template<typename T>
 bool tvec3<T>::is_zero() const noexcept
 {
     return !x && !y && !z;

@@ -14,10 +14,11 @@ public:
 
     T r, g, b;
 
-    tcolor3()                         noexcept;
-    tcolor3(T r, T g, T b)            noexcept;
-    explicit tcolor3(T val)           noexcept;
-    explicit tcolor3(uninitialized_t) noexcept;
+    tcolor3()                           noexcept;
+    tcolor3(T r, T g, T b)              noexcept;
+    explicit tcolor3(T val)             noexcept;
+    explicit tcolor3(uninitialized_t)   noexcept;
+    explicit tcolor3(const tvec3<T> &c) noexcept;
 
     bool is_black() const noexcept;
     
@@ -74,5 +75,3 @@ template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 tcolor3<T> from_color3b(const color3b &c) noexcept;
 
 AGZM_END
-
-#include "impl/color3.inl"

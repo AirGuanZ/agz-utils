@@ -14,11 +14,12 @@ public:
 
     T r, g, b, a;
 
-    tcolor4()                         noexcept;
-    tcolor4(T val, T a)               noexcept;
-    tcolor4(T r, T g, T b, T a = 1)   noexcept;
-    explicit tcolor4(T val)           noexcept;
-    explicit tcolor4(uninitialized_t) noexcept;
+    tcolor4()                           noexcept;
+    tcolor4(T val, T a)                 noexcept;
+    tcolor4(T r, T g, T b, T a = 1)     noexcept;
+    explicit tcolor4(T val)             noexcept;
+    explicit tcolor4(uninitialized_t)   noexcept;
+    explicit tcolor4(const tvec4<T> &c) noexcept;
 
     bool is_black() const noexcept;
     
@@ -75,5 +76,3 @@ template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 tcolor4<T> from_color4b(const color4b &c) noexcept;
 
 AGZM_END
-
-#include "impl/color4.inl"

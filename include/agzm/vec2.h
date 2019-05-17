@@ -76,5 +76,3 @@ using vec2d = tvec2<double>;
 using vec2i = tvec2<int>;
 
 AGZM_END
-
-#include "impl/vec2.inl"

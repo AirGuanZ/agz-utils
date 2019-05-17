@@ -18,6 +18,7 @@ public:
     tvec4(T x, T y, T z, T w)       noexcept;
     explicit tvec4(T val)           noexcept;
     explicit tvec4(uninitialized_t) noexcept;
+    explicit tvec4(const tcolor4<T> &c) noexcept;
 
     bool is_zero() const noexcept;
 
@@ -76,5 +77,3 @@ using vec4d = tvec4<float>;
 using vec4i = tvec4<float>;
 
 AGZM_END
-
-#include "impl/vec4.inl"
