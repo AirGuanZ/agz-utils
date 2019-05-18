@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "vec.h"
 
 AGZM_BEGIN
 
@@ -18,6 +19,7 @@ public:
     tvec4(T x, T y, T z, T w)       noexcept;
     explicit tvec4(T val)           noexcept;
     explicit tvec4(uninitialized_t) noexcept;
+    explicit tvec4(const tvec<T, 4> &v) noexcept;
     explicit tvec4(const tcolor4<T> &c) noexcept;
 
     bool is_zero() const noexcept;

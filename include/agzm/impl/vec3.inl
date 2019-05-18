@@ -26,6 +26,13 @@ tvec3<T>::tvec3(T val) noexcept
 }
 
 template<typename T>
+tvec3<T>::tvec3(const tvec<T, 3> &v) noexcept
+    : x(v[0]), y(v[1]), z(v[2])
+{
+
+}
+
+template<typename T>
 tvec3<T>::tvec3(uninitialized_t) noexcept
 {
 

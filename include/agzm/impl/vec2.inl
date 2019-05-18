@@ -26,6 +26,13 @@ tvec2<T>::tvec2(T val) noexcept
 }
 
 template<typename T>
+tvec2<T>::tvec2(const tvec<T, 2> &v) noexcept
+    : x(v[0]), y(v[1])
+{
+    
+}
+
+template<typename T>
 tvec2<T>::tvec2(uninitialized_t) noexcept
 {
     

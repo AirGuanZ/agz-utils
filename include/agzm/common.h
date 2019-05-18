@@ -86,4 +86,6 @@ template<typename T> class tvec2;
 template<typename T> class tvec3;
 template<typename T> class tvec4;
 
+template<typename T, int D> class tvec;
+
 AGZM_END
