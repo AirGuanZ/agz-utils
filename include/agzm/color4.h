@@ -45,6 +45,8 @@ public:
     self_t &operator-=(T rhs) noexcept;
     self_t &operator*=(T rhs) noexcept;
     self_t &operator/=(T rhs) noexcept;
+
+#include "impl/swizzle_color4.inl"
 };
 
 template<typename T> tcolor4<T> operator-(const tcolor4<T> &color) noexcept;

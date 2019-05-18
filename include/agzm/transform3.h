@@ -50,4 +50,7 @@ public:
 template<typename T, bool C>
 ttransform3<T, C> operator*(const ttransform3<T, C> &lhs, const ttransform3<T, C> &rhs) noexcept;
 
+using transform3f = ttransform3<float>;
+using transform3d = ttransform3<double>;
+
 AGZM_END
