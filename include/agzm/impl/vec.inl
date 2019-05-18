@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include "../vec.h"
-
 AGZM_BEGIN
 
 template<typename T, int D>

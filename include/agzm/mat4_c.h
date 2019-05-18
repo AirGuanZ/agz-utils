@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-#include "vec3.h"
 #include "vec4.h"
 
 AGZM_BEGIN
@@ -65,6 +64,8 @@ public:
 
     static self_t perspective(T fov_y_rad, T w_over_h, T near_plane, T far_plane)       noexcept;
     static self_t look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept;
+
+    self_t inv_from_adj(const self_t &adj) const noexcept;
 
           col_t &operator[](size_t idx)       noexcept;
     const col_t &operator[](size_t idx) const noexcept;

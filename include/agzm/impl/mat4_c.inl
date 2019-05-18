@@ -213,6 +213,12 @@ typename tmat4_c<T>::self_t tmat4_c<T>::look_at(const tvec3<T> &eye, const tvec3
 }
 
 template<typename T>
+typename tmat4_c<T>::self_t tmat4_c<T>::inv_from_adj(const self_t &adj) const noexcept
+{
+    return adj / dot(data[0], adj.get_row(0));
+}
+
+template<typename T>
 typename tmat4_c<T>::col_t& tmat4_c<T>::operator[](size_t idx) noexcept
 {
     return data[idx];
@@ -266,8 +272,7 @@ auto tmat4_c<T>::determinant() const noexcept
 template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::inv() const noexcept
 {
-    self_t a = adj();
-    return a / dot(data[0], a.get_row(0));
+    return inv_from_adj(adj());
 }
 
 template<typename T>

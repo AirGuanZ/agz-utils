@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-#include "vec2.h"
 #include "vec3.h"
 
 AGZM_BEGIN
@@ -60,6 +59,8 @@ public:
     
     static self_t scale(const tvec2<T> &ratio) noexcept;
     static self_t scale(T x, T y)              noexcept;
+
+    self_t inv_from_adj(const self_t &adj) const noexcept;
 
           col_t &operator[](size_t idx)       noexcept;
     const col_t &operator[](size_t idx) const noexcept;

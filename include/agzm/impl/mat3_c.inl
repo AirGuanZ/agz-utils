@@ -168,6 +168,12 @@ typename tmat3_c<T>::self_t tmat3_c<T>::scale(T x, T y) noexcept
 }
 
 template<typename T>
+typename tmat3_c<T>::self_t tmat3_c<T>::inv_from_adj(const self_t &adj) const noexcept
+{
+    return adj / dot(data[0], adj.get_row(0));
+}
+
+template<typename T>
 typename tmat3_c<T>::col_t& tmat3_c<T>::operator[](size_t idx) noexcept
 {
     return data[idx];
@@ -220,8 +226,7 @@ auto tmat3_c<T>::determinant() const noexcept
 template<typename T>
 typename tmat3_c<T>::self_t tmat3_c<T>::inv() const noexcept
 {
-    self_t a = adj();
-    return a / dot(data[0], a.get_row(0));
+    return inv_from_adj(adj());
 }
 
 template<typename T>
@@ -340,17 +345,20 @@ tvec3<T> operator*(const tvec3<T> &lhs, const tmat3_c<T> &rhs) noexcept
                     dot(lhs, rhs.get_col(2)));
 }
 
-template<typename T> tmat3_c<T> operator*(const tmat3_c<T> &lhs, T rhs) noexcept
+template<typename T>
+tmat3_c<T> operator*(const tmat3_c<T> &lhs, T rhs) noexcept
 {
     return tmat3_c<T>::from_cols(lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs);
 }
 
-template<typename T> tmat3_c<T> operator/(const tmat3_c<T> &lhs, T rhs) noexcept
+template<typename T>
+tmat3_c<T> operator/(const tmat3_c<T> &lhs, T rhs) noexcept
 {
     return tmat3_c<T>::from_cols(lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs);
 }
 
-template<typename T> tmat3_c<T> operator*(T lhs, const tmat3_c<T> &rhs) noexcept
+template<typename T>
+tmat3_c<T> operator*(T lhs, const tmat3_c<T> &rhs) noexcept
 {
     return rhs * lhs;
 }
