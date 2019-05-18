@@ -51,3 +51,13 @@ auto normal             = vec3f(1, 2, 3).normalize();
 auto transformed_normal = transform.apply_to_normal(normal);
 ```
 
+### spherical harmonics
+
+```cpp
+float value = spherical_harmonics::eval<3, -2>(vec3f(1, 1, 0)); // eval sh
+
+auto rotate_mat = mat3f::rotate(vec3f(1, 2, 3), 0.6);    // 3x3 rotation matrix
+float coefs[5] = { ... };                                // 2-order sh coefficients
+spherical_harmonics::rotate_sh_coefs(rotate_mat, coefs); // transform sh coefficients
+```
+
