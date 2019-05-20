@@ -58,4 +58,9 @@ void save_gray_to_png_file(const std::string &filename, const math::byte *data, 
     file::write_raw_file(filename, content.data(), content.size());
 }
 
+void save_gray_to_png_file(const std::string &filename, const image_buffer<math::byte> &data)
+{
+    save_gray_to_png_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
+}
+
 } // namespace agz::img
