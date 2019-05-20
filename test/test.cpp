@@ -1,8 +1,8 @@
 #include "Catch.hpp"
 
-#include <agzm/agzm.h>
+#include <agz/utility/math/math.h>
 
-using namespace agzm;
+using namespace agz::math;
 
 bool EQ(float x, float y) noexcept
 {

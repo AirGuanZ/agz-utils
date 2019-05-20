@@ -1,6 +1,28 @@
 # agzm
 
-Header-only math utils for computer graphics
+Utilities for computer graphics
+
+## usage
+
+In `CMakeLists.txt`:
+
+```cmake
+ADD_SUBDIRECTORY(path_to_agzm/)
+INCLUDE_DIRECTORIES(${AGZUtils_INCLUDE_DIRS})
+TARGET_LINK_LIBRARIES(your_target AGZUtils)
+```
+
+In C++:
+
+```cpp
+#include <agz/utility/utility.h>
+```
+
+## math
+
+```cpp
+using namespace agz::math;
+```
 
 ### vec
 
@@ -59,5 +81,24 @@ float value = spherical_harmonics::eval<3, -2>(vec3f(1, 1, 0)); // eval sh
 auto rotate_mat = mat3f::rotate(vec3f(1, 2, 3), 0.6);    // 3x3 rotation matrix
 float coefs[5] = { ... };                                // 2-order sh coefficients
 spherical_harmonics::rotate_sh_coefs(rotate_mat, coefs); // transform sh coefficients
+```
+
+### tensor
+
+```cpp
+tensor_t<float, 3> t1({ 256, 256, 3 }, 1);
+auto t2 = tensor_t<float, 3>::from_linear_indexed_fn(
+    			[](int i) { return float(i * i); });
+auto t3 = t1 + t2;
+```
+
+## image & texture
+
+```cpp
+using namespace agz::img;
+using namespace agz::texture;
+
+texture2d_t<agz::math::byte> tex(load_grey_from_file("tex.png"));
+save_gray_to_png_file("output.png", tex.get_data());
 ```
 
