@@ -30,6 +30,15 @@ namespace type_list_impl
         using type = T;
     };
 
+    template<typename T>
+    constexpr bool find_in() { return false; }
+
+    template<typename T, typename T1, typename...Ts>
+    constexpr bool find_in()
+    {
+        return std::is_same_v<T, T1> ? true : find_in<T, Ts...>();
+    }
+
 } // namespace type_list_impl
 
 template<typename...Ts>
@@ -45,6 +54,9 @@ public:
 
     template<int...Is>
     using sublist = type_list_t<at<Is>...>;
+
+    template<typename T>
+    static constexpr bool contains = type_list_impl::find_in<T, Ts...>();
 };
 
 } // namespace misc

@@ -33,6 +33,13 @@ tvec2<T>::tvec2(const tvec<T, 2> &v) noexcept
 }
 
 template<typename T>
+tvec2<T>::tvec2(const tcolor2<T> &c) noexcept
+    : tvec2(c.c, c.a)
+{
+
+}
+
+template<typename T>
 tvec2<T>::tvec2(uninitialized_t) noexcept
 {
     

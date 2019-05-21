@@ -22,14 +22,14 @@ public:
     explicit texture2d_t(int h, int w,            const texel_t &init_texel = texel_t());
     explicit texture2d_t(const math::vec2i &size, const texel_t &init_texel = texel_t());
 
-    texture2d_t(const self_t&)       = default;
-    self_t &operator=(const self_t&) = default;
+    texture2d_t(const self_t&)               = default;
+    texture2d_t<T> &operator=(const self_t&) = default;
 
     explicit texture2d_t(const data_t &data);
     explicit texture2d_t(data_t &&data) noexcept;
 
-    texture2d_t(self_t &&move_from)       noexcept;
-    self_t &operator=(self_t &&move_from) noexcept;
+    texture2d_t(self_t &&move_from)               noexcept;
+    texture2d_t<T> &operator=(self_t &&move_from) noexcept;
 
     void initialize(int h, int w,            uninitialized_t);
     void initialize(const math::vec2i &size, uninitialized_t);

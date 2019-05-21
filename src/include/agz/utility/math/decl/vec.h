@@ -2,16 +2,10 @@
 
 #include <tuple>
 
+#include "../../misc/type_list.h"
 #include "common.h"
 
 AGZM_BEGIN
-
-namespace tvec_impl
-{
-
-    template<typename...Ts> constexpr size_t type_list_length_v = std::tuple_size_v<std::tuple<Ts...>>;
-
-} // namespace tvec_impl
 
 template<typename T, int D>
 class tvec
@@ -29,7 +23,7 @@ public:
     explicit tvec(T val)           noexcept;
     explicit tvec(uninitialized_t) noexcept;
 
-    template<typename...As, typename = std::enable_if_t<(D > 1 && tvec_impl::type_list_length_v<As...> == D)>>
+    template<typename...As, typename = std::enable_if_t<(D > 1 && misc::type_list_t<As...>::length == D)>>
     tvec(As&&...args) noexcept;
 
     bool is_zero() const noexcept;

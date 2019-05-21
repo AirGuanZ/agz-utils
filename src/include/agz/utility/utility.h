@@ -5,5 +5,6 @@
 #include "./image.h"
 #include "./math.h"
 #include "./misc.h"
+#include "./string.h"
 #include "./texture.h"
 #include "./thread.h"

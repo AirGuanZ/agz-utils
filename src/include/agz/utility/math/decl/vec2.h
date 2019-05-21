@@ -19,6 +19,7 @@ public:
              tvec2(T x, T y)            noexcept;
     explicit tvec2(T val)               noexcept;
     explicit tvec2(const tvec<T, 2> &v) noexcept;
+    explicit tvec2(const tcolor2<T> &v) noexcept;
     explicit tvec2(uninitialized_t)     noexcept;
 
     bool is_zero() const noexcept;

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <type_traits>
 
-#include "../common/common.h"
+#include "../../common/common.h"
 
 #define AGZM_BEGIN namespace agz::math {
 #define AGZM_END   }
@@ -79,6 +79,7 @@ T deg2rad(T deg) noexcept
     static_assert(std::is_floating_point_v<T>); return deg / 180 * PI;
 }
 
+template<typename T> class tcolor2;
 template<typename T> class tcolor3;
 template<typename T> class tcolor4;
 template<typename T> class tmat3_c;
