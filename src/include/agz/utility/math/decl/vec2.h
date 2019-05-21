@@ -51,7 +51,7 @@ public:
     self_t &operator*=(T rhs) noexcept;
     self_t &operator/=(T rhs) noexcept;
 
-#include "impl/swizzle_vec2.inl"
+#include "../impl/swizzle_vec2.inl"
 };
 
 template<typename T> tvec2<T> operator-(const tvec2<T> &vec) noexcept;
