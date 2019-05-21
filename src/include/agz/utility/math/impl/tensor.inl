@@ -73,7 +73,7 @@ namespace tensor_impl
 template<typename P, int D>
 template<typename F>
 tensor_t<P, D>::tensor_t(from_indexed_func_t, const vec<int, D> &shape, F &&func)
-    : shape_(shape), elem_count_(shape.product())
+    : data_(nullptr), shape_(shape), elem_count_(shape.product())
 {
     assert(elem_count_ > 0);
 
@@ -91,8 +91,10 @@ tensor_t<P, D>::tensor_t(from_indexed_func_t, const vec<int, D> &shape, F &&func
     {
         const index_t &index_view = index;
         new(&data[i]) P(func(index_view));
-        index = tensor_impl::next_index(index);
+        index = tensor_impl::next_index(shape, index);
     }
+
+    data_ = data;
 
     guard.dismiss();
 }
@@ -100,7 +102,7 @@ tensor_t<P, D>::tensor_t(from_indexed_func_t, const vec<int, D> &shape, F &&func
 template<typename P, int D>
 template<typename F>
 tensor_t<P, D>::tensor_t(from_linear_indexed_func_t, const vec<int, D> &shape, F &&func)
-    : shape_(shape), elem_count_(shape.product())
+    : data_(nullptr), shape_(shape), elem_count_(shape.product())
 {
     assert(elem_count_ > 0);
 
@@ -116,7 +118,17 @@ tensor_t<P, D>::tensor_t(from_linear_indexed_func_t, const vec<int, D> &shape, F
     for(int i = 0; i != elem_count_; ++i, ++constructed_count)
         new(&data[i]) P(func(i));
 
+    data_ = data;
+
     guard.dismiss();
+}
+
+template<typename P, int D>
+void tensor_t<P, D>::destruct()
+{
+    assert(data_);
+    for(int i = 0; i < elem_count_; ++i)
+        alloc::call_destructor(data_[i]);
 }
 
 template<typename P, int D>
@@ -128,15 +140,14 @@ tensor_t<P, D>::tensor_t()
 
 template<typename P, int D>
 tensor_t<P, D>::tensor_t(const index_t &shape, uninitialized_t)
+    : data_(nullptr), shape_(shape), elem_count_(shape.product())
 {
-    P *data = std::allocator<P>().allocate(elem_count_);
-    data_.reset(data);
+    data_ = std::allocator<P>().allocate(elem_count_);
 }
 
 template<typename P, int D>
 tensor_t<P, D>::tensor_t(const index_t &shape, const P &init_value)
-    : tensor_t(from_linear_indexed_func_t{ }, shape,
-        [&](int i) { return init_value; })
+    : tensor_t(from_linear_indexed_func_t{ }, shape, [&](int) { return init_value; })
 {
 
 }
@@ -150,7 +161,7 @@ typename tensor_t<P, D>::self_t tensor_t<P, D>::from_indexed_fn(const index_t &s
 
 template<typename P, int D>
 template<typename F>
-typename tensor_t<P, D>::self_t tensor_t<P, D>::from_lineared_indexed_fn(const index_t &shape, F &&func)
+typename tensor_t<P, D>::self_t tensor_t<P, D>::from_linear_indexed_fn(const index_t &shape, F &&func)
 {
     return self_t(from_linear_indexed_func_t{ }, shape, std::forward<F>(func));
 }
@@ -158,7 +169,7 @@ typename tensor_t<P, D>::self_t tensor_t<P, D>::from_lineared_indexed_fn(const i
 template<typename P, int D>
 typename tensor_t<P, D>::self_t tensor_t<P, D>::from_array(const index_t &shape, const P *data)
 {
-    return from_lineared_indexed_fn(shape, [&](int i)
+    return from_linear_indexed_fn(shape, [&](int i)
     {
         return data[i];
     });
@@ -196,6 +207,12 @@ tensor_t<P, D> &tensor_t<P, D>::operator=(self_t &&move_from) noexcept
 }
 
 template<typename P, int D>
+tensor_t<P, D>::~tensor_t()
+{
+    destroy();
+}
+
+template<typename P, int D>
 void tensor_t<P, D>::initialize(const index_t &shape, const P &init_value)
 {
     self_t t(shape, init_value);
@@ -211,7 +228,14 @@ bool tensor_t<P, D>::is_available() const noexcept
 template<typename P, int D>
 void tensor_t<P, D>::destroy()
 {
-    data_ = nullptr;
+    if(data_)
+    {
+        assert(elem_count_ > 0);
+
+        this->destruct();
+        std::allocator<P>().deallocate(data_, elem_count_);
+        data_ = nullptr;
+    }
     shape_ = index_t(0);
     elem_count_ = 0;
 }
@@ -289,7 +313,7 @@ auto tensor_t<P, D>::map(F &&func) const
     if(!is_available())
         return tensor_t<ret_pixel_t, D>();
 
-    return tensor_t<ret_pixel_t, D>::from_lineared_indexed_fn(
+    return tensor_t<ret_pixel_t, D>::from_linear_indexed_fn(
         shape_, [&](int i)
     {
         return func(data_[i]);
@@ -299,13 +323,13 @@ auto tensor_t<P, D>::map(F &&func) const
 template<typename P, int D>
 P *tensor_t<P, D>::raw_data() noexcept
 {
-    return data_.get();
+    return data_;
 }
 
 template<typename P, int D>
 const P *tensor_t<P, D>::raw_data() const noexcept
 {
-    return data_.get();
+    return data_;
 }
 
 template<typename P, int D>
@@ -329,8 +353,8 @@ auto elemwise_binary(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs, F &&o
             "invalid/unmatched tensor size in elementwise binary operation");
     }
 
-    using ret_pixel_t = rm_rcv_t<std::invoke_result_t<F, const P&, const P&>>;
-    return tensor_t<ret_pixel_t, D>::from_lineared_indexed_fn(lhs.shape(),
+    using ret_pixel_t = rm_rcv_t<decltype(opr(std::declval<const P&>(), std::declval<const P&>()))>;
+    return tensor_t<ret_pixel_t, D>::from_linear_indexed_fn(lhs.shape(),
         [&](int i)
     {
         return opr(lhs.at(i), rhs.at(i));
@@ -376,25 +400,25 @@ bool operator!=(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs)
 template<typename P, int D>
 auto operator+(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs)
 {
-    return elemwise_binary(lhs, rhs, std::plus<tensor_t<P, D>>());
+    return elemwise_binary(lhs, rhs, std::plus<P>());
 }
 
 template<typename P, int D>
 auto operator-(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs)
 {
-    return elemwise_binary(lhs, rhs, std::minus<tensor_t<P, D>>());
+    return elemwise_binary(lhs, rhs, std::minus<P>());
 }
 
 template<typename P, int D>
 auto operator*(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs)
 {
-    return elemwise_binary(lhs, rhs, std::multiplies<tensor_t<P, D>>());
+    return elemwise_binary(lhs, rhs, std::multiplies<P>());
 }
 
 template<typename P, int D>
 auto operator/(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs)
 {
-    return elemwise_binary(lhs, rhs, std::divides<tensor_t<P, D>>());
+    return elemwise_binary(lhs, rhs, std::divides<P>());
 }
 
 AGZM_END

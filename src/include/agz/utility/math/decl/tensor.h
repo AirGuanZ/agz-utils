@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../misc/type_list.h"
+#include "../../misc/type_list.h"
 #include "common.h"
 #include "vec.h"
 
@@ -11,7 +11,7 @@ AGZM_BEGIN
 template<typename P, int D>
 class tensor_t
 {
-    std::unique_ptr<P[]> data_;
+    P *data_;
 
     vec<int, D> shape_;
     int elem_count_;
@@ -24,6 +24,8 @@ class tensor_t
 
     template<typename F>
     tensor_t(from_linear_indexed_func_t, const vec<int, D> &shape, F &&func);
+
+    void destruct();
 
 public:
 
@@ -41,7 +43,7 @@ public:
     static self_t from_indexed_fn(const index_t &shape, F &&func);
    
     template<typename F>
-    static self_t from_lineared_indexed_fn(const index_t &shape, F &&func);
+    static self_t from_linear_indexed_fn(const index_t &shape, F &&func);
 
     static self_t from_array(const index_t &shape, const P *data);
 
@@ -50,6 +52,8 @@ public:
 
     tensor_t<P, D> &operator=(const self_t &copy_from);
     tensor_t<P, D> &operator=(self_t &&move_from) noexcept;
+
+    ~tensor_t();
 
     void initialize(const index_t &shape, const P &init_value = P());
 

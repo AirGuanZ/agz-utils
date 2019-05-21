@@ -24,4 +24,5 @@ void agz::file::write_raw_file(const std::string &filename, const void *data, si
     if(!fout)
         throw std::runtime_error("failed to open file: " + filename);
     fout.write(reinterpret_cast<const char*>(data), byte_size);
+    fout.close();
 }
