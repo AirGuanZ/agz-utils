@@ -28,11 +28,8 @@ inline spinlock_t::spinlock_t(bool init_flag) noexcept
 inline void spinlock_t::lock() noexcept
 {
     bool val = false;
-    while(!core_.compare_exchange_weak(
-        val, true, std::memory_order_acquire))
-    {
+    while(!core_.compare_exchange_weak(val, true, std::memory_order_acquire))
         val = false;
-    }
 }
 
 inline void spinlock_t::unlock() noexcept
