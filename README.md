@@ -7,7 +7,7 @@ Utilities for computer graphics
 In `CMakeLists.txt`:
 
 ```cmake
-ADD_SUBDIRECTORY(path_to_agzm/)
+ADD_SUBDIRECTORY(path_to_agzm/src)
 INCLUDE_DIRECTORIES(${AGZUtils_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES(your_target AGZUtils)
 ```
