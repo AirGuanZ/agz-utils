@@ -30,6 +30,10 @@ public:
     self_t rotate_to_new_x(const axis_t &new_x) const noexcept;
     self_t rotate_to_new_y(const axis_t &new_y) const noexcept;
     self_t rotate_to_new_z(const axis_t &new_z) const noexcept;
+
+    bool in_positive_x_hemisphere(const vec_t &v) const noexcept;
+    bool in_positive_y_hemisphere(const vec_t &v) const noexcept;
+    bool in_positive_z_hemisphere(const vec_t &v) const noexcept;
 };
 
 template<typename T>

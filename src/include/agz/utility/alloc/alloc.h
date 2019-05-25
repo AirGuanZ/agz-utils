@@ -34,4 +34,12 @@ void call_destructor(T &obj) noexcept
     alloc_impl::call_destructor_aux<T, std::is_trivially_destructible_v<T>>::call(obj);
 }
 
+template<typename T>
+void call_destructor(T *arr, size_t num) noexcept
+{
+    assert(arr);
+    for(size_t i = num; i > 0; --i)
+        call_destructor(arr[i - 1]);
+}
+
 } // namespace agz::alloc

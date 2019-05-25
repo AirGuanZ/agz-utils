@@ -81,8 +81,7 @@ tensor_t<P, D>::tensor_t(from_indexed_func_t, const vec<int, D> &shape, F &&func
     P *data = std::allocator<P>().allocate(elem_count_);
     misc::scope_guard_t guard([&]
     {
-        for(int i = 0; i != constructed_count; ++i)
-            alloc::call_destructor(data[i]);
+        alloc::call_destructor(data, constructed_count);
         std::allocator<P>().deallocate(data, elem_count_);
     });
 
@@ -110,8 +109,7 @@ tensor_t<P, D>::tensor_t(from_linear_indexed_func_t, const vec<int, D> &shape, F
     P *data = std::allocator<P>().allocate(elem_count_);
     misc::scope_guard_t guard([&]
     {
-        for(int i = 0; i != constructed_count; ++i)
-            alloc::call_destructor(data[i]);
+        alloc::call_destructor(data, constructed_count);
         std::allocator<P>().deallocate(data, elem_count_);
     });
 

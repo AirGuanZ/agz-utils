@@ -105,4 +105,22 @@ tcoord3<T> operator-(const tcoord3<T> &coord) noexcept
     return tcoord3<T>(-coord.x, -coord.y, -coord.z);
 }
 
+template<typename T>
+bool tcoord3<T>::in_positive_x_hemisphere(const vec_t &v) const noexcept
+{
+    return dot(v, x) > 0;
+}
+
+template<typename T>
+bool tcoord3<T>::in_positive_y_hemisphere(const vec_t &v) const noexcept
+{
+    return dot(v, y) > 0;
+}
+
+template<typename T>
+bool tcoord3<T>::in_positive_z_hemisphere(const vec_t &v) const noexcept
+{
+    return dot(v, z) > 0;
+}
+
 AGZM_END

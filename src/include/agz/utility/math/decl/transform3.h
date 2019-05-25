@@ -34,7 +34,7 @@ public:
     static self_t scale(const tvec3<T> &ratio) noexcept;
     static self_t scale(T x, T y, T z)         noexcept;
 
-    self_t operator*=(const self_t &rhs) const noexcept;
+    self_t operator*=(const self_t &rhs) noexcept;
 
     tvec3<T> apply_to_point (const tvec3<T> &point)  const noexcept;
     tvec3<T> apply_to_vector(const tvec3<T> &vector) const noexcept;

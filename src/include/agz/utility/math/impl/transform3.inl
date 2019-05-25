@@ -79,7 +79,7 @@ typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::scal
 }
 
 template<typename T, bool COLUMN_MAJOR>
-typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::operator*=(const self_t &rhs) const noexcept
+typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::operator*=(const self_t &rhs) noexcept
 {
     mat_ *= rhs.mat_;
     inv_ = rhs.inv_ * inv_;
