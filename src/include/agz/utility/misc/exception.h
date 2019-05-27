@@ -1,11 +1,15 @@
 #pragma once
 
 #include <exception>
-#include <string>
 
 namespace agz::misc
 {
     
+/**
+ * @brief 将e内部的所有异常消息由外往内地提取出来
+ * 
+ * 针对nested exception的设施
+ */
 template<typename TIt>
 void extract_hierarchy_exceptions(const std::exception &e, TIt out_it)
 {
@@ -24,8 +28,14 @@ void extract_hierarchy_exceptions(const std::exception &e, TIt out_it)
     }
 }
 
+/**
+ * @brief 用来抛nested exception的try替代品
+ */
 #define AGZ_HIERARCHY_TRY try {
 
+/**
+ * @brief 把接到的异常用nested exception包一层之后再抛出去
+ */
 #define AGZ_HIERARCHY_WRAP(MSG) \
     } \
     catch(...) \

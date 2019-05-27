@@ -3,6 +3,11 @@
 namespace agz::misc
 {
     
+/**
+ * @brief 不可复制类型
+ * 
+ * 凡继承此类者无默认复制构造/赋值函数
+ */
 class uncopyable_t
 {
 public:

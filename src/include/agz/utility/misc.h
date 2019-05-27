@@ -1,5 +1,6 @@
 #pragma once
 
+#include "misc/bitcast.h"
 #include "misc/exception.h"
 #include "misc/type_list.h"
 #include "misc/scope_guard.h"

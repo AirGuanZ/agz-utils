@@ -1,7 +1,16 @@
 #include <cassert>
-
 #include <agz/utility/file/file_raw.h>
 #include <agz/utility/image/save_image.h>
+
+//============= includes for stb =============
+
+#include <cstdio>
+#include <cstdarg>
+#include <cstdlib>
+#include <cstring>
+#include <cmath>
+
+//============= end includes for stb =============
 
 namespace
 {
@@ -10,7 +19,6 @@ namespace
 #define STBI_MSC_SECURE_CRT
 #endif
 
-#define STBIW_ASSERT
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 

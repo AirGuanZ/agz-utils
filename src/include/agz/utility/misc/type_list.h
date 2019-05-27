@@ -41,22 +41,25 @@ namespace type_list_impl
 
 } // namespace type_list_impl
 
+/**
+ * @brief 类型列表
+ */
 template<typename...Ts>
 class type_list_t
 {
 public:
 
-    static constexpr int length = type_list_impl::length<Ts...>();
-    static constexpr int size   = length;
+    static constexpr int length = type_list_impl::length<Ts...>(); // 类型列表长度
+    static constexpr int size   = length;                          // 类型列表长度
 
     template<int I>
-    using at = typename type_list_impl::at_aux<I, Ts...>::type;
+    using at = typename type_list_impl::at_aux<I, Ts...>::type; // 用下标取类型
 
     template<int...Is>
-    using sublist = type_list_t<at<Is>...>;
+    using sublist = type_list_t<at<Is>...>; // 用下标序列取子列表
 
     template<typename T>
-    static constexpr bool contains = type_list_impl::find_in<T, Ts...>();
+    static constexpr bool contains = type_list_impl::find_in<T, Ts...>(); // 列表中是否包含指定类型
 };
 
 } // namespace misc

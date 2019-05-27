@@ -6,7 +6,10 @@
 
 namespace agz::misc
 {
-    
+   
+/**
+ * @brief 离开作用域时自动执行指定的功能
+ */
 class scope_guard_t : public uncopyable_t
 {
     std::function<void()> func_;
@@ -26,6 +29,9 @@ public:
             func_();
     }
 
+    /**
+     * @brief 提前取消功能的执行
+     */
     void dismiss()
     {
         func_ = std::function<void()>();
