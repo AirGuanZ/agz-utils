@@ -6,7 +6,7 @@
 #include "common.h"
 #include "vec.h"
 
-AGZM_BEGIN
+namespace agz::math {
     
 template<typename P, int D>
 class tensor_t
@@ -114,4 +114,4 @@ auto operator*(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs);
 template<typename P, int D>
 auto operator/(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs);
 
-AGZM_END
+} // namespace agz::math

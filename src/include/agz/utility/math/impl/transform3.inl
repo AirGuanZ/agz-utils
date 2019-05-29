@@ -1,6 +1,6 @@
 #pragma once
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T, bool C>
 ttransform3<T, C>::ttransform3() noexcept
@@ -137,4 +137,4 @@ ttransform3<T, C> operator*(const ttransform3<T, C> &lhs, const ttransform3<T, C
     return ttransform3<T>(lhs.get_mat() * rhs.get_mat(), rhs.get_inv_mat() * lhs.get_mat());
 }
 
-AGZM_END
+} // namespace agz::math

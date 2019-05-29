@@ -1,6 +1,6 @@
 #pragma once
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T>
 tcolor3<T>::tcolor3() noexcept
@@ -282,4 +282,4 @@ tcolor3<T> from_color3b(const color3b &c) noexcept
     return c.map([](unsigned char s) { return s / T(255); });
 }
 
-AGZM_END
+} // namespace agz::math

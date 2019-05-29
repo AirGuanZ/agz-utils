@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-AGZM_BEGIN
+namespace agz::math {
 
 namespace sh_impl
 {
@@ -311,4 +311,4 @@ namespace spherical_harmonics
 
 } // namespace spherical_harmonics
 
-AGZM_END
+} // namespace agz::math

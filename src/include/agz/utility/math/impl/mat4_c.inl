@@ -1,6 +1,6 @@
 #pragma once
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T>
 tmat4_c<T>::tmat4_c(const tvec4<T> &c0, const tvec4<T> &c1, const tvec4<T> &c2, const tvec4<T> &c3) noexcept
@@ -442,4 +442,4 @@ template<typename T> tmat4_c<T> operator*(T lhs, const tmat4_c<T> &rhs) noexcept
     return rhs * lhs;
 }
 
-AGZM_END
+} // namespace agz::math

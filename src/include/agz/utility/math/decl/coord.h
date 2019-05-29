@@ -3,7 +3,7 @@
 #include "common.h"
 #include "vec3.h"
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T>
 class tcoord3
@@ -39,4 +39,4 @@ public:
 template<typename T>
 tcoord3<T> operator-(const tcoord3<T> &coord) noexcept;
 
-AGZM_END
+} // namespace agz::math

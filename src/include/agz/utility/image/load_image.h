@@ -24,7 +24,7 @@ math::tensor_t<math::color3b, 2> load_rgb_from_memory(const void *data, size_t b
 math::tensor_t<math::color4b, 2> load_rgba_from_memory(const void *data, size_t byte_length);
 
 /** 从文件中读取灰度图像 */
-math::tensor_t<math::byte, 2>load_gray_from_file(const std::string &filename);
+math::tensor_t<math::byte, 2> load_gray_from_file(const std::string &filename);
 
 /** 从文件中读取灰度 + alpha图像 */
 math::tensor_t<math::color2b, 2> load_gray_alpha_from_file(const std::string &filename);

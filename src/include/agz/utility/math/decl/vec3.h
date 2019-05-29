@@ -3,7 +3,7 @@
 #include "common.h"
 #include "vec.h"
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T>
 class tvec3
@@ -81,4 +81,4 @@ using vec3f = tvec3<float>;
 using vec3d = tvec3<float>;
 using vec3i = tvec3<float>;
 
-AGZM_END
+} // namespace agz::math

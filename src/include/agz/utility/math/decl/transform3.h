@@ -3,7 +3,7 @@
 #include "common.h"
 #include "mat4_c.h"
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T, bool COLUMN_MAJOR = true>
 class ttransform3
@@ -53,4 +53,4 @@ ttransform3<T, C> operator*(const ttransform3<T, C> &lhs, const ttransform3<T, C
 using transform3f = ttransform3<float>;
 using transform3d = ttransform3<double>;
 
-AGZM_END
+} // namespace agz::math

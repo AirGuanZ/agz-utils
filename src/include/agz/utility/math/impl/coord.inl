@@ -1,6 +1,6 @@
 #pragma once
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T>
 tcoord3<T>::tcoord3() noexcept
@@ -123,4 +123,4 @@ bool tcoord3<T>::in_positive_z_hemisphere(const vec_t &v) const noexcept
     return dot(v, z) > 0;
 }
 
-AGZM_END
+} // namespace agz::math

@@ -8,7 +8,7 @@
 #include "vec3.h"
 #include "vec4.h"
 
-AGZM_BEGIN
+namespace agz::math {
 
 namespace swizzle_impl
 {
@@ -47,4 +47,4 @@ auto swizzle_color(const V &color) noexcept
     return ret_t(swizzle_impl::idx_2_mem<V, Is>(color)...);
 }
 
-AGZM_END
+} // namespace agz::math

@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T>
 tvec3<T>::tvec3() noexcept
@@ -300,4 +300,4 @@ auto cos(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept
     return dot(lhs, rhs) / (lhs.length() * rhs.length());
 }
 
-AGZM_END
+} // namespace agz::math

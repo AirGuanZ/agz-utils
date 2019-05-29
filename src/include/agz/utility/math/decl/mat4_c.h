@@ -3,7 +3,7 @@
 #include "common.h"
 #include "vec4.h"
 
-AGZM_BEGIN
+namespace agz::math {
 
 /**
  * @brief column-major 4x4 matrix
@@ -110,4 +110,4 @@ template<typename T> tmat4_c<T> operator*(T lhs, const tmat4_c<T> &rhs) noexcept
 using mat4f_c = tmat4_c<float>;
 using mat4d_c = tmat4_c<double>;
 
-AGZM_END
+} // namespace agz::math

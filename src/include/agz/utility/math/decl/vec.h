@@ -5,7 +5,7 @@
 #include "../../misc/type_list.h"
 #include "common.h"
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T, int D>
 class tvec
@@ -81,4 +81,4 @@ template<typename T, int D> auto cos(const tvec<T, D> &lhs, const tvec<T, D> &rh
 template<typename T, int D>
 using vec = tvec<T, D>;
 
-AGZM_END
+} // namespace agz::math

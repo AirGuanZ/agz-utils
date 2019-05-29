@@ -5,10 +5,7 @@
 
 #include "../../common/common.h"
 
-#define AGZM_BEGIN namespace agz::math {
-#define AGZM_END   }
-
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
 T clamp(T val, T min_v, T max_v) noexcept
@@ -87,4 +84,4 @@ template<typename T> class tvec4;
 
 template<typename T, int D> class tvec;
 
-AGZM_END
+} // namespace agz::math

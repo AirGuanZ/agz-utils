@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-AGZM_BEGIN
+namespace agz::math {
 
 template<typename T>
 class tcolor3
@@ -76,4 +76,4 @@ color3b to_color3b(const tcolor3<T> &c) noexcept;
 template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 tcolor3<T> from_color3b(const color3b &c) noexcept;
 
-AGZM_END
+} // namespace agz::math

@@ -6,7 +6,7 @@
 #include "../../alloc/alloc.h"
 #include "../../misc/scope_guard.h"
 
-AGZM_BEGIN
+namespace agz::math {
 
 namespace tensor_impl
 {
@@ -419,4 +419,4 @@ auto operator/(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs)
     return elemwise_binary(lhs, rhs, std::divides<P>());
 }
 
-AGZM_END
+} // namespace agz::math
