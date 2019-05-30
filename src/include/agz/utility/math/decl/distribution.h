@@ -52,14 +52,14 @@ public:
      * @brief 以归一化后的prob数组为分布律采样一个1到n-1间的整数
      * @param u [0, 1]间的均匀随机数
      */
-    T sample(F u);
+    T sample(F u) const noexcept;
 
     /**
      * @brief 以归一化后的prob数组为分布律采样一个1到n-1间的整数
      * @param u1 [0, 1]间的均匀随机数
      * @param u2 [0, 1]间的均匀随机数
      */
-    T sample(F u1, F u2);
+    T sample(F u1, F u2) const noexcept;
 };
 
 } // namespace agz::math::distribution

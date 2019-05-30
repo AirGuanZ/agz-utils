@@ -84,7 +84,7 @@ bool alias_sampler_t<F, T>::available() const noexcept
 }
 
 template<typename F, typename T>
-T alias_sampler_t<F, T>::sample(F u)
+T alias_sampler_t<F, T>::sample(F u) const noexcept
 {
     assert(available());
     assert(0 <= u && u <= 1);
@@ -103,7 +103,7 @@ T alias_sampler_t<F, T>::sample(F u)
 }
 
 template<typename F, typename T>
-T alias_sampler_t<F, T>::sample(F u1, F u2)
+T alias_sampler_t<F, T>::sample(F u1, F u2) const noexcept
 {
     assert(available());
     assert(0 <= u1 && u1 <= 1);
