@@ -17,6 +17,49 @@ T uniform_integer(T beg, T end, F u)
 }
 
 template<typename F, typename T>
+bsearch_sampler_t<F, T>::bsearch_sampler_t(const F *prob, T n)
+{
+    initialize(prob, n);
+}
+
+template<typename F, typename T>
+void bsearch_sampler_t<F, T>::initialize(const F *prob, T n)
+{
+    assert(n > 0);
+
+    partial_sum_.clear();
+    std::partial_sum(prob, prob + n, std::back_inserter(partial_sum_));
+
+    F ratio = 1 / partial_sum_.back();
+    for(auto &p : partial_sum_)
+        p *= ratio;
+}
+
+template<typename F, typename T>
+bool bsearch_sampler_t<F, T>::available() const noexcept
+{
+    return !partial_sum_.empty();
+}
+
+template<typename F, typename T>
+void bsearch_sampler_t<F, T>::destroy()
+{
+    partial_sum_.clear();
+}
+
+template<typename F, typename T>
+T bsearch_sampler_t<F, T>::sample(F u) const noexcept
+{
+    assert(available());
+    assert(0 <= u && u <= 1);
+
+    auto upper = std::upper_bound(partial_sum_.begin(), partial_sum_.end());
+    if(upper == partial_sum_.end())
+        return static_cast<T>(partial_sum_.size() - 1);
+    return static_cast<T>(upper - partial_sum_.begin());
+}
+
+template<typename F, typename T>
 alias_sampler_t<F, T>::alias_sampler_t(const F *prob, T n)
 {
     initialize(prob, n);
@@ -26,6 +69,8 @@ template<typename F, typename T>
 void alias_sampler_t<F, T>::initialize(const F *prob, T n)
 {
     // https://en.wikipedia.org/wiki/Alias_method
+
+    assert(n > 0);
 
     F sum = std::accumulate(prob, prob + n, F(0));
     F ratio = n / sum;
@@ -65,9 +110,9 @@ void alias_sampler_t<F, T>::initialize(const F *prob, T n)
             unders_.push_back(over);
 
         for(auto i : overs_)
-            table_[i].accept_prob = 100;
+            table_[i].accept_prob = 1;
         for(auto i : unders_)
-            table_[i].accept_prob = 100;
+            table_[i].accept_prob = 1;
     }
 }
 
@@ -107,6 +152,7 @@ T alias_sampler_t<F, T>::sample(F u1, F u2) const noexcept
 {
     assert(available());
     assert(0 <= u1 && u1 <= 1);
+    assert(0 <= u2 && u2 <= 1);
 
     T n = static_cast<T>(table_.size());
     F nu = n * u1;
