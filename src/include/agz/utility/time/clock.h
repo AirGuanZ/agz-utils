@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <chrono>
 
@@ -6,7 +6,7 @@ namespace agz::time
 {
    
 /**
- * @brief ¸ß¾«¶È¼ÆÊ±Æ÷
+ * @brief é«˜ç²¾åº¦è®¡æ—¶å™¨
  */
 class clock_t
 {
@@ -16,19 +16,19 @@ class clock_t
 
 public:
 
-    /** ±»¹¹ÔìÊ±Ëã×÷Ò»´ÎÖØÆô */
+    /** è¢«æ„é€ æ—¶ç®—ä½œä¸€æ¬¡é‡å¯ */
     clock_t() noexcept;
 
-    /** ÖØÆô¼ÆÊ± */
+    /** é‡å¯è®¡æ—¶ */
     void restart() noexcept;
 
-    /** ÉÏÒ»´ÎÖØÆôÒÔÀ´µÄÃëÊı */
+    /** ä¸Šä¸€æ¬¡é‡å¯ä»¥æ¥çš„ç§’æ•° */
     uint64_t s() const noexcept;
 
-    /** ÉÏÒ»´ÎÖØÆôÒÔÀ´µÄºÁÃëÊı */
+    /** ä¸Šä¸€æ¬¡é‡å¯ä»¥æ¥çš„æ¯«ç§’æ•° */
     uint64_t ms() const noexcept;
 
-    /** ÉÏÒ»´ÎÖØÆôÒÔÀ´µÄÎ¢ÃëÊı */
+    /** ä¸Šä¸€æ¬¡é‡å¯ä»¥æ¥çš„å¾®ç§’æ•° */
     uint64_t us() const noexcept;
 };
 
