@@ -8,3 +8,4 @@
 #include "./string.h"
 #include "./texture.h"
 #include "./thread.h"
+#include "./time.h"
