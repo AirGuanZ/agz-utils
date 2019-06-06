@@ -56,6 +56,15 @@ T determinant(T m00, T m01, T m02, T m03,
 template<typename T>
 constexpr std::enable_if_t<std::is_floating_point_v<T>, T> PI = T(3.141592653589793238462643383);
 
+template<typename T>
+constexpr T invPI = 1 / PI<T>;
+
+template<typename T>
+constexpr T inv2PI = 1 / (2 * PI<T>);
+
+template<typename T>
+constexpr T inv4PI = 1 / (4 * PI<T>);
+
 constexpr float  PI_f = PI<float>;
 constexpr double PI_d = PI<double>;
 

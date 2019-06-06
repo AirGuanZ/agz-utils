@@ -108,6 +108,43 @@ tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_normal(const tvec3<T> &normal) c
 }
 
 template<typename T, bool COLUMN_MAJOR>
+tcoord3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_coord(const tcoord3<T> &coord) const noexcept
+{
+    return tcoord3<T>(apply_to_vector(coord.x),
+                      apply_to_vector(coord.y),
+                      apply_to_vector(coord.z));
+}
+
+template<typename T, bool COLUMN_MAJOR>
+tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_point(const tvec3<T> &point) const noexcept
+{
+    auto p4 = inv_ * tvec4<T>(point.x, point.y, point.z, 1);
+    return tvec3<T>(p4.x, p4.y, p4.z) / p4.w;
+}
+
+template<typename T, bool COLUMN_MAJOR>
+tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_vector(const tvec3<T> &vector) const noexcept
+{
+    auto v4 = inv_ * tvec4<T>(vector.x, vector.y, vector.z, 0);
+    return tvec3<T>(v4.x, v4.y, v4.z);
+}
+
+template<typename T, bool COLUMN_MAJOR>
+tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_normal(const tvec3<T> &normal) const noexcept
+{
+    auto v4 = (mat_.t() * tvec4<T>(normal.x, normal.y, normal.z, 0)).normalize();
+    return tvec3<T>(v4.x, v4.y, v4.z).normalize();
+}
+
+template<typename T, bool COLUMN_MAJOR>
+tcoord3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_coord(const tcoord3<T> &coord) const noexcept
+{
+    return tcoord3<T>(apply_inverse_to_vector(coord.x),
+                      apply_inverse_to_vector(coord.y),
+                      apply_inverse_to_vector(coord.z));
+}
+
+template<typename T, bool COLUMN_MAJOR>
 typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::inv() const noexcept
 {
     return self_t(inv_, mat_);
@@ -135,6 +172,33 @@ template<typename T, bool C>
 ttransform3<T, C> operator*(const ttransform3<T, C> &lhs, const ttransform3<T, C> &rhs) noexcept
 {
     return ttransform3<T>(lhs.get_mat() * rhs.get_mat(), rhs.get_inv_mat() * lhs.get_mat());
+}
+
+template<typename F>
+std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept
+{
+    static_assert(std::is_floating_point_v<F>);
+
+    F z = 1 - 2 * u1;
+    F phi = 2 * PI<F> * u2;
+    F r = std::sqrt((std::max)(F(0), 1 - z * z));
+    F x = r * std::cos(phi);
+    F y = r * std::sin(phi);
+    return { { x, y, z }, inv4PI<F> };
+}
+
+template<typename F>
+std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept
+{
+    static_assert(std::is_floating_point_v<F>);
+
+    F z = u1;
+    F phi = 2 * PI<F> * u2;
+    F r = std::sqrt((std::max)(F(0), 1 - z * z));
+    F x = r * std::cos(phi);
+    F y = r * std::sin(phi);
+
+    return { { x, y, z }, inv2PI<F> };
 }
 
 } // namespace agz::math

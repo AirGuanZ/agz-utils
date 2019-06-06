@@ -1,7 +1,9 @@
 #pragma once
 
 #include "common.h"
+#include "coord.h"
 #include "mat4_c.h"
+#include "vec3.h"
 
 namespace agz::math {
 
@@ -36,9 +38,15 @@ public:
 
     self_t operator*=(const self_t &rhs) noexcept;
 
-    tvec3<T> apply_to_point (const tvec3<T> &point)  const noexcept;
-    tvec3<T> apply_to_vector(const tvec3<T> &vector) const noexcept;
-    tvec3<T> apply_to_normal(const tvec3<T> &normal) const noexcept;
+    tvec3<T>   apply_to_point (const tvec3<T> &point)   const noexcept;
+    tvec3<T>   apply_to_vector(const tvec3<T> &vector)  const noexcept;
+    tvec3<T>   apply_to_normal(const tvec3<T> &normal)  const noexcept;
+    tcoord3<T> apply_to_coord (const tcoord3<T> &coord) const noexcept;
+    
+    tvec3<T>   apply_inverse_to_point (const tvec3<T> &point)   const noexcept;
+    tvec3<T>   apply_inverse_to_vector(const tvec3<T> &vector)  const noexcept;
+    tvec3<T>   apply_inverse_to_normal(const tvec3<T> &normal)  const noexcept;
+    tcoord3<T> apply_inverse_to_coord (const tcoord3<T> &coord) const noexcept;
 
     self_t inv()     const noexcept;
     self_t inverse() const noexcept;
