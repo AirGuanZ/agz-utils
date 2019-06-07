@@ -165,4 +165,23 @@ T alias_sampler_t<F, T>::sample(F u1, F u2) const noexcept
     return table_[i].another_idx;
 }
 
+template<typename F>
+std::pair<tvec3<F>, F> uniform_on_cone(F max_cos_theta, F u1, F u2) noexcept
+{
+    F cos_theta = (1 - u1) + u1 * max_cos_theta;
+    F sin_theta = std::sqrt((std::max)(F(0), 1 - cos_theta * cos_theta));
+    F phi = 2 * PI<F> * u2;
+    F pdf = 1 / (2 * PI<F> * (1 - max_cos_theta));
+    return {
+        { std::cos(phi) * sin_theta, std::sin(phi) * sin_theta, cos_theta },
+        pdf
+    };
+}
+
+template<typename F>
+F uniform_on_cone_pdf(F max_cos_theta) noexcept
+{
+    return 1 / (2 * PI<F> * (1 - max_cos_theta));
+}
+
 } // namespace agz::math::distribution

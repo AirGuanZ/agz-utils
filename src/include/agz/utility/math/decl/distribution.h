@@ -101,11 +101,37 @@ template<typename F>
 std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept;
 
 /**
+ * @brief 单位球面上的均匀分布对应的pdf（w.r.t. solid angle）
+ */
+template<typename F>
+constexpr F uniform_on_sphere_pdf = 1 / (4 * PI<F>);
+
+/**
  * @brief 将[0, 1]^2上的均匀分布转换为单位半球面上的均匀分布（w.r.t. solid angle）
  * 
  * （+z那一侧的单位球面）
  */
 template<typename F>
 std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept;
+
+/**
+ * @brief 单位半球面上的均匀分布对应的pdf（w.r.t. solid angle）
+ */
+template<typename F>
+constexpr F uniform_on_hemisphere_pdf = 1 / (2 * PI<F>);
+
+/**
+ * @brief 把[0, 1]^2上的均匀分布转换为以maxCosTheta为顶角的单位球面上的锥体内的方向上的均匀分布（w.r.t. solid angle）
+ * 
+ * @param max_cos_theta 以+z为锥体中心，theta是方向向量与+z的夹角
+ */
+template<typename F>
+std::pair<tvec3<F>, F> uniform_on_cone(F max_cos_theta, F u1, F u2) noexcept;
+
+/**
+ * @brief 把[0, 1]^2上的均匀分布转换为以maxCosTheta为顶角的单位球面上的锥体内的方向上的均匀分布对应的pdf（w.r.t. solid angle）
+ */
+template<typename F>
+F uniform_on_cone_pdf(F max_cos_theta) noexcept;
 
 } // namespace agz::math::distribution
