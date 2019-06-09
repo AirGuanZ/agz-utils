@@ -134,4 +134,18 @@ std::pair<tvec3<F>, F> uniform_on_cone(F max_cos_theta, F u1, F u2) noexcept;
 template<typename F>
 F uniform_on_cone_pdf(F max_cos_theta) noexcept;
 
+/**
+ * @brief 将[0, 1]^2上的均匀分布转换为单位半球面上以z为权重的分布（w.r.t. solid angle）
+ * 
+ * （+z那一侧的单位球面）
+ */
+template<typename F>
+std::pair<tvec3<F>, F> zweighted_on_hemisphere(F u1, F u2) noexcept;
+
+/**
+ * @brief 单位半球面上以z为权重的分布对应的pdf（w.r.t. solid angle）
+ */
+template<typename F>
+F zweighted_on_hemisphere_pdf(F z) noexcept;
+
 } // namespace agz::math::distribution

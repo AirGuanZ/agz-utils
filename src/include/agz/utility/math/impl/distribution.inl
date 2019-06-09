@@ -166,6 +166,33 @@ T alias_sampler_t<F, T>::sample(F u1, F u2) const noexcept
 }
 
 template<typename F>
+std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept
+{
+    static_assert(std::is_floating_point_v<F>);
+
+    F z = 1 - 2 * u1;
+    F phi = 2 * PI<F> * u2;
+    F r = std::sqrt((std::max)(F(0), 1 - z * z));
+    F x = r * std::cos(phi);
+    F y = r * std::sin(phi);
+    return { { x, y, z }, inv4PI<F> };
+}
+
+template<typename F>
+std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept
+{
+    static_assert(std::is_floating_point_v<F>);
+
+    F z = u1;
+    F phi = 2 * PI<F> * u2;
+    F r = std::sqrt((std::max)(F(0), 1 - z * z));
+    F x = r * std::cos(phi);
+    F y = r * std::sin(phi);
+
+    return { { x, y, z }, inv2PI<F> };
+}
+
+template<typename F>
 std::pair<tvec3<F>, F> uniform_on_cone(F max_cos_theta, F u1, F u2) noexcept
 {
     F cos_theta = (1 - u1) + u1 * max_cos_theta;
@@ -182,6 +209,38 @@ template<typename F>
 F uniform_on_cone_pdf(F max_cos_theta) noexcept
 {
     return 1 / (2 * PI<F> * (1 - max_cos_theta));
+}
+
+template<typename F>
+std::pair<tvec3<F>, F> zweighted_on_hemisphere(F u1, F u2) noexcept
+{
+    tvec2<F> sam;
+    u1 = 2 * u1 - 1;
+    u2 = 2 * u2 - 1;
+    if(u1 || u2)
+    {
+        F theta, r;
+        if(std::abs(u1) > std::abs(u2))
+        {
+            r = u1;
+            theta = F(0.25) * PI<F> * (u2 / u1);
+        }
+        else
+        {
+            r = u2;
+            theta = F(0.5) * PI<F> -F(0.25) * PI<F> * (u1 / u2);
+        }
+        sam = r * tvec2<F>(std::cos(theta), std::sin(theta));
+    }
+
+    F z = std::sqrt(std::max(F(0), 1 - sam.length_square()));
+    return { { sam.x, sam.y, z }, z * invPI<F> };
+}
+
+template<typename F>
+F zweighted_on_hemisphere_pdf(F z) noexcept
+{
+    return z > 0 ? z * invPI<F> : 0;
 }
 
 } // namespace agz::math::distribution

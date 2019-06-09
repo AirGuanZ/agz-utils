@@ -174,31 +174,4 @@ ttransform3<T, C> operator*(const ttransform3<T, C> &lhs, const ttransform3<T, C
     return ttransform3<T>(lhs.get_mat() * rhs.get_mat(), rhs.get_inv_mat() * lhs.get_mat());
 }
 
-template<typename F>
-std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept
-{
-    static_assert(std::is_floating_point_v<F>);
-
-    F z = 1 - 2 * u1;
-    F phi = 2 * PI<F> * u2;
-    F r = std::sqrt((std::max)(F(0), 1 - z * z));
-    F x = r * std::cos(phi);
-    F y = r * std::sin(phi);
-    return { { x, y, z }, inv4PI<F> };
-}
-
-template<typename F>
-std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept
-{
-    static_assert(std::is_floating_point_v<F>);
-
-    F z = u1;
-    F phi = 2 * PI<F> * u2;
-    F r = std::sqrt((std::max)(F(0), 1 - z * z));
-    F x = r * std::cos(phi);
-    F y = r * std::sin(phi);
-
-    return { { x, y, z }, inv2PI<F> };
-}
-
 } // namespace agz::math
