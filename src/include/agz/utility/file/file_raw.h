@@ -17,4 +17,9 @@ std::vector<unsigned char> read_raw_file(const std::string &filename);
  */
 void write_raw_file(const std::string &filename, const void *data, size_t byte_size);
 
+/**
+ * @brief 读取一个文本文件的全部内容
+ */
+std::string read_txt_file(const std::string &filename);
+
 } // namespace agz::file

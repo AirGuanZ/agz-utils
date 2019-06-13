@@ -8,6 +8,52 @@
 namespace agz::stdstr
 {
 
+inline char is_lower(char c) noexcept
+{
+    return 'a' <= c && c <= 'z';
+}
+
+inline char is_upper(char c) noexcept
+{
+    return 'A' <= c && c <= 'Z';
+}
+
+inline char to_lower(char c) noexcept
+{
+    return is_upper(c) ? c - 'A' + 'a' : c;
+}
+
+inline char to_upper(char c) noexcept
+{
+    return  is_lower(c) ? c - 'a' + 'A' : c;
+}
+
+inline void to_lower_(std::string &s) noexcept
+{
+    for(char &c : s)
+        c = to_lower(c);
+}
+
+inline void to_upper_(std::string &s) noexcept
+{
+    for(char &c : s)
+        c = to_upper(c);
+}
+
+inline std::string to_lower(std::string_view str) noexcept
+{
+    std::string ret(str);
+    to_lower_(ret);
+    return ret;
+}
+
+inline std::string to_upper(std::string_view str) noexcept
+{
+    std::string ret(str);
+    to_upper_(ret);
+    return ret;
+}
+
 inline bool starts_with(std::string_view str, std::string_view prefix) noexcept
 {
     return str.substr(0, prefix.size()) == prefix;
@@ -111,20 +157,6 @@ std::string join(std::string_view joiner, TIt begin, TIt end)
     return ret;
 }
 
-inline std::vector<std::string> split(std::string_view src, char splitter, bool rm_empty_result)
-{
-    std::vector<std::string> ret;
-    split(src, splitter, std::back_inserter(ret), rm_empty_result);
-    return ret;
-}
-
-inline std::vector<std::string> split(std::string_view src, std::string_view splitter, bool rm_empty_result)
-{
-    std::vector<std::string> ret;
-    split(src, splitter, std::back_inserter(ret), rm_empty_result);
-    return ret;
-}
-
 template<typename TIt>
 size_t split(std::string_view src, char splitter, TIt out_iterator, bool rm_empty_result)
 {
@@ -170,6 +202,20 @@ size_t split(std::string_view src, std::string_view splitter, TIt out_iterator, 
 
         beg = end + splitter.size();
     }
+    return ret;
+}
+
+inline std::vector<std::string> split(std::string_view src, char splitter, bool rm_empty_result)
+{
+    std::vector<std::string> ret;
+    split(src, splitter, std::back_inserter(ret), rm_empty_result);
+    return ret;
+}
+
+inline std::vector<std::string> split(std::string_view src, std::string_view splitter, bool rm_empty_result)
+{
+    std::vector<std::string> ret;
+    split(src, splitter, std::back_inserter(ret), rm_empty_result);
     return ret;
 }
 

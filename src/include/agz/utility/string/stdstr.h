@@ -6,6 +6,18 @@
 
 namespace agz::stdstr
 {
+
+inline char is_lower(char c) noexcept;
+inline char is_upper(char c) noexcept;
+
+inline char to_lower(char c) noexcept;
+inline char to_upper(char c) noexcept;
+
+inline void to_lower_(std::string &s) noexcept;
+inline void to_upper_(std::string &s) noexcept;
+
+inline std::string to_lower(std::string_view str) noexcept;
+inline std::string to_upper(std::string_view str) noexcept;
    
 inline bool starts_with(std::string_view str, std::string_view prefix) noexcept;
 inline bool ends_with  (std::string_view str, std::string_view suffix) noexcept;

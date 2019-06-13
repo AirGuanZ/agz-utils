@@ -1,4 +1,5 @@
 #include <fstream>
+#include <sstream>
 
 #include <agz/utility/file/file_raw.h>
 
@@ -25,4 +26,14 @@ void agz::file::write_raw_file(const std::string &filename, const void *data, si
         throw std::runtime_error("failed to open file: " + filename);
     fout.write(reinterpret_cast<const char*>(data), byte_size);
     fout.close();
+}
+
+std::string agz::file::read_txt_file(const std::string &filename)
+{
+    std::ifstream fin(filename, std::ios_base::in);
+    if(!fin)
+        throw std::runtime_error("failed to open text file: " + filename);
+    std::stringstream sst;
+    sst << fin.rdbuf();
+    return sst.str();
 }
