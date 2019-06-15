@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../texture2d.h"
-
 namespace agz::texture
 {
 
@@ -14,7 +12,7 @@ texture2d_t<T>::texture2d_t(int h, int w, const texel_t *data)
 
 template<typename T>
 texture2d_t<T>::texture2d_t(const math::vec2i &size, const texel_t *data)
-    : data_(size, data)
+    : data_({ size[1], size[0] }, data)
 {
 
 }
@@ -28,7 +26,7 @@ texture2d_t<T>::texture2d_t(int h, int w, uninitialized_t)
 
 template<typename T>
 texture2d_t<T>::texture2d_t(const math::vec2i &size, uninitialized_t)
-    : data_(size, UNINIT)
+    : data_({ size[1], size[0] }, UNINIT)
 {
     
 }
@@ -42,7 +40,7 @@ texture2d_t<T>::texture2d_t(int h, int w, const texel_t &init_texel)
 
 template<typename T>
 texture2d_t<T>::texture2d_t(const math::vec2i &size, const texel_t &init_texel)
-    : data_(size, init_texel)
+    : data_({ size[1], size[0] }, init_texel)
 {
     
 }
@@ -69,7 +67,7 @@ texture2d_t<T>::texture2d_t(self_t &&move_from) noexcept
 }
 
 template<typename T>
-typename texture2d_t<T>::self_t& texture2d_t<T>::operator=(self_t &&move_from) noexcept
+texture2d_t<T> &texture2d_t<T>::operator=(self_t &&move_from) noexcept
 {
     data_ = std::move(move_from.data_);
     return *this;

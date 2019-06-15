@@ -185,15 +185,16 @@ tensor_t<P, D>::tensor_t(const self_t &copy_from)
 
 template<typename P, int D>
 tensor_t<P, D>::tensor_t(self_t &&move_from) noexcept
+    : tensor_t()
 {
-    swap(move_from);
+    this->swap(move_from);
 }
 
 template<typename P, int D>
 tensor_t<P, D> &tensor_t<P, D>::operator=(const self_t &copy_from)
 {
     self_t t(copy_from);
-    swap(t);
+    this->swap(t);
     return *this;
 }
 

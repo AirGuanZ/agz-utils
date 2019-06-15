@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <iterator>
+#include <sstream>
 
 #include "../../misc/type_list.h"
 
@@ -277,6 +278,32 @@ T from_string(const std::string &str)
     >;
     static_assert(supported_types::contains<T>, "unsupported dst type by agz::stdstr::from_string");
     return stdstr_impl::from_string_impl<T>(str);
+}
+
+namespace stdstr_impl
+{
+
+    template<typename Arg>
+    std::string concat_impl(std::stringstream &sst, Arg &&arg)
+    {
+        sst << std::forward<Arg>(arg);
+        return sst.str();
+    }
+    
+    template<typename Arg, typename Next, typename...Others>
+    std::string concat_impl(std::stringstream &sst, Arg &&arg, Next &&next, Others&&...others)
+    {
+        sst << std::forward<Arg>(arg);
+        return concat_impl(sst, std::forward<Next>(next), std::forward<Others>(others)...);
+    }
+
+} // namespace stdstr_impl
+
+template<typename...Args>
+std::string cat(Args&&...args)
+{
+    std::stringstream sst;
+    return stdstr_impl::concat_impl(sst, std::forward<Args>(args)...);
 }
 
 } // namespace agz::stdstr

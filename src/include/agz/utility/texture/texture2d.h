@@ -60,3 +60,5 @@ protected:
 };
 
 } // namespace agz::texture
+
+#include "impl/texture2d.inl"

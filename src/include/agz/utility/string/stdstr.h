@@ -50,6 +50,9 @@ inline std::string replace(std::string_view str, std::string_view old_seg, std::
 template<typename T>
 T from_string(const std::string &str);
 
+template<typename...Args>
+std::string cat(Args&&...args);
+
 } // namespace agz::stdstr
 
 #include "impl/stdstr.inl"
