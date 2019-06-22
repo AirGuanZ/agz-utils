@@ -12,7 +12,7 @@ texture2d_t<T>::texture2d_t(int h, int w, const texel_t *data)
 
 template<typename T>
 texture2d_t<T>::texture2d_t(const math::vec2i &size, const texel_t *data)
-    : data_({ size[1], size[0] }, data)
+    : data_({ size[0], size[1] }, data)
 {
 
 }
@@ -26,7 +26,7 @@ texture2d_t<T>::texture2d_t(int h, int w, uninitialized_t)
 
 template<typename T>
 texture2d_t<T>::texture2d_t(const math::vec2i &size, uninitialized_t)
-    : data_({ size[1], size[0] }, UNINIT)
+    : data_({ size[0], size[1] }, UNINIT)
 {
     
 }
@@ -40,7 +40,7 @@ texture2d_t<T>::texture2d_t(int h, int w, const texel_t &init_texel)
 
 template<typename T>
 texture2d_t<T>::texture2d_t(const math::vec2i &size, const texel_t &init_texel)
-    : data_({ size[1], size[0] }, init_texel)
+    : data_({ size[0], size[1] }, init_texel)
 {
     
 }

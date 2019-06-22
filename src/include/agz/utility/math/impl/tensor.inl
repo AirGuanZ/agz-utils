@@ -79,10 +79,12 @@ tensor_t<P, D>::tensor_t(from_indexed_func_t, const vec<int, D> &shape, F &&func
 
     int constructed_count = 0;
     P *data = std::allocator<P>().allocate(elem_count_);
+    //P *data = operator new[](sizeof(P), static_cast<std::align_val_t>(alignof(P)));
     misc::scope_guard_t guard([&]
     {
         alloc::call_destructor(data, constructed_count);
         std::allocator<P>().deallocate(data, elem_count_);
+        //operator delete[](elem_count_, static_cast<std::align_val_t>(alignof(P)));
     });
 
     index_t index(0);
@@ -256,6 +258,7 @@ P &tensor_t<P, D>::at(const index_t &index) noexcept
 {
     assert(is_available());
     int linear_index = tensor_impl::to_linear_index_aux<D>::eval(shape_, index);
+    assert(linear_index < elem_count_);
     return data_[linear_index];
 }
 
@@ -264,6 +267,7 @@ const P &tensor_t<P, D>::at(const index_t &index) const noexcept
 {
     assert(is_available());
     int linear_index = tensor_impl::to_linear_index_aux<D>::eval(shape_, index);
+    assert(linear_index < elem_count_);
     return data_[linear_index];
 }
 
