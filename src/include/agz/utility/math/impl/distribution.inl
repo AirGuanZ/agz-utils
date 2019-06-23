@@ -228,7 +228,7 @@ std::pair<tvec3<F>, F> zweighted_on_hemisphere(F u1, F u2) noexcept
         else
         {
             r = u2;
-            theta = F(0.5) * PI<F> -F(0.25) * PI<F> * (u1 / u2);
+            theta = F(0.5) * PI<F> - F(0.25) * PI<F> * (u1 / u2);
         }
         sam = r * tvec2<F>(std::cos(theta), std::sin(theta));
     }
