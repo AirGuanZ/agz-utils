@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./platform.h"
+#include "../system/platform.h"
 
 namespace agz::misc
 {

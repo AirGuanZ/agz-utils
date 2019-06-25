@@ -1,4 +1,4 @@
-#include <agz/utility/misc/platform.h>
+#include <agz/utility/system/platform.h>
 #include <agz/utility/system/shell.h>
 
 #ifdef AGZ_OS_WIN32
