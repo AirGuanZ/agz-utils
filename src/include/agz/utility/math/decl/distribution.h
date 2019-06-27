@@ -148,4 +148,10 @@ std::pair<tvec3<F>, F> zweighted_on_hemisphere(F u1, F u2) noexcept;
 template<typename F>
 F zweighted_on_hemisphere_pdf(F z) noexcept;
 
+/**
+ * @brief 将[0, 1]^2上的均匀分布转换为三角形面片上的均匀分布，返回barycentric coordinate
+ */
+template<typename F>
+tvec2<F> uniform_on_triangle(F u1, F u2) noexcept;
+
 } // namespace agz::math::distribution

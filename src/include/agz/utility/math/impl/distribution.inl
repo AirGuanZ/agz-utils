@@ -243,4 +243,11 @@ F zweighted_on_hemisphere_pdf(F z) noexcept
     return z > 0 ? z * invPI<F> : 0;
 }
 
+template<typename F>
+tvec2<F> uniform_on_triangle(F u1, F u2) noexcept
+{
+    F t = std::sqrt(u1);
+    return { 1 - t, t * u2 };
+}
+
 } // namespace agz::math::distribution
