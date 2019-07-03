@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <chrono>
 #include <iostream>
@@ -7,14 +7,14 @@ namespace agz::console
 {
 
 /**
- * @brief ÊÊÓÃÓÚÖÕ¶Ë×Ö·û½çÃæµÄ½ø¶ÈÌõ
+ * @brief é€‚ç”¨äºç»ˆç«¯å­—ç¬¦ç•Œé¢çš„è¿›åº¦æ¡
  * 
- * »ù±¾Ê¹ÓÃÁ÷³Ì£º¹¹ÔìÊ±È·¶¨×ÜÈÎÎñÊı¡¢½ø¶ÈÌõ³¤¶ÈÒÔ¼°ÓÃÓÚÏÔÊ¾µÄ×Ö·û
- * Ê¹ÓÃdisplayÀ´ÖØ»æ½ø¶ÈÌõ
- * Ê¹ÓÃdoneÀ´¹Ø±Õ½ø¶ÈÌõ
- * Ê¹ÓÃoperator++Ê¹ÒÑÍê³ÉµÄÈÎÎñÊı+1
+ * åŸºæœ¬ä½¿ç”¨æµç¨‹ï¼šæ„é€ æ—¶ç¡®å®šæ€»ä»»åŠ¡æ•°ã€è¿›åº¦æ¡é•¿åº¦ä»¥åŠç”¨äºæ˜¾ç¤ºçš„å­—ç¬¦
+ * ä½¿ç”¨displayæ¥åˆ·æ–°è¿›åº¦æ¡
+ * ä½¿ç”¨doneæ¥å…³é—­è¿›åº¦æ¡
+ * ä½¿ç”¨operator++ä½¿å·²å®Œæˆçš„ä»»åŠ¡æ•°+1
  */
-class ProgressBar
+class progress_bar_t
 {
     int finished_;
     int total_;
@@ -27,13 +27,13 @@ class ProgressBar
 
 public:
 
-    ProgressBar(int total, int width, char complete = '#', char incomplete = ' ')
+    progress_bar_t(int total, int width, char complete = '#', char incomplete = ' ')
         : finished_(0), total_(total), width_(width), complete_(complete), incomplete_(incomplete)
     {
 
     }
 
-    ProgressBar &operator++()
+    progress_bar_t &operator++()
     {
         ++finished_;
         return *this;
@@ -75,9 +75,9 @@ public:
 };
 
 /**
- * @brief »ù±¾Í¬ProgressBar£¬Ö»²»¹ıÖ±½ÓÒÔÒÑÍê³ÉµÄ°Ù·Ö±ÈÎª²ÎÊı
+ * @brief åŸºæœ¬åŒprogress_bar_tï¼Œåªä¸è¿‡ç›´æ¥ä»¥å·²å®Œæˆçš„ç™¾åˆ†æ¯”ä¸ºå‚æ•°
  */
-class ProgressBarF
+class progress_bar_f_t
 {
     float percent_;
 
@@ -89,7 +89,7 @@ class ProgressBarF
 
 public:
 
-    ProgressBarF(int width, char complete = '#', char incomplete = ' ')
+    progress_bar_f_t(int width, char complete = '#', char incomplete = ' ')
         : percent_(0), width_(width), complete_(complete), incomplete_(incomplete)
     {
 

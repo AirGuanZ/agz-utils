@@ -5,6 +5,7 @@
 namespace agz::misc
 {
     
+/** @brief 用于提示编译器这是一条不可到达分支 */
 [[noreturn]] inline void unreachable()
 {
 #if defined(AGZ_CC_MSVC)

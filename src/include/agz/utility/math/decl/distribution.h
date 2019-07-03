@@ -12,6 +12,11 @@ namespace agz::math::distribution
 template<typename T, typename F, typename = std::enable_if_t<std::is_integral_v<T> && std::is_floating_point_v<F>>>
 T uniform_integer(T beg, T end, F u);
 
+/**
+ * @brief 基于二分搜索在常数时间内按离散分布律进行采样
+ *
+ * 参见 https://en.wikipedia.org/wiki/Alias_methods
+ */
 template<typename F, typename T = int>
 class bsearch_sampler_t
 {
@@ -45,7 +50,7 @@ public:
 };
 
 /**
- * @brief 常数时间按离散分布律进行采样
+ * @brief 基于Alias Method在常数时间内按离散分布律进行采样
  * 
  * 参见 https://en.wikipedia.org/wiki/Alias_methods
  */

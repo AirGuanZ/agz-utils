@@ -55,9 +55,7 @@ TEST_CASE("vec")
 
     SECTION("swizzle")
     {
-        REQUIRE(swizzle_vec<2, 1, 0>(vec4f(0, 1, 2, 3)) == vec3f(2, 1, 0));
         REQUIRE(vec3f(0, 1, 2).yyz() == vec3f(1, 1, 2));
-
         REQUIRE(color4d(0, 1, 2, 3).rggb() == color4d{ 0, 1, 1, 2 });
     }
 }

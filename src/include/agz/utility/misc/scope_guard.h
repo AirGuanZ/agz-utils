@@ -41,7 +41,7 @@ public:
 /**
  * @brief 定义一个自动命名的scope guard，离开定义作用域时自动调用指定的操作
  * 
- * 由于命名是根据行号自动进行的，很难对其调用dismiss操作。如有此需要，可显式使用 AGZ::ScopeGuard
+ * 由于命名是根据行号自动进行的，很难对其调用dismiss操作。如有此需要，可显式使用 agz::scope_guard_t
  */
 #define AGZ_SCOPE_GUARD(X)             AGZ_SCOPE_GUARD_IMPL0(X, __LINE__)
 #define AGZ_SCOPE_GUARD_IMPL0(X, LINE) AGZ_SCOPE_GUARD_IMPL1(X, LINE)

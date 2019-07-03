@@ -14,7 +14,7 @@ namespace agz::alloc
 /**
  * @brief 用于统一管理对象生命周期
  * 
- * 可以将一个已有对象及其释放方式托管给releaset_t的实例，也可以让一个releaser_t实例创建并持有对象或对象数组
+ * 可以将一个已有对象及其释放方式托管给releaser_t实例，也可以让一个releaser_t实例创建并持有新的对象或对象数组
  */
 class releaser_t : public misc::uncopyable_t
 {

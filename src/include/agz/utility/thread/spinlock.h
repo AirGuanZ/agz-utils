@@ -7,6 +7,9 @@
 namespace agz::thread
 {
     
+/**
+ * @brief 标准自旋锁，没啥好说的，可用于std::lock_guard
+ */
 class spinlock_t : public misc::uncopyable_t
 {
     std::atomic<bool> core_;

@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "common.h"
+#include <agz/utility/math.h>
 
 namespace agz::img
 {
