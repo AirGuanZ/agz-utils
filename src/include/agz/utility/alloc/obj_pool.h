@@ -24,9 +24,7 @@ class obj_pool_t : public misc::uncopyable_t
     // 即min_{x}\{ x >= original_size and x mod align = 0 \}
     static constexpr size_t align_to(size_t original_size, size_t align)
     {
-        if constexpr(original_size % align == 0)
-            return original_size;
-        return original_size + align - original_size % align;
+        return original_size % align ? (original_size + align - original_size % align) : original_size;
     }
 
     // 用来保证所持有的chunk的内存最后一定被释放
