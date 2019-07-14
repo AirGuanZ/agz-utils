@@ -45,17 +45,20 @@ class obj_pool_t : public misc::uncopyable_t
     };
 
     // 要申请的基本元素的对齐值
-    static constexpr size_t align_v = static_max(alignof(T), alignof(node));
+    static constexpr size_t BLOCK_ALIGN = static_max(alignof(T), alignof(node));
 
-    // 为每个对象准备的内存区域如下：
+    // 为每个对象准备的内存区域block的布局如下：
     //   首先是按align_v对齐的一块大小为sizeof(T)的区域
     //   然后是一小段padding，要保证padding后的地址符合alignof(void*)
-    //   然后跟一个void*，用来作为侵入式对象链表的节点，指向下一个节点
+    //   然后跟一个node，用来作为侵入式对象链表的节点，指向下一个节点
     //   最后这块内存区域的大小必须能被align_v整除，因为它相邻的下一片区域会被用作下一个对象
+    //   如果T满足trivially destructible，那么就不要padding和obj node部分了
 
-    static constexpr size_t node_offset = align_to(sizeof(T), alignof(node));
+    // obj node距block开头的字节数
+    static constexpr size_t NODE_OFFSET = align_to(static_max(sizeof(T), sizeof(node)), alignof(node));
 
-    static constexpr size_t size_v = align_to(node_offset + sizeof(node), align_v);
+    // block大小
+    static constexpr size_t BLOCK_SIZE = align_to(NODE_OFFSET + sizeof(node), BLOCK_ALIGN);
 
     static T *block_to_obj(void *block)
     {
@@ -64,12 +67,12 @@ class obj_pool_t : public misc::uncopyable_t
 
     static node *block_to_obj_node(void *block)
     {
-        return static_cast<node*>(static_cast<char*>(block) + node_offset);
+        return reinterpret_cast<node*>(static_cast<char*>(block) + NODE_OFFSET);
     }
-
+    
     static void *obj_node_to_block(node *node)
     {
-        return static_cast<char*>(node) - node_offset;
+        return static_cast<char*>(node) - NODE_OFFSET;
     }
 
     static node *block_to_free_node(void *block)
@@ -85,7 +88,7 @@ class obj_pool_t : public misc::uncopyable_t
 
     void new_chunk()
     {
-        void *new_chunk = aligned_alloc(chunk_byte_size_, align_v);
+        void *new_chunk = aligned_alloc(chunk_byte_size_, BLOCK_ALIGN);
         misc::scope_guard_t guard([=] { aligned_free(new_chunk); });
 
         chunks_.push_back({ new_chunk });
@@ -99,8 +102,8 @@ class obj_pool_t : public misc::uncopyable_t
             free_node->next = free_entry_;
             free_entry_ = free_node;
 
-            used_bytes += size_v;
-            block = static_cast<char*>(block) + size_v;
+            used_bytes += BLOCK_SIZE;
+            block = static_cast<char*>(block) + BLOCK_SIZE;
         }
     }
 
@@ -128,7 +131,7 @@ public:
     explicit obj_pool_t(size_t chunk_obj_count = 128)
         : free_entry_(nullptr), obj_entry_(nullptr)
     {
-        chunk_byte_size_ = chunk_obj_count * size_v;
+        chunk_byte_size_ = chunk_obj_count * BLOCK_SIZE;
     }
 
     ~obj_pool_t()

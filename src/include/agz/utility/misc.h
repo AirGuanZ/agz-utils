@@ -7,3 +7,4 @@
 #include "misc/scope_guard.h"
 #include "misc/uncopyable.h"
 #include "misc/unreachable.h"
+#include "misc/variant.h"
