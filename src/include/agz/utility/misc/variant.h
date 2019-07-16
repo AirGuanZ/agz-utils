@@ -36,9 +36,9 @@ public:
 
     template<typename T>
     variant_t<Types...> &operator=(T &&rhs)
-        noexcept(noexcept(*static_cast<std::variant<Types...>*>(this) = std::forward<T>(rhs)))
+        noexcept(noexcept(*static_cast<std_variant_t*>(this) = std::forward<T>(rhs)))
     {
-        *static_cast<std::variant<Types...>*>(this) = std::forward<T>(rhs);
+        *static_cast<std_variant_t*>(this) = std::forward<T>(rhs);
         return *this;
     }
 
@@ -53,46 +53,30 @@ public:
     {
         return std::get_if<T>(this);
     }
-
-    std_variant_t as_std_variant() &&
-    {
-        return static_cast<std::variant<Types...>>(*this);
-    }
-
-    std_variant_t &as_std_variant() &
-    {
-        return static_cast<std::variant<Types...>&>(*this);
-    }
-
-    std_variant_t as_std_variant() const &&
-    {
-        return static_cast<std::variant<Types...>>(*this);
-    }
-
-    const std_variant_t &as_std_variant() const &
-    {
-        return static_cast<const std::variant<Types...>&>(*this);
-    }
 };
 
 namespace variant_impl
 {
 
-    template<typename T, typename = void>
-    struct has_std_variant : std::false_type { };
-
     template<typename T>
-    struct has_std_variant<T, std::void_t<decltype(std::declval<T>().as_std_variant())>>
-        : std::true_type { };
+    decltype(auto) to_std_variant(T &&var) { return std::forward<T>(var); }
 
-    template<typename T>
-    decltype(auto) to_std_variant(T &&var)
+    template<typename...Ts>
+    std::variant<Ts...> &to_std_variant(variant_t<Ts...> &var)
     {
-        using Tt = std::remove_reference_t<T>;
-        if constexpr(has_std_variant<Tt>::value)
-            return std::forward<T>(var).as_std_variant();
-        else
-            return std::forward<T>(var);
+        return static_cast<std::variant<Ts...>&>(var);
+    }
+
+    template<typename...Ts>
+    const std::variant<Ts...> &to_std_variant(const variant_t<Ts...> &var)
+    {
+        return static_cast<const std::variant<Ts...>&>(var);
+    }
+
+    template<typename...Ts>
+    std::variant<Ts...> to_std_variant(variant_t<Ts...> &&var)
+    {
+        return static_cast<std::variant<Ts...>>(var);
     }
 
 } // namespace variant_impl
