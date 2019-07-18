@@ -69,9 +69,19 @@ class alias_sampler_t
 
 public:
 
+    using self_t = alias_sampler_t<F, T>;
+
     alias_sampler_t() = default;
 
     alias_sampler_t(const F *prob, T n);
+
+    alias_sampler_t(self_t &&move_from) noexcept = default;
+
+    alias_sampler_t(const self_t &copy_from) = default;
+
+    self_t &operator=(self_t &&move_from) noexcept = default;
+
+    self_t &operator=(const self_t &copy_from) = default;
 
     /**
      * @param prob 与分布律成固定比例的数组
