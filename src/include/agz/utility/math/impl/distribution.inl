@@ -75,8 +75,8 @@ void alias_sampler_t<F, T>::initialize(const F *prob, T n)
     F sum = std::accumulate(prob, prob + n, F(0));
     F ratio = n / sum;
 
-    std::vector<T> overs_;
-    std::vector<T> unders_;
+    std::vector<T> overs;
+    std::vector<T> unders;
 
     table_.clear();
     table_.resize(n);
@@ -89,30 +89,30 @@ void alias_sampler_t<F, T>::initialize(const F *prob, T n)
         table_[i].another_idx = i;
 
         if(p > 1)
-            overs_.push_back(i);
+            overs.push_back(i);
         else if(p < 1)
-            unders_.push_back(i);
+            unders.push_back(i);
     }
 
-    while(!overs_.empty() && !unders_.empty())
+    while(!overs.empty() && !unders.empty())
     {
-        T over  = overs_.back();
-        T under = unders_.back();
-        overs_.pop_back();
-        unders_.pop_back();
+        T over  = overs.back();
+        T under = unders.back();
+        overs.pop_back();
+        unders.pop_back();
 
         table_[over].accept_prob -= 1 - table_[under].accept_prob;
         table_[under].another_idx = over;
 
         if(table_[over].accept_prob > 1)
-            overs_.push_back(over);
+            overs.push_back(over);
         else if(table_[over].accept_prob < 1)
-            unders_.push_back(over);
+            unders.push_back(over);
     }
 
-    for(auto i : overs_)
+    for(auto i : overs)
         table_[i].accept_prob = 1;
-    for(auto i : unders_)
+    for(auto i : unders)
         table_[i].accept_prob = 1;
 }
 
