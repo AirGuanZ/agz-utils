@@ -53,7 +53,7 @@ T bsearch_sampler_t<F, T>::sample(F u) const noexcept
     assert(available());
     assert(0 <= u && u <= 1);
 
-    auto upper = std::upper_bound(partial_sum_.begin(), partial_sum_.end());
+    auto upper = std::upper_bound(partial_sum_.begin(), partial_sum_.end(), u);
     if(upper == partial_sum_.end())
         return static_cast<T>(partial_sum_.size() - 1);
     return static_cast<T>(upper - partial_sum_.begin());
