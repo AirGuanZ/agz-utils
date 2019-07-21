@@ -6,11 +6,31 @@
 #include "../misc/scope_guard.h"
 #include "../misc/uncopyable.h"
 #include "./alloc.h"
+#include "./releaser.h"
 
 namespace agz::alloc
 {
-    
+
 template<typename T>
+class obj_pool_t : public misc::uncopyable_t
+{
+    releaser_t releaser_;
+
+public:
+
+    template<typename...Args>
+    T *create(Args&&...args)
+    {
+        return releaser_.create<T>(std::forward<Args>(args)...);
+    }
+
+    void free_all_memory()
+    {
+        releaser_.release();
+    }
+};
+    
+/*template<typename T>
 class obj_pool_t : public misc::uncopyable_t
 {
     // 编译时求最大值
@@ -181,6 +201,6 @@ public:
         free_entry_ = nullptr;
         obj_entry_ = nullptr;
     }
-};
+};*/
 
 } // namespace agz::alloc

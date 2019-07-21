@@ -74,7 +74,19 @@ public:
     }
 
     /**
-     * @param worker_count 异步线程数，小于1时使用硬件线程数
+     * @brief 计算以worker_count_param为参数时实际会开多少线程
+     * 
+     * 小于1时使用(硬件线程数 + worker_count)
+     */
+    static int actual_worker_count(int worker_count_param) noexcept
+    {
+        if(worker_count_param < 1)
+            worker_count_param += static_cast<int>(std::thread::hardware_concurrency());
+        return (std::max)(worker_count_param, 1);
+    }
+
+    /**
+     * @param worker_count 异步线程数，小于1时使用(硬件线程数 + worker_count)
      * @param tasks 待执行的任务数据
      * @param f 用于执行任务的函数
      * 
@@ -91,9 +103,7 @@ public:
         exceptions_.clear();
         tasks_ = std::move(tasks);
 
-        if(worker_count < 1)
-            worker_count = static_cast<int>(std::thread::hardware_concurrency());
-
+        worker_count = actual_worker_count(worker_count);
         for(int i = 0; i < worker_count; ++i)
             workers_.emplace_back(&queue_executer_t<Task>::worker, f, this);
     }
