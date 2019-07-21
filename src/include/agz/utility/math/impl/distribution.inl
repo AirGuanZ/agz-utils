@@ -108,12 +108,12 @@ void alias_sampler_t<F, T>::initialize(const F *prob, T n)
             overs_.push_back(over);
         else if(table_[over].accept_prob < 1)
             unders_.push_back(over);
-
-        for(auto i : overs_)
-            table_[i].accept_prob = 1;
-        for(auto i : unders_)
-            table_[i].accept_prob = 1;
     }
+
+    for(auto i : overs_)
+        table_[i].accept_prob = 1;
+    for(auto i : unders_)
+        table_[i].accept_prob = 1;
 }
 
 template<typename F, typename T>
