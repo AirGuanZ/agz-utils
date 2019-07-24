@@ -306,4 +306,18 @@ std::string cat(Args&&...args)
     return stdstr_impl::concat_impl(sst, std::forward<Args>(args)...);
 }
 
+inline std::string align_left(std::string_view str, size_t width, char padder)
+{
+    if(str.length() >= width)
+        return std::string(str);
+    return std::string(str) + std::string(width - str.length(), padder);
+}
+
+inline std::string align_right(std::string_view str, size_t width, char padder)
+{
+    if(str.length() >= width)
+        return std::string(str);
+    return std::string(width - str.length(), padder) + std::string(str);
+}
+
 } // namespace agz::stdstr

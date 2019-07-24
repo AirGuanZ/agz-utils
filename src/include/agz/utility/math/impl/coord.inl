@@ -28,7 +28,7 @@ typename tcoord3<T>::self_t tcoord3<T>::from_x(axis_t new_x) noexcept
 {
     new_x = new_x.normalize();
     axis_t new_z(UNINIT);
-    if(std::abs(dot(new_x, axis_t(0, 1, 0)) - 1) < T(0.1))
+    if(std::abs(std::abs(dot(new_x, axis_t(0, 1, 0))) - 1) < T(0.1))
         new_z = cross(new_x, axis_t(0, 0, 1));
     else
         new_z = cross(new_x, axis_t(0, 1, 0));
@@ -40,7 +40,7 @@ typename tcoord3<T>::self_t tcoord3<T>::from_y(axis_t new_y) noexcept
 {
     new_y = new_y.normalize();
     axis_t new_x(UNINIT);
-    if(std::abs(dot(new_y, axis_t(0, 0, 1)) - 1) < T(0.1))
+    if(std::abs(std::abs(dot(new_y, axis_t(0, 0, 1))) - 1) < T(0.1))
         new_x = cross(new_y, axis_t(1, 0, 0));
     else
         new_x = cross(new_y, axis_t(0, 0, 1));
@@ -52,7 +52,7 @@ typename tcoord3<T>::self_t tcoord3<T>::from_z(axis_t new_z) noexcept
 {
     new_z = new_z.normalize();
     axis_t new_y(UNINIT);
-    if(std::abs(dot(new_z, axis_t(1, 0, 0)) - 1) < T(0.1))
+    if(std::abs(std::abs(dot(new_z, axis_t(1, 0, 0))) - 1) < T(0.1))
         new_y = cross(new_z, axis_t(0, 1, 0));
     else
         new_y = cross(new_z, axis_t(1, 0, 0));

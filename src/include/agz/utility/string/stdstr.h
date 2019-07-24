@@ -53,6 +53,9 @@ T from_string(const std::string &str);
 template<typename...Args>
 std::string cat(Args&&...args);
 
+inline std::string align_left (std::string_view str, size_t width, char padder = ' ');
+inline std::string align_right(std::string_view str, size_t width, char padder = ' ');
+
 } // namespace agz::stdstr
 
 #include "impl/stdstr.inl"
