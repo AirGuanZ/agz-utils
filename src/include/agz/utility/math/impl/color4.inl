@@ -38,7 +38,7 @@ tcolor4<T>::tcolor4(uninitialized_t) noexcept
 
 template<typename T>
 tcolor4<T>::tcolor4(const tvec4<T> &c) noexcept
-    : tcolor3(c.x, c.y, c.z, c.w)
+    : tcolor4(c.x, c.y, c.z, c.w)
 {
 
 }

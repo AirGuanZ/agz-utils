@@ -1,24 +1,25 @@
-#pragma once
+ï»¿#pragma once
 
+#include <string>
 #include <vector>
 
 namespace agz::file
 {
 
 /**
- * @brief ¶ÁÈ¡Ò»¸ö¶ş½øÖÆÎÄ¼şµÄÈ«²¿ÄÚÈİ
+ * @brief è¯»å–ä¸€ä¸ªäºŒè¿›åˆ¶æ–‡ä»¶çš„å…¨éƒ¨å†…å®¹
  */
 std::vector<unsigned char> read_raw_file(const std::string &filename);
 
 /**
- * @brief Ò»´ÎĞ´ÈëÒ»¸ö¶ş½øÖÆÎÄ¼şµÄÈ«²¿ÄÚÈİ
+ * @brief ä¸€æ¬¡å†™å…¥ä¸€ä¸ªäºŒè¿›åˆ¶æ–‡ä»¶çš„å…¨éƒ¨å†…å®¹
  * 
- * Èô´æÔÚÔ­ÎÄ¼ş£¬¸²¸ÇÖ®
+ * è‹¥å­˜åœ¨åŸæ–‡ä»¶ï¼Œè¦†ç›–ä¹‹
  */
 void write_raw_file(const std::string &filename, const void *data, size_t byte_size);
 
 /**
- * @brief ¶ÁÈ¡Ò»¸öÎÄ±¾ÎÄ¼şµÄÈ«²¿ÄÚÈİ
+ * @brief è¯»å–ä¸€ä¸ªæ–‡æœ¬æ–‡ä»¶çš„å…¨éƒ¨å†…å®¹
  */
 std::string read_txt_file(const std::string &filename);
 

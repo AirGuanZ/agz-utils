@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 namespace agz::math {
 
 template<typename T>

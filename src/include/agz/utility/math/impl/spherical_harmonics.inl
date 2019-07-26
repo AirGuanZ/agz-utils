@@ -73,7 +73,7 @@ namespace sh_impl
         {
             static const T INV_C = Sqrt(4 * PI<T> / 3);
 
-            static const mat3f_c<T> INV_A(0,     0,     INV_C,
+            static const tmat3_c<T> INV_A(0,     0,     INV_C,
                                           INV_C, 0,     0,
                                           0,     INV_C, 0);
 

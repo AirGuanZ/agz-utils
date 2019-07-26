@@ -1,3 +1,6 @@
+#include <climits>
+#include <cstring>
+
 #include <agz/utility/file/file_raw.h>
 #include <agz/utility/image/load_image.h>
 

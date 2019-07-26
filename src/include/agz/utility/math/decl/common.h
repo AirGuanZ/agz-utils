@@ -73,13 +73,13 @@ using byte = unsigned char;
 template<typename T>
 T rad2deg(T rad) noexcept
 {
-    static_assert(std::is_floating_point_v<T>); return rad / PI * 180;
+    static_assert(std::is_floating_point_v<T>); return rad / PI<T> * 180;
 }
 
 template<typename T>
 T deg2rad(T deg) noexcept
 {
-    static_assert(std::is_floating_point_v<T>); return deg / 180 * PI;
+    static_assert(std::is_floating_point_v<T>); return deg / 180 * PI<T>;
 }
 
 template<typename T> class tcolor2;

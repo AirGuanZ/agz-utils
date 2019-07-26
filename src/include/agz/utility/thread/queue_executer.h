@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <cassert>
 #include <functional>
@@ -11,24 +11,24 @@ namespace agz::thread
 {
 
 /**
- * @brief Òì²½Ö´ĞĞÒ»ÏµÁĞÈÎÎñ
+ * @brief å¼‚æ­¥æ‰§è¡Œä¸€ç³»åˆ—ä»»åŠ¡
  * 
  * 
- * ·ÖÎªrunningÌ¬/·ÇrunningÌ¬£¬×ª»»ÈçÏÂ£º
+ * åˆ†ä¸ºrunningæ€/érunningæ€ï¼Œè½¬æ¢å¦‚ä¸‹ï¼š
  * 
- * running -£¨join/stop£©> ·Çrunning
+ * running -ï¼ˆjoin/stopï¼‰> érunning
  * 
- * ·Çrunning -£¨run_async£©> running
- * 
- * 
- * ×¢Òâ£¬ÔÚrunningÌ¬ÏÂ£¬¼´Ê¹ËùÓĞÈÎÎñ¶¼±»Íê³É£¬Ö»ÒªÃ»ÓĞµ÷ÓÃjoin/stop£¬¾Í²»»á½øÈë·ÇrunningÌ¬
- * 
- * runningÏÂ¿Éµ÷ÓÃ£ºfinished/error
- * 
- * ·ÇrunningÏÂ¿Éµ÷ÓÃ£ºexceptions/error
+ * érunning -ï¼ˆrun_asyncï¼‰> running
  * 
  * 
- * ÈÎºÎÊ±ºò¶¼¿Éµ÷ÓÃrunning²éÑ¯´¦ÓÚÄÄ¸ö×´Ì¬
+ * æ³¨æ„ï¼Œåœ¨runningæ€ä¸‹ï¼Œå³ä½¿æ‰€æœ‰ä»»åŠ¡éƒ½è¢«å®Œæˆï¼Œåªè¦æ²¡æœ‰è°ƒç”¨join/stopï¼Œå°±ä¸ä¼šè¿›å…¥érunningæ€
+ * 
+ * runningä¸‹å¯è°ƒç”¨ï¼šfinished/error
+ * 
+ * érunningä¸‹å¯è°ƒç”¨ï¼šexceptions/error
+ * 
+ * 
+ * ä»»ä½•æ—¶å€™éƒ½å¯è°ƒç”¨runningæŸ¥è¯¢å¤„äºå“ªä¸ªçŠ¶æ€
  */
 template<typename Task>
 class queue_executer_t
@@ -74,9 +74,9 @@ public:
     }
 
     /**
-     * @brief ¼ÆËãÒÔworker_count_paramÎª²ÎÊıÊ±Êµ¼Ê»á¿ª¶àÉÙÏß³Ì
+     * @brief è®¡ç®—ä»¥worker_count_paramä¸ºå‚æ•°æ—¶å®é™…ä¼šå¼€å¤šå°‘çº¿ç¨‹
      * 
-     * Ğ¡ÓÚ1Ê±Ê¹ÓÃ(Ó²¼şÏß³ÌÊı + worker_count)
+     * å°äº1æ—¶ä½¿ç”¨(ç¡¬ä»¶çº¿ç¨‹æ•° + worker_count)
      */
     static int actual_worker_count(int worker_count_param) noexcept
     {
@@ -86,13 +86,13 @@ public:
     }
 
     /**
-     * @param worker_count Òì²½Ïß³ÌÊı£¬Ğ¡ÓÚ1Ê±Ê¹ÓÃ(Ó²¼şÏß³ÌÊı + worker_count)
-     * @param tasks ´ıÖ´ĞĞµÄÈÎÎñÊı¾İ
-     * @param f ÓÃÓÚÖ´ĞĞÈÎÎñµÄº¯Êı
+     * @param worker_count å¼‚æ­¥çº¿ç¨‹æ•°ï¼Œå°äº1æ—¶ä½¿ç”¨(ç¡¬ä»¶çº¿ç¨‹æ•° + worker_count)
+     * @param tasks å¾…æ‰§è¡Œçš„ä»»åŠ¡æ•°æ®
+     * @param f ç”¨äºæ‰§è¡Œä»»åŠ¡çš„å‡½æ•°
      * 
-     * Ö´ĞĞ¹ı³ÌÖĞÅ×³öµÄÒì³£±»´æÈëÒ»¸öÒì³£Ö¸Õë¶ÓÁĞÖĞ
+     * æ‰§è¡Œè¿‡ç¨‹ä¸­æŠ›å‡ºçš„å¼‚å¸¸è¢«å­˜å…¥ä¸€ä¸ªå¼‚å¸¸æŒ‡é’ˆé˜Ÿåˆ—ä¸­
      * 
-     * ½øÈërunning×´Ì¬
+     * è¿›å…¥runningçŠ¶æ€
      * 
      * assert(!running());
      */
@@ -109,9 +109,9 @@ public:
     }
 
     /**
-     * @brief µÈ´ıÈÎÎñÖ´ĞĞÍê±Ï
+     * @brief ç­‰å¾…ä»»åŠ¡æ‰§è¡Œå®Œæ¯•
      * 
-     * ½«½áÊørunning×´Ì¬
+     * å°†ç»“æŸrunningçŠ¶æ€
      * 
      * assert(running())
      */
@@ -127,11 +127,11 @@ public:
     }
 
     /**
-     * @brief ÖÕÖ¹ºóĞøÈÎÎñµÄÖ´ĞĞ
+     * @brief ç»ˆæ­¢åç»­ä»»åŠ¡çš„æ‰§è¡Œ
      * 
-     * ÈÎÎñÖ´ĞĞÊÇÔ­×ÓµÄ£¬ËùÒÔÕâÖ»ÊÇ°ÑÊ£ÏÂµÄÈÎÎñ¶ÓÁĞÇå¿Õ¶øÒÑ
+     * ä»»åŠ¡æ‰§è¡Œæ˜¯åŸå­çš„ï¼Œæ‰€ä»¥è¿™åªæ˜¯æŠŠå‰©ä¸‹çš„ä»»åŠ¡é˜Ÿåˆ—æ¸…ç©ºè€Œå·²
      * 
-     * ½«½áÊørunning×´Ì¬
+     * å°†ç»“æŸrunningçŠ¶æ€
      * 
      * assert(running())
      */
@@ -147,9 +147,9 @@ public:
     }
 
     /**
-     * @brief ÊÇ·ñÕıÈ·Íê³ÉÁËËùÓĞÈÎÎñ
+     * @brief æ˜¯å¦æ­£ç¡®å®Œæˆäº†æ‰€æœ‰ä»»åŠ¡
      * 
-     * ÔÚÈÎÎñ¶ÓÁĞÎª¿ÕÇÒÎŞÒì³£Ê±·µ»Øtrue
+     * åœ¨ä»»åŠ¡é˜Ÿåˆ—ä¸ºç©ºä¸”æ— å¼‚å¸¸æ—¶è¿”å›true
      * 
      * assert(running());
      */
@@ -170,9 +170,9 @@ public:
     }
 
     /**
-     * @brief ÊÇ·ñ·¢ÉúÁË´íÎó
+     * @brief æ˜¯å¦å‘ç”Ÿäº†é”™è¯¯
      * 
-     * ÔÚrunning»ò·Çrunning×´Ì¬ÏÂ¶¼¿Éµ÷ÓÃ
+     * åœ¨runningæˆ–érunningçŠ¶æ€ä¸‹éƒ½å¯è°ƒç”¨
      */
     bool error() const
     {
@@ -181,7 +181,7 @@ public:
     }
 
     /**
-     * @brief ÊÇ·ñ´¦ÓÚrunning×´Ì¬
+     * @brief æ˜¯å¦å¤„äºrunningçŠ¶æ€
      */
     bool running() const
     {
@@ -189,11 +189,11 @@ public:
     }
 
     /**
-     * @brief È¡µÃËùÓĞ·¢ÉúµÄÒì³£
+     * @brief å–å¾—æ‰€æœ‰å‘ç”Ÿçš„å¼‚å¸¸
      * 
      * assert(!running())
      * 
-     * »áÇå¿ÕÄÚ²¿µÄÒì³£¶ÓÁĞ
+     * ä¼šæ¸…ç©ºå†…éƒ¨çš„å¼‚å¸¸é˜Ÿåˆ—
      */
     std::vector<std::exception_ptr> exceptions()
     {
