@@ -171,4 +171,16 @@ F zweighted_on_hemisphere_pdf(F z) noexcept;
 template<typename F>
 tvec2<F> uniform_on_triangle(F u1, F u2) noexcept;
 
+/**
+ * @brief 将[0, 1]^2上的均匀分布转换为单位圆盘上的均匀分布
+ */
+template<typename F>
+tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept;
+
+/**
+ * @brief 在单位圆盘上均匀采样对应的pdf
+ */
+template<typename F>
+constexpr F uniform_on_unit_disk_pdf = 1;
+
 } // namespace agz::math::distribution

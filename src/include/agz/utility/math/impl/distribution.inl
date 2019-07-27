@@ -251,4 +251,12 @@ tvec2<F> uniform_on_triangle(F u1, F u2) noexcept
     return { 1 - t, t * u2 };
 }
 
+template<typename F>
+tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept
+{
+    F phi = 2 * PI<F> * u1;
+    F r   = std::sqrt(u2);
+    return { r * std::cos(phi), r * std::sin(phi) };
+}
+
 } // namespace agz::math::distribution
