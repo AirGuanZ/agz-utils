@@ -259,4 +259,15 @@ tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept
     return { r * std::cos(phi), r * std::sin(phi) };
 }
 
+template<typename F, typename I>
+std::pair<I, F> extract_uniform_int(F u, I begin, I end)
+{
+    assert(begin < end);
+
+    I delta = end - begin;
+    I integer = begin + (std::min<I>)(I(u * delta), delta - 1);
+    F real = (std::min<F>)(begin + u * delta - integer, 1);
+    return { integer, real };
+}
+
 } // namespace agz::math::distribution

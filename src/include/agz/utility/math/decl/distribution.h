@@ -183,4 +183,10 @@ tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept;
 template<typename F>
 constexpr F uniform_on_unit_disk_pdf = 1;
 
+/**
+ * @brief 将[0, 1]上的均匀分布转换为{ begin, begin + 1, ..., end - 1 } \times [0, 1]上的均匀分布
+ */
+template<typename F, typename I>
+std::pair<I, F> extract_uniform_int(F u, I begin, I end);
+
 } // namespace agz::math::distribution
