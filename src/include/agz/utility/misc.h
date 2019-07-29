@@ -5,6 +5,7 @@
 #include "misc/push_inserter.h"
 #include "misc/type_list.h"
 #include "misc/scope_guard.h"
+#include "misc/span.h"
 #include "misc/uncopyable.h"
 #include "misc/unreachable.h"
 #include "misc/variant.h"

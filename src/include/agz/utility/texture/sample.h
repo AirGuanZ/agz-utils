@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "../math.h"
 
@@ -15,12 +15,12 @@ namespace sample_impl
 } // namespace sample_impl
 
 /**
- * @brief ¶ÔÎÆÀí½øĞĞ×î½üÁÚ²ÉÑù
+ * @brief å¯¹çº¹ç†è¿›è¡Œæœ€è¿‘é‚»é‡‡æ ·
  * 
- * @param uv ÎÆÀí×ø±ê£¬È¡Öµ·¶Î§[0, 1]^2£¬Á½¸öÎ¬¶È·Ö±ğ¶ÔÓ¦Ë®Æ½ºÍ´¹Ö±
- * @param tex ¿Éµ÷ÓÃ¶ÔÏó£¬ÓÃÓÚÈ¡µÃÎÆËØ¡£µ÷ÓÃ²ÎÊıÎªÁ½¸öint£¬µÚÒ»¸öÎªxÏÂ±ê£¬µÚ¶ş¸öÎªyÏÂ±ê
- * @param width ÎÆÀí¿í¶È
- * @param height ÎÆÀí¸ß¶È
+ * @param uv çº¹ç†åæ ‡ï¼Œå–å€¼èŒƒå›´[0, 1]^2ï¼Œä¸¤ä¸ªç»´åº¦åˆ†åˆ«å¯¹åº”æ°´å¹³å’Œå‚ç›´
+ * @param tex å¯è°ƒç”¨å¯¹è±¡ï¼Œç”¨äºå–å¾—çº¹ç´ ã€‚è°ƒç”¨å‚æ•°ä¸ºä¸¤ä¸ªintï¼Œç¬¬ä¸€ä¸ªä¸ºxä¸‹æ ‡ï¼Œç¬¬äºŒä¸ªä¸ºyä¸‹æ ‡
+ * @param width çº¹ç†å®½åº¦
+ * @param height çº¹ç†é«˜åº¦
  */
 template<typename F, typename Tex>
 auto nearest_sample(const math::tvec2<F> &uv, const Tex &tex, int width, int height)
@@ -35,12 +35,12 @@ auto nearest_sample(const math::tvec2<F> &uv, const Tex &tex, int width, int hei
 }
 
 /**
- * @brief ¶ÔÎÆÀí½øĞĞ×î½üÁÚ²ÉÑù
+ * @brief å¯¹çº¹ç†è¿›è¡Œæœ€è¿‘é‚»é‡‡æ ·
  *
- * @param uv ÎÆÀí×ø±ê£¬È¡Öµ·¶Î§[0, 1]^2£¬Á½¸öÎ¬¶È·Ö±ğ¶ÔÓ¦Ë®Æ½ºÍ´¹Ö±
- * @param tex ¿Éµ÷ÓÃ¶ÔÏó£¬ÓÃÓÚÈ¡µÃÎÆËØ¡£µ÷ÓÃ²ÎÊıÎªÁ½¸öint£¬µÚÒ»¸öÎªxÏÂ±ê£¬µÚ¶ş¸öÎªyÏÂ±ê
- * @param width ÎÆÀí¿í¶È
- * @param height ÎÆÀí¸ß¶È
+ * @param uv çº¹ç†åæ ‡ï¼Œå–å€¼èŒƒå›´[0, 1]^2ï¼Œä¸¤ä¸ªç»´åº¦åˆ†åˆ«å¯¹åº”æ°´å¹³å’Œå‚ç›´
+ * @param tex å¯è°ƒç”¨å¯¹è±¡ï¼Œç”¨äºå–å¾—çº¹ç´ ã€‚è°ƒç”¨å‚æ•°ä¸ºä¸¤ä¸ªintï¼Œç¬¬ä¸€ä¸ªä¸ºxä¸‹æ ‡ï¼Œç¬¬äºŒä¸ªä¸ºyä¸‹æ ‡
+ * @param width çº¹ç†å®½åº¦
+ * @param height çº¹ç†é«˜åº¦
  */
 template<typename F, typename Tex>
 auto linear_sample(const math::tvec2<F> &uv, const Tex &tex, int width, int height)
