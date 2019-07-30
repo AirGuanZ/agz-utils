@@ -94,7 +94,7 @@ public:
         return *elems_;
     }
 
-    auto &back() const noexcept
+    auto &back() noexcept
     {
         assert(!empty());
         return *(elems_ + size_ - 1);
