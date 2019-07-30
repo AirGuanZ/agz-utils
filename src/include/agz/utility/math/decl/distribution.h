@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <type_traits>
 #include <vector>
@@ -7,15 +7,15 @@ namespace agz::math::distribution
 {
     
 /**
- * @brief ½«[0, 1]¼äµÄ¸¡µãÊıu×ª»»Îª[beg, end)ÖĞµÄÕûÊı
+ * @brief å°†[0, 1]é—´çš„æµ®ç‚¹æ•°uè½¬æ¢ä¸º[beg, end)ä¸­çš„æ•´æ•°
  */
 template<typename T, typename F, typename = std::enable_if_t<std::is_integral_v<T> && std::is_floating_point_v<F>>>
 T uniform_integer(T beg, T end, F u);
 
 /**
- * @brief »ùÓÚ¶ş·ÖËÑË÷ÔÚ³£ÊıÊ±¼äÄÚ°´ÀëÉ¢·Ö²¼ÂÉ½øĞĞ²ÉÑù
+ * @brief åŸºäºäºŒåˆ†æœç´¢åœ¨å¸¸æ•°æ—¶é—´å†…æŒ‰ç¦»æ•£åˆ†å¸ƒå¾‹è¿›è¡Œé‡‡æ ·
  *
- * ²Î¼û https://en.wikipedia.org/wiki/Alias_methods
+ * å‚è§ https://en.wikipedia.org/wiki/Alias_methods
  */
 template<typename F, typename T = int>
 class bsearch_sampler_t
@@ -31,10 +31,10 @@ public:
     bsearch_sampler_t(const F *prob, T n);
 
     /**
-     * @param prob Óë·Ö²¼ÂÉ³É¹Ì¶¨±ÈÀıµÄÊı×é
-     * @param n Êı×é´óĞ¡
+     * @param prob ä¸åˆ†å¸ƒå¾‹æˆå›ºå®šæ¯”ä¾‹çš„æ•°ç»„
+     * @param n æ•°ç»„å¤§å°
      *
-     * Ó¦Âú×ãprob[i] >= 0
+     * åº”æ»¡è¶³prob[i] >= 0
      */
     void initialize(const F *prob, T n);
 
@@ -43,18 +43,18 @@ public:
     void destroy();
 
     /**
-     * @brief ÒÔ¹éÒ»»¯ºóµÄprobÊı×éÎª·Ö²¼ÂÉ²ÉÑùÒ»¸ö1µ½n-1¼äµÄÕûÊı
-     * @param u [0, 1]¼äµÄ¾ùÔÈËæ»úÊı
+     * @brief ä»¥å½’ä¸€åŒ–åçš„probæ•°ç»„ä¸ºåˆ†å¸ƒå¾‹é‡‡æ ·ä¸€ä¸ª1åˆ°n-1é—´çš„æ•´æ•°
+     * @param u [0, 1]é—´çš„å‡åŒ€éšæœºæ•°
      */
     T sample(F u) const noexcept;
 };
 
 /**
- * @brief »ùÓÚAlias MethodÔÚ³£ÊıÊ±¼äÄÚ°´ÀëÉ¢·Ö²¼ÂÉ½øĞĞ²ÉÑù
+ * @brief åŸºäºAlias Methodåœ¨å¸¸æ•°æ—¶é—´å†…æŒ‰ç¦»æ•£åˆ†å¸ƒå¾‹è¿›è¡Œé‡‡æ ·
  * 
  * FIXME
  * 
- * ²Î¼û https://en.wikipedia.org/wiki/Alias_methods
+ * å‚è§ https://en.wikipedia.org/wiki/Alias_methods
  */
 template<typename F, typename T = int>
 class alias_sampler_t
@@ -86,10 +86,10 @@ public:
     self_t &operator=(const self_t &copy_from) = default;
 
     /**
-     * @param prob Óë·Ö²¼ÂÉ³É¹Ì¶¨±ÈÀıµÄÊı×é
-     * @param n Êı×é´óĞ¡
+     * @param prob ä¸åˆ†å¸ƒå¾‹æˆå›ºå®šæ¯”ä¾‹çš„æ•°ç»„
+     * @param n æ•°ç»„å¤§å°
      * 
-     * Ó¦Âú×ãprob[i] >= 0
+     * åº”æ»¡è¶³prob[i] >= 0
      */
     void initialize(const F *prob, T n);
 
@@ -98,93 +98,93 @@ public:
     void destroy();
 
     /**
-     * @brief ÒÔ¹éÒ»»¯ºóµÄprobÊı×éÎª·Ö²¼ÂÉ²ÉÑùÒ»¸ö1µ½n-1¼äµÄÕûÊı
-     * @param u [0, 1]¼äµÄ¾ùÔÈËæ»úÊı
+     * @brief ä»¥å½’ä¸€åŒ–åçš„probæ•°ç»„ä¸ºåˆ†å¸ƒå¾‹é‡‡æ ·ä¸€ä¸ª1åˆ°n-1é—´çš„æ•´æ•°
+     * @param u [0, 1]é—´çš„å‡åŒ€éšæœºæ•°
      */
     T sample(F u) const noexcept;
 
     /**
-     * @brief ÒÔ¹éÒ»»¯ºóµÄprobÊı×éÎª·Ö²¼ÂÉ²ÉÑùÒ»¸ö1µ½n-1¼äµÄÕûÊı
-     * @param u1 [0, 1]¼äµÄ¾ùÔÈËæ»úÊı
-     * @param u2 [0, 1]¼äµÄ¾ùÔÈËæ»úÊı
+     * @brief ä»¥å½’ä¸€åŒ–åçš„probæ•°ç»„ä¸ºåˆ†å¸ƒå¾‹é‡‡æ ·ä¸€ä¸ª1åˆ°n-1é—´çš„æ•´æ•°
+     * @param u1 [0, 1]é—´çš„å‡åŒ€éšæœºæ•°
+     * @param u2 [0, 1]é—´çš„å‡åŒ€éšæœºæ•°
      */
     T sample(F u1, F u2) const noexcept;
 };
 
 /**
- * @brief ½«[0, 1]^2ÉÏµÄ¾ùÔÈ·Ö²¼×ª»»Îªµ¥Î»ÇòÃæÉÏµÄ¾ùÔÈ·Ö²¼£¨w.r.t. solid angle£©
+ * @brief å°†[0, 1]^2ä¸Šçš„å‡åŒ€åˆ†å¸ƒè½¬æ¢ä¸ºå•ä½çƒé¢ä¸Šçš„å‡åŒ€åˆ†å¸ƒï¼ˆw.r.t. solid angleï¼‰
  */
 template<typename F>
 std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept;
 
 /**
- * @brief µ¥Î»ÇòÃæÉÏµÄ¾ùÔÈ·Ö²¼¶ÔÓ¦µÄpdf£¨w.r.t. solid angle£©
+ * @brief å•ä½çƒé¢ä¸Šçš„å‡åŒ€åˆ†å¸ƒå¯¹åº”çš„pdfï¼ˆw.r.t. solid angleï¼‰
  */
 template<typename F>
 constexpr F uniform_on_sphere_pdf = 1 / (4 * PI<F>);
 
 /**
- * @brief ½«[0, 1]^2ÉÏµÄ¾ùÔÈ·Ö²¼×ª»»Îªµ¥Î»°ëÇòÃæÉÏµÄ¾ùÔÈ·Ö²¼£¨w.r.t. solid angle£©
+ * @brief å°†[0, 1]^2ä¸Šçš„å‡åŒ€åˆ†å¸ƒè½¬æ¢ä¸ºå•ä½åŠçƒé¢ä¸Šçš„å‡åŒ€åˆ†å¸ƒï¼ˆw.r.t. solid angleï¼‰
  * 
- * £¨+zÄÇÒ»²àµÄµ¥Î»ÇòÃæ£©
+ * ï¼ˆ+zé‚£ä¸€ä¾§çš„å•ä½çƒé¢ï¼‰
  */
 template<typename F>
 std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept;
 
 /**
- * @brief µ¥Î»°ëÇòÃæÉÏµÄ¾ùÔÈ·Ö²¼¶ÔÓ¦µÄpdf£¨w.r.t. solid angle£©
+ * @brief å•ä½åŠçƒé¢ä¸Šçš„å‡åŒ€åˆ†å¸ƒå¯¹åº”çš„pdfï¼ˆw.r.t. solid angleï¼‰
  */
 template<typename F>
 constexpr F uniform_on_hemisphere_pdf = 1 / (2 * PI<F>);
 
 /**
- * @brief °Ñ[0, 1]^2ÉÏµÄ¾ùÔÈ·Ö²¼×ª»»ÎªÒÔmaxCosThetaÎª¶¥½ÇµÄµ¥Î»ÇòÃæÉÏµÄ×¶ÌåÄÚµÄ·½ÏòÉÏµÄ¾ùÔÈ·Ö²¼£¨w.r.t. solid angle£©
+ * @brief æŠŠ[0, 1]^2ä¸Šçš„å‡åŒ€åˆ†å¸ƒè½¬æ¢ä¸ºä»¥maxCosThetaä¸ºé¡¶è§’çš„å•ä½çƒé¢ä¸Šçš„é”¥ä½“å†…çš„æ–¹å‘ä¸Šçš„å‡åŒ€åˆ†å¸ƒï¼ˆw.r.t. solid angleï¼‰
  * 
- * @param max_cos_theta ÒÔ+zÎª×¶ÌåÖĞĞÄ£¬thetaÊÇ·½ÏòÏòÁ¿Óë+zµÄ¼Ğ½Ç
+ * @param max_cos_theta ä»¥+zä¸ºé”¥ä½“ä¸­å¿ƒï¼Œthetaæ˜¯æ–¹å‘å‘é‡ä¸+zçš„å¤¹è§’
  */
 template<typename F>
 std::pair<tvec3<F>, F> uniform_on_cone(F max_cos_theta, F u1, F u2) noexcept;
 
 /**
- * @brief °Ñ[0, 1]^2ÉÏµÄ¾ùÔÈ·Ö²¼×ª»»ÎªÒÔmaxCosThetaÎª¶¥½ÇµÄµ¥Î»ÇòÃæÉÏµÄ×¶ÌåÄÚµÄ·½ÏòÉÏµÄ¾ùÔÈ·Ö²¼¶ÔÓ¦µÄpdf£¨w.r.t. solid angle£©
+ * @brief æŠŠ[0, 1]^2ä¸Šçš„å‡åŒ€åˆ†å¸ƒè½¬æ¢ä¸ºä»¥maxCosThetaä¸ºé¡¶è§’çš„å•ä½çƒé¢ä¸Šçš„é”¥ä½“å†…çš„æ–¹å‘ä¸Šçš„å‡åŒ€åˆ†å¸ƒå¯¹åº”çš„pdfï¼ˆw.r.t. solid angleï¼‰
  */
 template<typename F>
 F uniform_on_cone_pdf(F max_cos_theta) noexcept;
 
 /**
- * @brief ½«[0, 1]^2ÉÏµÄ¾ùÔÈ·Ö²¼×ª»»Îªµ¥Î»°ëÇòÃæÉÏÒÔzÎªÈ¨ÖØµÄ·Ö²¼£¨w.r.t. solid angle£©
+ * @brief å°†[0, 1]^2ä¸Šçš„å‡åŒ€åˆ†å¸ƒè½¬æ¢ä¸ºå•ä½åŠçƒé¢ä¸Šä»¥zä¸ºæƒé‡çš„åˆ†å¸ƒï¼ˆw.r.t. solid angleï¼‰
  * 
- * £¨+zÄÇÒ»²àµÄµ¥Î»ÇòÃæ£©
+ * ï¼ˆ+zé‚£ä¸€ä¾§çš„å•ä½çƒé¢ï¼‰
  */
 template<typename F>
 std::pair<tvec3<F>, F> zweighted_on_hemisphere(F u1, F u2) noexcept;
 
 /**
- * @brief µ¥Î»°ëÇòÃæÉÏÒÔzÎªÈ¨ÖØµÄ·Ö²¼¶ÔÓ¦µÄpdf£¨w.r.t. solid angle£©
+ * @brief å•ä½åŠçƒé¢ä¸Šä»¥zä¸ºæƒé‡çš„åˆ†å¸ƒå¯¹åº”çš„pdfï¼ˆw.r.t. solid angleï¼‰
  */
 template<typename F>
 F zweighted_on_hemisphere_pdf(F z) noexcept;
 
 /**
- * @brief ½«[0, 1]^2ÉÏµÄ¾ùÔÈ·Ö²¼×ª»»ÎªÈı½ÇĞÎÃæÆ¬ÉÏµÄ¾ùÔÈ·Ö²¼£¬·µ»Øbarycentric coordinate
+ * @brief å°†[0, 1]^2ä¸Šçš„å‡åŒ€åˆ†å¸ƒè½¬æ¢ä¸ºä¸‰è§’å½¢é¢ç‰‡ä¸Šçš„å‡åŒ€åˆ†å¸ƒï¼Œè¿”å›barycentric coordinate
  */
 template<typename F>
 tvec2<F> uniform_on_triangle(F u1, F u2) noexcept;
 
 /**
- * @brief ½«[0, 1]^2ÉÏµÄ¾ùÔÈ·Ö²¼×ª»»Îªµ¥Î»Ô²ÅÌÉÏµÄ¾ùÔÈ·Ö²¼
+ * @brief å°†[0, 1]^2ä¸Šçš„å‡åŒ€åˆ†å¸ƒè½¬æ¢ä¸ºå•ä½åœ†ç›˜ä¸Šçš„å‡åŒ€åˆ†å¸ƒ
  */
 template<typename F>
 tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept;
 
 /**
- * @brief ÔÚµ¥Î»Ô²ÅÌÉÏ¾ùÔÈ²ÉÑù¶ÔÓ¦µÄpdf
+ * @brief åœ¨å•ä½åœ†ç›˜ä¸Šå‡åŒ€é‡‡æ ·å¯¹åº”çš„pdf
  */
 template<typename F>
 constexpr F uniform_on_unit_disk_pdf = 1;
 
 /**
- * @brief ½«[0, 1]ÉÏµÄ¾ùÔÈ·Ö²¼×ª»»Îª{ begin, begin + 1, ..., end - 1 } \times [0, 1]ÉÏµÄ¾ùÔÈ·Ö²¼
+ * @brief å°†[0, 1]ä¸Šçš„å‡åŒ€åˆ†å¸ƒè½¬æ¢ä¸º{ begin, begin + 1, ..., end - 1 } \times [0, 1]ä¸Šçš„å‡åŒ€åˆ†å¸ƒ
  */
 template<typename F, typename I>
 std::pair<I, F> extract_uniform_int(F u, I begin, I end);
