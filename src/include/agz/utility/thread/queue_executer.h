@@ -7,6 +7,8 @@
 #include <thread>
 #include <vector>
 
+#include "../misc/uncopyable.h"
+
 namespace agz::thread
 {
 
@@ -31,7 +33,7 @@ namespace agz::thread
  * 任何时候都可调用running查询处于哪个状态
  */
 template<typename Task>
-class queue_executer_t
+class queue_executer_t : public misc::uncopyable_t
 {
     std::queue<Task> tasks_;
     std::vector<std::exception_ptr> exceptions_;
