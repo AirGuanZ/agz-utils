@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <cassert>
 #include <condition_variable>
@@ -10,7 +10,7 @@ namespace agz::thread
 {
     
 /**
- * @brief µäĞÍµÄcount down latch·â×°£¬¿ÉÈÃÏß³ÌµÈ´ıÄ³¸ö¼ÆÊıÆ÷½µÎª0
+ * @brief å…¸å‹çš„count down latchå°è£…ï¼Œå¯è®©çº¿ç¨‹ç­‰å¾…æŸä¸ªè®¡æ•°å™¨é™ä¸º0
  */
 class count_down_latch_t : public misc::uncopyable_t
 {
@@ -27,7 +27,7 @@ public:
     }
 
     /**
-     * @brief Ç¿ÖÆÖØÉècounterÖµ£¬ÓÃÓÚ¸Ãlatch¶ÔÏóµÄÖØÓÃ£¬²»ÄÜÓÃËüÌæ´úcount_down
+     * @brief å¼ºåˆ¶é‡è®¾counterå€¼ï¼Œç”¨äºè¯¥latchå¯¹è±¡çš„é‡ç”¨ï¼Œä¸èƒ½ç”¨å®ƒæ›¿ä»£count_down
      */
     void set_counter(int counter)
     {
@@ -36,7 +36,7 @@ public:
     }
 
     /**
-     * @brief µÈ´ıÆäËûÏß³Ì°Ñcounter½µÎª0
+     * @brief ç­‰å¾…å…¶ä»–çº¿ç¨‹æŠŠcounteré™ä¸º0
      */
     void wait()
     {
@@ -45,7 +45,7 @@ public:
     }
 
     /**
-     * @brief Ê¹counter¼õÒ»²¢ÔÚÎª0Ê±Í¨ÖªµÈÔÚcounterÉÏµÄÏß³Ì
+     * @brief ä½¿counterå‡ä¸€å¹¶åœ¨ä¸º0æ—¶é€šçŸ¥ç­‰åœ¨counterä¸Šçš„çº¿ç¨‹
      */
     void count_down()
     {

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <string>
 
@@ -8,31 +8,34 @@ namespace agz::img
 {
 
 /**
- * Ö§³ÖµÄÎÄ¼ş¸ñÊ½£ºJPEG, PNG, TGA, BMP, GIF, HDR, PIC, PNM
+ * æ”¯æŒçš„æ–‡ä»¶æ ¼å¼ï¼šJPEG, PNG, TGA, BMP, GIF, HDR, PIC, PNM
  */
     
-/** ´ÓÄÚ´æÖĞ¶ÁÈ¡»Ò¶ÈÍ¼Ïñ£¬ÒªÇódata¾ßÓĞÌØ¶¨µÄÍ¼ÏñÎÄ¼ş¸ñÊ½ */
+/** ä»å†…å­˜ä¸­è¯»å–ç°åº¦å›¾åƒï¼Œè¦æ±‚dataå…·æœ‰ç‰¹å®šçš„å›¾åƒæ–‡ä»¶æ ¼å¼ */
 math::tensor_t<math::byte, 2> load_gray_from_memory(const void *data, size_t byte_length);
 
-/** ´ÓÄÚ´æÖĞ¶ÁÈ¡»Ò¶È + alphaÍ¼Ïñ£¬ÒªÇódata¾ßÓĞÌØ¶¨µÄÍ¼ÏñÎÄ¼ş¸ñÊ½ */
+/** ä»å†…å­˜ä¸­è¯»å–ç°åº¦ + alphaå›¾åƒï¼Œè¦æ±‚dataå…·æœ‰ç‰¹å®šçš„å›¾åƒæ–‡ä»¶æ ¼å¼ */
 math::tensor_t<math::color2b, 2> load_gray_alpha_from_memory(const void *data, size_t byte_length);
 
-/** ´ÓÄÚ´æÖĞ¶ÁÈ¡rgbÍ¼Ïñ£¬ÒªÇódata¾ßÓĞÌØ¶¨µÄÍ¼ÏñÎÄ¼ş¸ñÊ½ */
+/** ä»å†…å­˜ä¸­è¯»å–rgbå›¾åƒï¼Œè¦æ±‚dataå…·æœ‰ç‰¹å®šçš„å›¾åƒæ–‡ä»¶æ ¼å¼ */
 math::tensor_t<math::color3b, 2> load_rgb_from_memory(const void *data, size_t byte_length);
 
-/** ´ÓÄÚ´æÖĞ¶ÁÈ¡rgbaÍ¼Ïñ£¬ÒªÇódata¾ßÓĞÌØ¶¨µÄÍ¼ÏñÎÄ¼ş¸ñÊ½ */
+/** ä»å†…å­˜ä¸­è¯»å–rgbaå›¾åƒï¼Œè¦æ±‚dataå…·æœ‰ç‰¹å®šçš„å›¾åƒæ–‡ä»¶æ ¼å¼ */
 math::tensor_t<math::color4b, 2> load_rgba_from_memory(const void *data, size_t byte_length);
 
-/** ´ÓÎÄ¼şÖĞ¶ÁÈ¡»Ò¶ÈÍ¼Ïñ */
+/** ä»æ–‡ä»¶ä¸­è¯»å–ç°åº¦å›¾åƒ */
 math::tensor_t<math::byte, 2> load_gray_from_file(const std::string &filename);
 
-/** ´ÓÎÄ¼şÖĞ¶ÁÈ¡»Ò¶È + alphaÍ¼Ïñ */
+/** ä»æ–‡ä»¶ä¸­è¯»å–ç°åº¦ + alphaå›¾åƒ */
 math::tensor_t<math::color2b, 2> load_gray_alpha_from_file(const std::string &filename);
 
-/** ´ÓÎÄ¼şÖĞ¶ÁÈ¡rgbÍ¼Ïñ */
+/** ä»æ–‡ä»¶ä¸­è¯»å–rgbå›¾åƒ */
 math::tensor_t<math::color3b, 2> load_rgb_from_file(const std::string &filename);
 
-/** ´ÓÎÄ¼şÖĞ¶ÁÈ¡rgbaÍ¼Ïñ */
+/** ä»æ–‡ä»¶ä¸­è¯»å–rgbaå›¾åƒ */
 math::tensor_t<math::color4b, 2> load_rgba_from_file(const std::string &filename);
+
+/** ä»hdræ–‡ä»¶ä¸­è¯»å–rgbå›¾åƒ */
+math::tensor_t<math::color3f, 2> load_rgb_from_hdr_file(const std::string &filename);
 
 } // namespace agz::img

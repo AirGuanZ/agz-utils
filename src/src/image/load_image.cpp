@@ -200,4 +200,33 @@ image_buffer<math::color4b> load_rgba_from_file(const std::string &filename)
     return load_rgba_from_memory(content.data(), content.size());
 }
 
+math::tensor_t<math::color3f, 2> load_rgb_from_hdr_file(const std::string &filename)
+{
+    auto content = file::read_raw_file(filename);
+
+    int w, h, channels;
+
+    float *data = stbi_loadf_from_memory(
+        static_cast<const stbi_uc*>(content.data()),
+        static_cast<int>(content.size()),
+        &w, &h, &channels, STBI_rgb);
+    if(!data)
+        return image_buffer<math::color3f>();
+
+    AGZ_SCOPE_GUARD({ stbi_image_free(data); });
+
+    assert(w > 0 && h > 0);
+
+    int idx = 0;
+    return image_buffer<math::color3f>::from_linear_indexed_fn(
+        { h, w }, [&](int i)
+    {
+        math::color3f ret(UNINIT);
+        for(int j = 0; j < 3; ++j)
+            ret[j] = data[idx + j];
+        idx += 3;
+        return ret;
+    });
+}
+
 } // namespace agz::img

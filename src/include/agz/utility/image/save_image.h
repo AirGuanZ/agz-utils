@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <string>
 
@@ -7,36 +7,36 @@
 namespace agz::img
 {
 
-/** @brief ½«»Ò¶ÈÍ¼ÒÔpng¸ñÊ½Êä³öµ½ÄÚ´æÖĞ */
+/** @brief å°†ç°åº¦å›¾ä»¥pngæ ¼å¼è¾“å‡ºåˆ°å†…å­˜ä¸­ */
 std::vector<unsigned char> save_gray_to_png_in_memory(const math::byte *data, int w, int h);
 
-/** @brief ½«»Ò¶È + alphaÍ¼ÏñÒÔpng¸ñÊ½Êä³öµ½ÄÚ´æÖĞ */
+/** @brief å°†ç°åº¦ + alphaå›¾åƒä»¥pngæ ¼å¼è¾“å‡ºåˆ°å†…å­˜ä¸­ */
 std::vector<unsigned char> save_gray_alpha_to_png_in_memory(const math::color2b *data, int w, int h);
 
-/** @brief ½«rgbÍ¼ÏñÒÔpng¸ñÊ½Êä³öµ½ÄÚ´æÖĞ */
+/** @brief å°†rgbå›¾åƒä»¥pngæ ¼å¼è¾“å‡ºåˆ°å†…å­˜ä¸­ */
 std::vector<unsigned char> save_rgb_to_png_in_memory(const math::color3b *data, int w, int h);
 
-/** @brief ½«rgbaÍ¼ÏñÒÔpng¸ñÊ½Êä³öµ½ÄÚ´æÖĞ */
+/** @brief å°†rgbaå›¾åƒä»¥pngæ ¼å¼è¾“å‡ºåˆ°å†…å­˜ä¸­ */
 std::vector<unsigned char> save_rgba_to_png_in_memory(const math::color4b *data, int w, int h);
 
-/** @brief ½«»Ò¶ÈÍ¼Êä³öµ½pngÎÄ¼ş */
+/** @brief å°†ç°åº¦å›¾è¾“å‡ºåˆ°pngæ–‡ä»¶ */
 void save_gray_to_png_file(const std::string &filename, const math::byte *data, int w, int h);
-/** @brief ½«»Ò¶ÈÍ¼Êä³öµ½pngÎÄ¼ş */
+/** @brief å°†ç°åº¦å›¾è¾“å‡ºåˆ°pngæ–‡ä»¶ */
 void save_gray_to_png_file(const std::string &filename, const math::tensor_t<math::byte, 2> &data);
 
-/** @brief ½«»Ò¶È + alphaÍ¼Êä³öµ½pngÎÄ¼ş */
+/** @brief å°†ç°åº¦ + alphaå›¾è¾“å‡ºåˆ°pngæ–‡ä»¶ */
 void save_gray_alpha_to_png_file(const std::string &filename, const math::color2b *data, int w, int h);
-/** @brief ½«»Ò¶È + alphaÍ¼Êä³öµ½pngÎÄ¼ş */
+/** @brief å°†ç°åº¦ + alphaå›¾è¾“å‡ºåˆ°pngæ–‡ä»¶ */
 void save_gray_alpha_to_png_file(const std::string &filename, const math::tensor_t<math::color2b, 2> &data);
 
-/** @brief ½«rgbÍ¼ÏñÊä³öµ½pngÎÄ¼ş */
+/** @brief å°†rgbå›¾åƒè¾“å‡ºåˆ°pngæ–‡ä»¶ */
 void save_rgb_to_png_file(const std::string &filename, const math::color3b *data, int w, int h);
-/** @brief ½«rgbÍ¼ÏñÊä³öµ½pngÎÄ¼ş */
+/** @brief å°†rgbå›¾åƒè¾“å‡ºåˆ°pngæ–‡ä»¶ */
 void save_rgb_to_png_file(const std::string &filename, const math::tensor_t<math::color3b, 2> &data);
 
-/** @brief ½«rgbaÍ¼ÏñÊä³öµ½pngÎÄ¼ş */
+/** @brief å°†rgbaå›¾åƒè¾“å‡ºåˆ°pngæ–‡ä»¶ */
 void save_rgba_to_png_file(const std::string &filename, const math::color4b *data, int w, int h);
-/** @brief ½«rgbaÍ¼ÏñÊä³öµ½pngÎÄ¼ş */
+/** @brief å°†rgbaå›¾åƒè¾“å‡ºåˆ°pngæ–‡ä»¶ */
 void save_rgba_to_png_file(const std::string &filename, const math::tensor_t<math::color4b, 2> &data);
 
 } // namespace agz::img
