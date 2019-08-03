@@ -177,6 +177,7 @@ typename tensor_t<P, D>::self_t tensor_t<P, D>::from_array(const index_t &shape,
 
 template<typename P, int D>
 tensor_t<P, D>::tensor_t(const self_t &copy_from)
+    : tensor_t()
 {
     if(copy_from.is_available())
     {

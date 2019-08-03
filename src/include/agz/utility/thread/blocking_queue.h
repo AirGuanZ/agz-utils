@@ -78,8 +78,11 @@ public:
         while(queue_.empty() && !stop_)
             cond_.wait(lk);
 
-        if(stop_)
+        if(queue_.empty())
+        {
+            assert(stop_);
             return std::nullopt;
+        }
         
         auto ret = std::move(queue_.front());
         queue_.pop();
