@@ -51,6 +51,9 @@ public:
           texel_t &operator()(int y, int x)       noexcept;
     const texel_t &operator()(int y, int x) const noexcept;
 
+          texel_t &at(int y, int x)       noexcept;
+    const texel_t &at(int y, int x) const noexcept;
+
           data_t &get_data()       noexcept;
     const data_t &get_data() const noexcept;
 
