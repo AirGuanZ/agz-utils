@@ -2,6 +2,7 @@
 
 #include "misc/bitcast.h"
 #include "misc/exception.h"
+#include "misc/hash.h"
 #include "misc/push_inserter.h"
 #include "misc/type_list.h"
 #include "misc/scope_guard.h"

@@ -43,4 +43,20 @@ void extract_hierarchy_exceptions(const std::exception &e, TIt out_it)
         std::throw_with_nested(std::runtime_error(MSG)); \
     }
 
+inline std::string extract_exception_ptr(const std::exception_ptr &ptr)
+{
+    try
+    {
+        std::rethrow_exception(ptr);
+    }
+    catch(const std::exception &err)
+    {
+        return err.what();
+    }
+    catch(...)
+    {
+        return "unknown exception";
+    }
+}
+
 } // namespace agz::misc
