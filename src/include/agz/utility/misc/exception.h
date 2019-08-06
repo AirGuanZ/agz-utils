@@ -1,14 +1,15 @@
-#pragma once
+ï»¿#pragma once
 
 #include <exception>
+#include <string>
 
 namespace agz::misc
 {
     
 /**
- * @brief ½«eÄÚ²¿µÄËùÓĞÒì³£ÏûÏ¢ÓÉÍâÍùÄÚµØÌáÈ¡³öÀ´
+ * @brief å°†eå†…éƒ¨çš„æ‰€æœ‰å¼‚å¸¸æ¶ˆæ¯ç”±å¤–å¾€å†…åœ°æå–å‡ºæ¥
  * 
- * Õë¶Ônested exceptionµÄÉèÊ©
+ * é’ˆå¯¹nested exceptionçš„è®¾æ–½
  */
 template<typename TIt>
 void extract_hierarchy_exceptions(const std::exception &e, TIt out_it)
@@ -29,12 +30,12 @@ void extract_hierarchy_exceptions(const std::exception &e, TIt out_it)
 }
 
 /**
- * @brief ÓÃÀ´Å×nested exceptionµÄtryÌæ´úÆ·
+ * @brief ç”¨æ¥æŠ›nested exceptionçš„tryæ›¿ä»£å“
  */
 #define AGZ_HIERARCHY_TRY try {
 
 /**
- * @brief °Ñ½Óµ½µÄÒì³£ÓÃnested exception°üÒ»²ãÖ®ºóÔÙÅ×³öÈ¥
+ * @brief æŠŠæ¥åˆ°çš„å¼‚å¸¸ç”¨nested exceptionåŒ…ä¸€å±‚ä¹‹åå†æŠ›å‡ºå»
  */
 #define AGZ_HIERARCHY_WRAP(MSG) \
     } \

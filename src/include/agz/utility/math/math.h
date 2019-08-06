@@ -1,5 +1,6 @@
 #pragma once
 
+#include "decl/collision.h"
 #include "decl/color2.h"
 #include "decl/color3.h"
 #include "decl/color4.h"
@@ -16,6 +17,7 @@
 #include "decl/vec3.h"
 #include "decl/vec4.h"
 
+#include "impl/collision.inl"
 #include "impl/color2.inl"
 #include "impl/color3.inl"
 #include "impl/color4.inl"

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <algorithm>
 #include <mutex>
@@ -9,14 +9,14 @@ namespace agz::thread
 {
 
 /**
- * @brief ²¢ÐÐ¶ÔÒ»¸ö¿Éµü´ú¶ÔÏóÖÐµÄÃ¿¸öÔªËØÖ´ÐÐÖ¸¶¨²Ù×÷
+ * @brief å¹¶è¡Œå¯¹ä¸€ä¸ªå¯è¿­ä»£å¯¹è±¡ä¸­çš„æ¯ä¸ªå…ƒç´ æ‰§è¡ŒæŒ‡å®šæ“ä½œ
  * 
- * @param iterable Ó¦ÓµÓÐbeginºÍend·½·¨£¬ÖÁÉÙÄÜµÃµ½forward iterator£»iteratingÖÐ²»Ó¦Å×³öÒì³£
- * @param func ÒªÖ´ÐÐµÄ²Ù×÷
- * @param worker_count ²¢ÐÐÏß³ÌÊý£¬·ÖÁ½ÖÖÇé¿ö£º
- *      1. n > 0£¬´ËÊ±´´½¨n¸öÏß³Ì
- *      2. n <= 0£¬´ËÊ±´´½¨max(1, hardware_thread_count - n)¸öÏß³Ì
- * @exception ÈÎÒ»ÈÎÎñ·¢ÉúÒì³£»áµ¼ÖÂ·ÅÆúºóÐøÈÎÎñµÄÖ´ÐÐ£¬ÇÒµÚÒ»¸öÒì³£»á±»Ô­ÑùÅ×³ö
+ * @param iterable åº”æ‹¥æœ‰beginå’Œendæ–¹æ³•ï¼Œè‡³å°‘èƒ½å¾—åˆ°forward iteratorï¼›iteratingä¸­ä¸åº”æŠ›å‡ºå¼‚å¸¸
+ * @param func è¦æ‰§è¡Œçš„æ“ä½œ
+ * @param worker_count å¹¶è¡Œçº¿ç¨‹æ•°ï¼Œåˆ†ä¸¤ç§æƒ…å†µï¼š
+ *      1. n > 0ï¼Œæ­¤æ—¶åˆ›å»ºnä¸ªçº¿ç¨‹
+ *      2. n <= 0ï¼Œæ­¤æ—¶åˆ›å»ºmax(1, hardware_thread_count - n)ä¸ªçº¿ç¨‹
+ * @exception ä»»ä¸€ä»»åŠ¡å‘ç”Ÿå¼‚å¸¸ä¼šå¯¼è‡´æ”¾å¼ƒåŽç»­ä»»åŠ¡çš„æ‰§è¡Œï¼Œä¸”ç¬¬ä¸€ä¸ªå¼‚å¸¸ä¼šè¢«åŽŸæ ·æŠ›å‡º
  */
 template<typename Iterable, typename Func>
 void parallel_foreach(Iterable &&iterable, const Func &func, int worker_count = 0)
