@@ -77,7 +77,7 @@ template<typename T> auto dot(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 template<typename T> auto cos(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept;
 
 using vec4f = tvec4<float>;
-using vec4d = tvec4<float>;
-using vec4i = tvec4<float>;
+using vec4d = tvec4<double>;
+using vec4i = tvec4<int>;
 
 } // namespace agz::math

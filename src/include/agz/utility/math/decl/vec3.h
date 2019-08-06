@@ -78,7 +78,7 @@ template<typename T> auto cross(const tvec3<T> &lhs, const tvec3<T> &rhs) noexce
 template<typename T> auto cos(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 
 using vec3f = tvec3<float>;
-using vec3d = tvec3<float>;
-using vec3i = tvec3<float>;
+using vec3d = tvec3<double>;
+using vec3i = tvec3<int>;
 
 } // namespace agz::math
