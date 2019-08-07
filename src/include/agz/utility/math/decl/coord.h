@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "common.h"
 #include "vec3.h"
@@ -16,46 +16,46 @@ public:
 
     axis_t x, y, z;
 
-    /** @brief Ä¬ÈÏ³õÊ¼»¯Îª(1, 0, 0), (0, 1, 0), (0, 0, 1) */
+    /** @brief é»˜è®¤åˆå§‹åŒ–ä¸º(1, 0, 0), (0, 1, 0), (0, 0, 1) */
     tcoord3()                                                  noexcept;
 
-    /** @brief »á×Ô¶¯¶Ôx£¬y£¬z½øĞĞ¹éÒ»»¯£¬²»¹ı²¢²»¶ÔÆäÊ©¼ÓÕı½»»¯Ö®ÀàµÄ±£ÕÏÆäÏà»¥´¹Ö±µÄ´ëÊ© */
+    /** @brief ä¼šè‡ªåŠ¨å¯¹xï¼Œyï¼Œzè¿›è¡Œå½’ä¸€åŒ–ï¼Œä¸è¿‡å¹¶ä¸å¯¹å…¶æ–½åŠ æ­£äº¤åŒ–ä¹‹ç±»çš„ä¿éšœå…¶ç›¸äº’å‚ç›´çš„æªæ–½ */
     tcoord3(const axis_t &x, const axis_t &y, const axis_t &z) noexcept;
 
-    /** @brief ±£³ÖÄÚ²¿³ÉÔ±ÎªÎ´³õÊ¼»¯×´Ì¬ */
+    /** @brief ä¿æŒå†…éƒ¨æˆå‘˜ä¸ºæœªåˆå§‹åŒ–çŠ¶æ€ */
     explicit tcoord3(uninitialized_t)                          noexcept;
 
-    /** @brief ¹¹ÔìÒ»¸öÒÔ¸ø¶¨ÏòÁ¿µÄ·½ÏòÎªxÖáÕı·½ÏòµÄÖ±½Ç×ø±êÏµ */
+    /** @brief æ„é€ ä¸€ä¸ªä»¥ç»™å®šå‘é‡çš„æ–¹å‘ä¸ºxè½´æ­£æ–¹å‘çš„ç›´è§’åæ ‡ç³» */
     static self_t from_x(axis_t new_x) noexcept;
 
-    /** @brief ¹¹ÔìÒ»¸öÒÔ¸ø¶¨ÏòÁ¿µÄ·½ÏòÎªyÖáÕı·½ÏòµÄÖ±½Ç×ø±êÏµ */
+    /** @brief æ„é€ ä¸€ä¸ªä»¥ç»™å®šå‘é‡çš„æ–¹å‘ä¸ºyè½´æ­£æ–¹å‘çš„ç›´è§’åæ ‡ç³» */
     static self_t from_y(axis_t new_y) noexcept;
 
-    /** @brief ¹¹ÔìÒ»¸öÒÔ¸ø¶¨ÏòÁ¿µÄ·½ÏòÎªzÖáÕı·½ÏòµÄÖ±½Ç×ø±êÏµ */
+    /** @brief æ„é€ ä¸€ä¸ªä»¥ç»™å®šå‘é‡çš„æ–¹å‘ä¸ºzè½´æ­£æ–¹å‘çš„ç›´è§’åæ ‡ç³» */
     static self_t from_z(axis_t new_z) noexcept;
 
-    /** @brief ½«world spaceÖĞµÄÏòÁ¿×ø±ê×ª»»µ½¸Ã×ø±êÏµÖĞÀ´ */
+    /** @brief å°†world spaceä¸­çš„å‘é‡åæ ‡è½¬æ¢åˆ°è¯¥åæ ‡ç³»ä¸­æ¥ */
     vec_t global_to_local(const vec_t &global_vector) const noexcept;
 
-    /** @brief ½«local spaceÖĞµÄÏòÁ¿×ø±ê×ª»»µ½world spaceÖĞ */
+    /** @brief å°†local spaceä¸­çš„å‘é‡åæ ‡è½¬æ¢åˆ°world spaceä¸­ */
     vec_t local_to_global(const vec_t &local_vector)  const noexcept;
 
-    /** @brief Ğı×ª¸Ã×ø±êÏµ£¬Ê¹ÆäxÖáÓë¸ø¶¨ÏòÁ¿ÎªÍ¬Ò»·½Ïò£¬·µ»ØµÃµ½µÄĞÂ×ø±êÏµ */
+    /** @brief æ—‹è½¬è¯¥åæ ‡ç³»ï¼Œä½¿å…¶xè½´ä¸ç»™å®šå‘é‡ä¸ºåŒä¸€æ–¹å‘ï¼Œè¿”å›å¾—åˆ°çš„æ–°åæ ‡ç³» */
     self_t rotate_to_new_x(const axis_t &new_x) const noexcept;
 
-    /** @brief Ğı×ª¸Ã×ø±êÏµ£¬Ê¹ÆäyÖáÓë¸ø¶¨ÏòÁ¿ÎªÍ¬Ò»·½Ïò£¬·µ»ØµÃµ½µÄĞÂ×ø±êÏµ */
+    /** @brief æ—‹è½¬è¯¥åæ ‡ç³»ï¼Œä½¿å…¶yè½´ä¸ç»™å®šå‘é‡ä¸ºåŒä¸€æ–¹å‘ï¼Œè¿”å›å¾—åˆ°çš„æ–°åæ ‡ç³» */
     self_t rotate_to_new_y(const axis_t &new_y) const noexcept;
 
-    /** @brief Ğı×ª¸Ã×ø±êÏµ£¬Ê¹ÆäzÖáÓë¸ø¶¨ÏòÁ¿ÎªÍ¬Ò»·½Ïò£¬·µ»ØµÃµ½µÄĞÂ×ø±êÏµ */
+    /** @brief æ—‹è½¬è¯¥åæ ‡ç³»ï¼Œä½¿å…¶zè½´ä¸ç»™å®šå‘é‡ä¸ºåŒä¸€æ–¹å‘ï¼Œè¿”å›å¾—åˆ°çš„æ–°åæ ‡ç³» */
     self_t rotate_to_new_z(const axis_t &new_z) const noexcept;
 
-    /** @brief ¸ø¶¨ÏòÁ¿ÊÇ·ñÎ»ÓÚxÖáËùÔÚµÄÕı°ëÇò */
+    /** @brief ç»™å®šå‘é‡æ˜¯å¦ä½äºxè½´æ‰€åœ¨çš„æ­£åŠçƒ */
     bool in_positive_x_hemisphere(const vec_t &v) const noexcept;
 
-    /** @brief ¸ø¶¨ÏòÁ¿ÊÇ·ñÎ»ÓÚyÖáËùÔÚµÄÕı°ëÇò */
+    /** @brief ç»™å®šå‘é‡æ˜¯å¦ä½äºyè½´æ‰€åœ¨çš„æ­£åŠçƒ */
     bool in_positive_y_hemisphere(const vec_t &v) const noexcept;
 
-    /** @brief ¸ø¶¨ÏòÁ¿ÊÇ·ñÎ»ÓÚzÖáËùÔÚµÄÕı°ëÇò */
+    /** @brief ç»™å®šå‘é‡æ˜¯å¦ä½äºzè½´æ‰€åœ¨çš„æ­£åŠçƒ */
     bool in_positive_z_hemisphere(const vec_t &v) const noexcept;
 };
 

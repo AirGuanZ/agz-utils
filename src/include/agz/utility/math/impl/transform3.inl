@@ -171,7 +171,7 @@ const typename ttransform3<T, COLUMN_MAJOR>::mat_t& ttransform3<T, COLUMN_MAJOR>
 template<typename T, bool C>
 ttransform3<T, C> operator*(const ttransform3<T, C> &lhs, const ttransform3<T, C> &rhs) noexcept
 {
-    return ttransform3<T>(lhs.get_mat() * rhs.get_mat(), rhs.get_inv_mat() * lhs.get_mat());
+    return ttransform3<T>(lhs.get_mat() * rhs.get_mat(), rhs.get_inv_mat() * lhs.get_inv_mat());
 }
 
 } // namespace agz::math
