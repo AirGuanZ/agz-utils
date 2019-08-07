@@ -18,7 +18,7 @@ class ttransform3
 
 public:
 
-    using self_t = ttransform3<T>;
+    using self_t = ttransform3<T, COLUMN_MAJOR>;
 
     ttransform3()                                 noexcept;
     ttransform3(const mat_t &m, const mat_t &inv) noexcept;
