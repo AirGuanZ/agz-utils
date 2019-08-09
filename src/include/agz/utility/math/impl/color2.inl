@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../decl/func.h"
+
 namespace agz::math {
 
 template<typename T>
@@ -55,6 +57,12 @@ typename tcolor2<T>::self_t tcolor2<T>::clamp_high(T max_v) const noexcept
 {
     return self_t(std::min(c, max_v),
                   std::min(a, max_v));
+}
+
+template<typename T>
+bool tcolor2<T>::is_finite() const noexcept
+{
+    return math::is_finite(c) && math::is_finite(a);
 }
 
 template<typename T>

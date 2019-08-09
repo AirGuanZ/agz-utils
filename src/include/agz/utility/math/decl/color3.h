@@ -29,6 +29,8 @@ public:
     auto lum()                const noexcept;
     auto relative_luminance() const noexcept;
 
+    bool is_finite() const noexcept;
+
     template<typename F> auto map(F &&f) const noexcept;
 
     bool operator!() const noexcept;

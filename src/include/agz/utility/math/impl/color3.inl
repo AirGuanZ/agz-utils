@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../decl/func.h"
+
 namespace agz::math {
 
 template<typename T>
@@ -76,6 +78,12 @@ template<typename T>
 auto tcolor3<T>::relative_luminance() const noexcept
 {
     return lum();
+}
+
+template<typename T>
+bool tcolor3<T>::is_finite() const noexcept
+{
+    return math::is_finite(r) && math::is_finite(g) && math::is_finite(b);
 }
 
 template<typename T>

@@ -39,6 +39,11 @@ public:
         return *this;
     }
 
+    void reset_time()
+    {
+        start_ = std::chrono::steady_clock::now();
+    }
+
     void display() const
     {
         float progress = (float)finished_ / total_;
@@ -89,7 +94,7 @@ class progress_bar_f_t
 
 public:
 
-    progress_bar_f_t(int width, char complete = '#', char incomplete = ' ')
+    explicit progress_bar_f_t(int width, char complete = '#', char incomplete = ' ')
         : percent_(0), width_(width), complete_(complete), incomplete_(incomplete)
     {
 
@@ -98,6 +103,11 @@ public:
     void set_percent(float percent)
     {
         percent_ = percent;
+    }
+
+    void reset_time()
+    {
+        start_ = std::chrono::steady_clock::now();
     }
 
     void display() const
@@ -125,6 +135,7 @@ public:
 
     void done()
     {
+        set_percent(100);
         display();
         std::cout << std::endl;
     }
