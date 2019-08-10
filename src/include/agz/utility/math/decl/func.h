@@ -17,4 +17,10 @@ bool is_finite(T val) noexcept
     return !std::isnan(val) && !std::isinf(val);
 }
 
+template<typename T>
+auto sqr(T val) noexcept
+{
+    return val * val;
+}
+
 } // namespace agz::math
