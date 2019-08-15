@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "./mat3_c.h"
 #include "./vec2.h"
@@ -6,6 +6,9 @@
 namespace agz::math
 {
     
+/**
+ * @brief 二维空间中的仿射变换，由一个三阶变换矩阵与它的逆矩阵构成
+ */
 template<typename T, bool COLUMN_MAJOR = true>
 class ttransform2
 {

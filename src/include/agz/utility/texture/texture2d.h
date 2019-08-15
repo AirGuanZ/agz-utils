@@ -1,10 +1,13 @@
-#pragma once
+﻿#pragma once
 
 #include "../math/math.h"
 
 namespace agz::texture
 {
 
+/**
+ * @brief ¶þÎ¬ÎÆÀí¶ÔÏó
+ */
 template<typename T>
 class texture2d_t
 {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "common.h"
 #include "coord.h"
@@ -7,6 +7,9 @@
 
 namespace agz::math {
 
+/**
+ * @brief 三维空间中的仿射变换，由一个四阶变换矩阵与它的逆矩阵构成
+ */
 template<typename T, bool COLUMN_MAJOR = true>
 class ttransform3
 {

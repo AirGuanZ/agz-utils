@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <functional>
 
@@ -27,6 +27,11 @@ namespace hash_impl
 
 } // namespace hash_impl
 
+/**
+ * @brief 将一个或多个对象hash到一个size_t上
+ * 
+ * 要求输入参数都可以用std::hash求其hash值
+ */
 template<typename A, typename...Others>
 size_t hash(const A &a, const Others&...others)
 {
