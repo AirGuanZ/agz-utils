@@ -146,11 +146,11 @@ public:
      * @exception shared_lib_exception_t 取得失败时抛出
      */
     template<typename T>
-    T *get_proc(const std::string &proc_name) const
+    T get_proc(const std::string &proc_name) const
     {
         assert(available());
         std::string err;
-        auto ret = reinterpret_cast<T*>(get_lib_process(lib_, proc_name.c_str(), &err));
+        auto ret = reinterpret_cast<T>(get_lib_process(lib_, proc_name.c_str(), &err));
         if(!ret)
             throw shared_lib_exception_t(err);
         return ret;
