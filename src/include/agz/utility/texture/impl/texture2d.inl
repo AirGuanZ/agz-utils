@@ -148,7 +148,7 @@ int texture2d_t<T>::height() const noexcept
 template<typename T>
 math::vec2i texture2d_t<T>::size() const noexcept
 {
-    return data_.shape();
+    return { data_.shape()[1], data_.shape()[0] };
 }
 
 template<typename T>
