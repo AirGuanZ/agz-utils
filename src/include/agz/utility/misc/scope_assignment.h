@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cassert>
+#include <utility>
 
 #include "./uncopyable.h"
 
@@ -18,18 +19,48 @@ class scope_assignment_t : public uncopyable_t
 
 public:
 
+    scope_assignment_t() noexcept(noexcept(T()))
+        : addr_(nullptr)
+    {
+        
+    }
+
     scope_assignment_t(T *addr, const T &value)
     {
         assert(addr);
         addr_ = addr;
-        old_value_ = *addr;
+        old_value_ = std::move(*addr);
         *addr = value;
+    }
+
+    scope_assignment_t(T *addr, T &&value)
+    {
+        assert(addr);
+        addr_ = addr;
+        old_value_ = std::move(*addr);
+        *addr = std::move(value);
     }
 
     ~scope_assignment_t()
     {
         if(addr_)
-            *addr_ = old_value_;
+            *addr_ = std::move(old_value_);
+    }
+
+    scope_assignment_t(scope_assignment_t &&move_from) noexcept
+        : addr_(move_from.addr_), old_value_(std::move(move_from.old_value_))
+    {
+        move_from.addr_ = nullptr;
+    }
+
+    scope_assignment_t &operator=(scope_assignment_t &&move_from) noexcept
+    {
+        if(addr_)
+            *addr_ = std::move(old_value_);
+        addr_ = move_from.addr_;
+        old_value_ = std::move(move_from.old_value_);
+        move_from.addr_ = nullptr;
+        return *this;
     }
 
     void dismiss() noexcept
