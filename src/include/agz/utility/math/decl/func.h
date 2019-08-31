@@ -76,4 +76,10 @@ auto exp(const tcolor4<T> &v) noexcept
     return v.map([](auto c) { return std::exp(c); });
 }
 
+template<typename T>
+std::pair<T, T> minmax(T a, T b) noexcept
+{
+    return a < b ? std::pair{ a, b } : std::pair{ b, a };
+}
+
 } // namespace agz::math
