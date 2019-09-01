@@ -189,4 +189,12 @@ constexpr F uniform_on_unit_disk_pdf = 1;
 template<typename F, typename I>
 std::pair<I, F> extract_uniform_int(F u, I begin, I end);
 
+/**
+ * @brief 将[0, 1]上的均匀分布转换为服从inv_cdf描述的cdf的分布
+ * 
+ * 记inverse CDF表格为A，大小为N，则A[0]对应CDF^{-1}(0)，A[N-1]对应CDF^{-1}(1)，中间的值用最近的表项作线性插值得到
+ */
+template<typename F>
+F sample_inv_cdf_table(F u, const F *inv_cdf, size_t tab_size) noexcept;
+
 } // namespace agz::math::distribution

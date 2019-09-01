@@ -270,4 +270,14 @@ std::pair<I, F> extract_uniform_int(F u, I begin, I end)
     return { integer, real };
 }
 
+template<typename F>
+F sample_inv_cdf_table(F u, const F *inv_cdf, size_t tab_size) noexcept
+{
+    assert(tab_size >= 2);
+    const F global = u * (tab_size - 1);
+    const size_t low = (std::min<size_t>)(static_cast<size_t>(global), tab_size - 2);
+    const F local = global - low;
+    return inv_cdf[low] * (1 - local) + inv_cdf[low + 1] * local;
+}
+
 } // namespace agz::math::distribution
