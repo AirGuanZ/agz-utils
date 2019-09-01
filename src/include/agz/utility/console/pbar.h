@@ -46,11 +46,11 @@ public:
 
     void display() const
     {
-        float progress = (float)finished_ / total_;
-        int pos = (int)(width_ * progress);
+        const float progress = float(finished_) / total_;
+        const int pos = int(width_ * progress);
 
-        std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
+        const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+        const auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
 
         std::cout << "[";
 
@@ -112,10 +112,10 @@ public:
 
     void display() const
     {
-        int pos = (int)(width_ * percent_ / 100);
+        const int pos = int(width_ * percent_ / 100);
 
-        std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
+        const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+        const auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
 
         std::cout << "[";
 
@@ -129,7 +129,7 @@ public:
                 std::cout << incomplete_;
         }
         std::cout << "] " << int(percent_) << "% "
-            << float(time_elapsed) / 1000.0 << "s\r";
+                  << float(time_elapsed) / 1000.0 << "s\r";
         std::cout.flush();
     }
 

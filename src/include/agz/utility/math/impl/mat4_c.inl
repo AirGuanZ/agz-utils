@@ -114,8 +114,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::translate(T x, T y, T z) noexcept
 template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::rotate(const tvec3<T> &_axis, T rad) noexcept
 {
-    auto axis = _axis.normalize();
-    T sinv = std::sin(rad), cosv = std::cos(rad);
+    const auto axis = _axis.normalize();
+    const T sinv = std::sin(rad), cosv = std::cos(rad);
 
     self_t ret(UNINIT);
 

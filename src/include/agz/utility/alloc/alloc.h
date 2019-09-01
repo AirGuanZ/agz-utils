@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <cassert>
 #include <new>
@@ -37,7 +37,7 @@ namespace impl
 }
 
 /**
- * @brief Îö¹¹Ò»¸ö¶ÔÏó
+ * @brief ææ„ä¸€ä¸ªå¯¹è±¡
  */
 template<typename T>
 void call_destructor(T &obj) noexcept
@@ -46,7 +46,7 @@ void call_destructor(T &obj) noexcept
 }
 
 /**
- * @brief Îö¹¹Ò»´®¶ÔÏó£¬Ë³Ğò×ÔºóÍùÇ°
+ * @brief ææ„ä¸€ä¸²å¯¹è±¡ï¼Œé¡ºåºè‡ªåå¾€å‰
  */
 template<typename T>
 void call_destructor(T *arr, size_t num) noexcept
@@ -57,11 +57,11 @@ void call_destructor(T *arr, size_t num) noexcept
 }
 
 /**
- * @brief ÉêÇëÒ»¿é°´ÒªÇó¶ÔÆëµÄÄÚ´æ£¬alignµÃÊÇ2µÄÕûÊı´ÎÃİ
+ * @brief ç”³è¯·ä¸€å—æŒ‰è¦æ±‚å¯¹é½çš„å†…å­˜ï¼Œalignå¾—æ˜¯2çš„æ•´æ•°æ¬¡å¹‚
  * 
- * ·µ»Ø½á¹û±ØĞëÓÉagz::alloc::aligned_freeÊÍ·Å
+ * è¿”å›ç»“æœå¿…é¡»ç”±agz::alloc::aligned_freeé‡Šæ”¾
  * 
- * ¾ø²»»á·µ»Ønullptr£¬ÉêÇëÊ§°ÜÊ±»áÅ×std::bad_alloc
+ * ç»ä¸ä¼šè¿”å›nullptrï¼Œç”³è¯·å¤±è´¥æ—¶ä¼šæŠ›std::bad_alloc
  */
 inline void *aligned_alloc(size_t byte_size, size_t align)
 {
@@ -81,9 +81,9 @@ inline void *aligned_alloc(size_t byte_size, size_t align)
 }
 
 /**
- * @brief ÊÍ·ÅÒ»¿éÓÉagz::alloc::aligned_allocÉêÇëµÄÄÚ´æ
+ * @brief é‡Šæ”¾ä¸€å—ç”±agz::alloc::aligned_allocç”³è¯·çš„å†…å­˜
  * 
- * ²ÎÊı²»ÄÜÊÇnullptr
+ * å‚æ•°ä¸èƒ½æ˜¯nullptr
  */
 inline void aligned_free(void *ptr)
 {

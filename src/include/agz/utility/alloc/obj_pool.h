@@ -14,7 +14,7 @@ namespace agz::alloc
 /**
  * @brief 对象池，可快速创建大量小对象
  * 
- * IMPROVE: 现在先拿releaser用者，空了再实现之
+ * IMPROVE: 现在先拿releaser用着，空了再实现之
  */
 template<typename T>
 class obj_pool_t : public misc::uncopyable_t

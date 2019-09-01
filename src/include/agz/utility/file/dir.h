@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <filesystem>
 
@@ -6,11 +6,11 @@ namespace agz::file
 {
     
 /**
- * @brief ÎªÌØ¶¨ÎÄ¼şÂ·¾¶×¼±¸°üº¬ËüµÄÎÄ¼ş¼Ğ
+ * @brief ä¸ºç‰¹å®šæ–‡ä»¶è·¯å¾„å‡†å¤‡åŒ…å«å®ƒçš„æ–‡ä»¶å¤¹
  * 
- * µ÷ÓÃ³É¹¦ºó±£Ö¤absolute(filename)µÄ¸¸Ä¿Â¼´æÔÚ
+ * è°ƒç”¨æˆåŠŸåä¿è¯absolute(filename)çš„çˆ¶ç›®å½•å­˜åœ¨
  * 
- * ÎŞ·¨±£Ö¤Ê±Å×Òì³£
+ * æ— æ³•ä¿è¯æ—¶æŠ›å¼‚å¸¸
  */
 inline void create_directory_for_file(const std::filesystem::path &filename)
 {

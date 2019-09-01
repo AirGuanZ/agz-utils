@@ -1,13 +1,13 @@
-#pragma once
+ï»¿#pragma once
 
 #include <type_traits>
 
 namespace agz
 {
     
-/** @brief ×÷Îª¹¹Ôìº¯ÊıÀàĞÍ²ÎÊı£¬±íÊ¾²»¶Ô³ÉÔ±½øĞĞ³õÊ¼»¯µÄ±êÖ¾ÀàĞÍ */
+/** @brief ä½œä¸ºæ„é€ å‡½æ•°ç±»å‹å‚æ•°ï¼Œè¡¨ç¤ºä¸å¯¹æˆå‘˜è¿›è¡Œåˆå§‹åŒ–çš„æ ‡å¿—ç±»å‹ */
 struct uninitialized_t { };
-/** @brief ²»³õÊ¼»¯±êÖ¾ÀàĞÍµÄÖµ */
+/** @brief ä¸åˆå§‹åŒ–æ ‡å¿—ç±»å‹çš„å€¼ */
 inline uninitialized_t UNINIT;
 
 /** @brief remove reference/const/volatile */
@@ -21,11 +21,11 @@ size_t array_size(const T (&)[N]) noexcept
     return N;
 }
 
-/** @brief ¸ù¾İ³ÉÔ±±äÁ¿Ö¸ÕëÈ¡µÃËüÔÚÀàÄÚµÄ×Ö½ÚÆ«ÒÆ */
+/** @brief æ ¹æ®æˆå‘˜å˜é‡æŒ‡é’ˆå–å¾—å®ƒåœ¨ç±»å†…çš„å­—èŠ‚åç§» */
 template<typename C, typename M>
 ptrdiff_t byte_offset(M(C::*memPtr)) noexcept
 {
-    // ÀíÂÛÉÏÕâÊÇUB£¬µ«ÎÒ²»ÖªµÀÓĞÊ²Ã´¸üºÃµÄ·½·¨
+    // ç†è®ºä¸Šè¿™æ˜¯UBï¼Œä½†æˆ‘ä¸çŸ¥é“æœ‰ä»€ä¹ˆæ›´å¥½çš„æ–¹æ³•
     return reinterpret_cast<char*>(&(reinterpret_cast<C*>(0)->*memPtr))
          - reinterpret_cast<char*>(reinterpret_cast<C*>(0));
 }
