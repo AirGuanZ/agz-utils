@@ -1,9 +1,7 @@
-#pragma once
-
-#ifdef AGZ_ENABLE_OPENGL
+﻿#pragma once
 
 #if !(defined(__gl_h_) || defined(__GL_H__))
-#   error "Include gl.h/glew.h before this header"
+    #error "include opengl header before this"
 #endif
 
 #include <cassert>
@@ -17,8 +15,18 @@ using vec2 = math::vec2f;
 using vec3 = math::vec3f;
 using vec4 = math::vec4f;
 
+using vec2i = math::vec2i;
+using vec3i = math::vec3i;
+using vec4i = math::vec4i;
+
+using vec2b = math::tvec2<unsigned char>;
+using vec3b = math::tvec3<unsigned char>;
+using vec4b = math::tvec4<unsigned char>;
+
 using mat3 = math::mat3f_c;
 using mat4 = math::mat4f_c;
+
+struct texture2d_unit_t { GLuint unit; };
 
 class gl_object_t
 {
@@ -56,7 +64,7 @@ public:
         assert(!handle_);
     }
 
-    GLuint native_handle() const noexcept
+    GLuint handle() const noexcept
     {
         return handle_;
     }
@@ -69,6 +77,17 @@ public:
     using runtime_error::runtime_error;
 };
 
-} // namespace agz::gl
+template<typename Var> struct var_to_gl_type;
 
-#endif // #ifdef AGZ_ENABLE_OPENGL
+template<> struct var_to_gl_type<GLfloat>          { static constexpr GLenum type = GL_FLOAT;      static constexpr GLenum utype = GL_FLOAT; static constexpr GLint usize = 1; };
+template<> struct var_to_gl_type<GLint>            { static constexpr GLenum type = GL_INT;        static constexpr GLenum utype = GL_INT;   static constexpr GLint usize = 1; };
+template<> struct var_to_gl_type<vec2>             { static constexpr GLenum type = GL_FLOAT_VEC2; static constexpr GLenum utype = GL_FLOAT; static constexpr GLint usize = 2; };
+template<> struct var_to_gl_type<vec3>             { static constexpr GLenum type = GL_FLOAT_VEC3; static constexpr GLenum utype = GL_FLOAT; static constexpr GLint usize = 3; };
+template<> struct var_to_gl_type<vec4>             { static constexpr GLenum type = GL_FLOAT_VEC4; static constexpr GLenum utype = GL_FLOAT; static constexpr GLint usize = 4; };
+template<> struct var_to_gl_type<vec2i>            { static constexpr GLenum type = GL_INT_VEC2;   static constexpr GLenum utype = GL_INT;   static constexpr GLint usize = 2; };
+template<> struct var_to_gl_type<vec3i>            { static constexpr GLenum type = GL_INT_VEC3;   static constexpr GLenum utype = GL_INT;   static constexpr GLint usize = 3; };
+template<> struct var_to_gl_type<vec4i>            { static constexpr GLenum type = GL_INT_VEC4;   static constexpr GLenum utype = GL_INT;   static constexpr GLint usize = 4; };
+template<> struct var_to_gl_type<mat4>             { static constexpr GLenum type = GL_FLOAT_MAT4; };
+template<> struct var_to_gl_type<texture2d_unit_t> { static constexpr GLenum type = GL_SAMPLER_2D; };
+
+} // namespace agz::gl

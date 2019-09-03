@@ -15,3 +15,9 @@
     #define AGZ_CC_GCC
     #define AGZ_CC_IS_GNU
 #endif
+
+#if defined(_DEBUG) || defined(DEBUG)
+    #define AGZ_WHEN_DEBUG(X) do { X; } while(false)
+#else
+    #define AGZ_WHEN_DEBUG(X) do { } while(false)
+#endif

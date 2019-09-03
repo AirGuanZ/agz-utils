@@ -1,14 +1,15 @@
-#pragma once
+﻿#pragma once
 
-#ifdef AGZ_ENABLE_OPENGL
-
-#include "./common.h"
 #include "../file.h"
 #include "../misc.h"
+#include "./common.h"
 
 namespace agz::gl
 {
 
+/**
+ * @brief 对gl shader object的直接封装
+ */
 template<GLenum TShaderType>
 class shader_t : public gl_object_t
 {
@@ -38,6 +39,9 @@ public:
         destroy();
     }
 
+    /**
+     * @brief 若含有shader name，将其标记为删除并释放所有权
+     */
     void destroy()
     {
         if(handle_)
@@ -47,13 +51,18 @@ public:
         }
     }
 
+    /**
+     * @brief 从源代码编译shader
+     * 
+     * 若已含有别的shader，先destroy掉
+     */
     void load_from_memory(std::string_view src)
     {
         destroy();
 
         GLuint new_handle = glCreateShader(ShaderType);
         if(!new_handle)
-            throw opengl_exception_t("failed to create new shader object");
+            throw opengl_exception_t("failed to create shader object");
         misc::scope_guard_t new_handle_guard([&] { glDeleteShader(new_handle); });
 
         const char *char_src = src.data();
@@ -76,12 +85,20 @@ public:
         new_handle_guard.dismiss();
     }
 
+    /**
+     * @brief 从源文件中编译shader
+     * 
+     * 若已含有别的shader，先destroy掉
+     */
     void load_from_file(std::string_view filename)
     {
         std::string src = file::read_txt_file(std::string(filename));
         load_from_memory(src);
     }
 
+    /**
+     * @brief 从源代码中编译shader，返回得到的shader_t
+     */
     static self_t from_memory(std::string_view src)
     {
         self_t ret;
@@ -89,6 +106,9 @@ public:
         return std::move(ret);
     }
 
+    /**
+     * @brief 从源文件中编译shader，返回得到的shader_t
+     */
     static self_t from_file(std::string_view filename)
     {
         self_t ret;
@@ -102,5 +122,3 @@ using geometry_shader_t = shader_t<GL_GEOMETRY_SHADER>;
 using fragment_shader_t = shader_t<GL_FRAGMENT_SHADER>;
 
 } // namespace agz::gl
-
-#endif // #ifdef AGZ_ENABLE_OPENGL
