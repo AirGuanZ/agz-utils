@@ -47,7 +47,7 @@ public:
      */
     void initialize_handle()
     {
-        assert(!handle_ && !last_fb_);
+        assert(!handle_);
         glCreateFramebuffers(1, &handle_);
         if(!handle_)
             throw opengl_exception_t("failed to create framebuffer object");
@@ -58,7 +58,6 @@ public:
      */
     void destroy()
     {
-        assert(!last_fb_);
         if(handle_)
         {
             glDeleteFramebuffers(1, &handle_);
