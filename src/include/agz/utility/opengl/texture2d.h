@@ -11,12 +11,16 @@ namespace impl
     
     template<typename DataTixel> struct data_type_to_texel_type;
     
-    template<> struct data_type_to_texel_type<GLfloat> { static constexpr GLenum format = GL_RED;  static constexpr GLenum type = GL_FLOAT;         static constexpr GLint row_align = 4; };
-    template<> struct data_type_to_texel_type<vec3>    { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_FLOAT;         static constexpr GLint row_align = 4; };
-    template<> struct data_type_to_texel_type<vec4>    { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_FLOAT;         static constexpr GLint row_align = 4; };
-    template<> struct data_type_to_texel_type<GLubyte> { static constexpr GLenum format = GL_RED;  static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 1; };
-    template<> struct data_type_to_texel_type<vec3b>   { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 1; };
-    template<> struct data_type_to_texel_type<vec4b>   { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 4; };
+    template<> struct data_type_to_texel_type<GLfloat>       { static constexpr GLenum format = GL_RED;  static constexpr GLenum type = GL_FLOAT;         static constexpr GLint row_align = 4; };
+    template<> struct data_type_to_texel_type<vec3>          { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_FLOAT;         static constexpr GLint row_align = 4; };
+    template<> struct data_type_to_texel_type<vec4>          { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_FLOAT;         static constexpr GLint row_align = 4; };
+    template<> struct data_type_to_texel_type<math::color3f> { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_FLOAT;         static constexpr GLint row_align = 4; };
+    template<> struct data_type_to_texel_type<math::color4f> { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_FLOAT;         static constexpr GLint row_align = 4; };
+    template<> struct data_type_to_texel_type<GLubyte>       { static constexpr GLenum format = GL_RED;  static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 1; };
+    template<> struct data_type_to_texel_type<vec3b>         { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 1; };
+    template<> struct data_type_to_texel_type<vec4b>         { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 4; };
+    template<> struct data_type_to_texel_type<math::color3b> { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 1; };
+    template<> struct data_type_to_texel_type<math::color4b> { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 4; };
 
 } // namespace impl
 

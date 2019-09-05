@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../system/platform.h"
+#include "./attrib.h"
 #include "./shader.h"
 #include "./uniform.h"
 
@@ -83,6 +84,19 @@ public:
     }
 
     /**
+     * @brief 不作类型检查，直接设置某个uniform变量的值
+     */
+    template<typename Var>
+    void set_uniform_unchecked(const char *name, const Var &val) const
+    {
+        assert(handle_);
+        auto loc = glGetUniformLocation(handle_, name);
+        if(loc < 0)
+            return;
+        impl::set_uniform(loc, val);
+    }
+
+    /**
      * @brief 返回shader中具有指定类型和名字的uniform variable
      * 
      * 会进行类型检查
@@ -127,6 +141,28 @@ public:
             throw opengl_exception_t("unmatched std140 uniform block size of " + std::string(name));
 
         return std140_uniform_block_t<Block>(handle_, index);
+    }
+
+    /**
+     * @brief 返回program中具有指定名字的attrib variable loc
+     * 
+     * 会根据模板参数和glsl反射进行类型检查
+     */
+    template<typename Var>
+    attrib_variable_t<Var> attrib_variable(const char *name) const
+    {
+        assert(handle_);
+
+        GLint loc = glGetAttribLocation(handle_, name);
+        if(loc < 0)
+            throw opengl_exception_t("invalid attrib variable name: " + std::string(name));
+
+        GLint size; GLenum type;
+        glGetActiveAttrib(handle_, loc, 0, nullptr, &size, &type, nullptr);
+        if(type != var_to_gl_type<Var>::type)
+            throw opengl_exception_t("unmatched attrib variable type of " + std::string(name));
+
+        return attrib_variable_t<Var>(loc);
     }
 };
 
