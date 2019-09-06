@@ -21,6 +21,7 @@ namespace impl
     template<> struct data_type_to_texel_type<vec4b>         { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 4; };
     template<> struct data_type_to_texel_type<math::color3b> { static constexpr GLenum format = GL_RGB;  static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 1; };
     template<> struct data_type_to_texel_type<math::color4b> { static constexpr GLenum format = GL_RGBA; static constexpr GLenum type = GL_UNSIGNED_BYTE; static constexpr GLint row_align = 4; };
+    template<> struct data_type_to_texel_type<GLuint>        { static constexpr GLenum format = GL_R;    static constexpr GLenum type = GL_UNSIGNED_INT;  static constexpr GLint row_align = 4; };
 
 } // namespace impl
 

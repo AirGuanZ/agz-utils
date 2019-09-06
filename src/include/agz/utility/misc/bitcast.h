@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <cstring>
 #include <type_traits>
@@ -7,13 +7,13 @@ namespace agz::misc
 {
 
 /**
- * @brief Ò»¸öÀàĞÍÊÇ·ñÄÜºÏ·¨µØ°´Î»×ªÎªÁíÒ»¸öÀàĞÍ
+ * @brief ä¸€ä¸ªç±»å‹æ˜¯å¦èƒ½åˆæ³•åœ°æŒ‰ä½è½¬ä¸ºå¦ä¸€ä¸ªç±»å‹
  */
 template<typename To, typename From>
 constexpr bool can_bitcast_v = sizeof(To) == sizeof(From) && std::is_trivially_copyable_v<From> && std::is_trivial_v<To>;
 
 /**
- * @brief °´Î»ÀàĞÍ×ª»»
+ * @brief æŒ‰ä½ç±»å‹è½¬æ¢
  */
 template<class To, class From>
 std::enable_if_t<can_bitcast_v<To, From>, To> bit_cast(const From &src) noexcept

@@ -16,6 +16,7 @@ namespace impl
     inline void set_uniform(GLint loc, const vec3 &v)                         { glUniform3f(loc, v.x, v.y, v.z);                      }
     inline void set_uniform(GLint loc, const vec4 &v)                         { glUniform4f(loc, v.x, v.y, v.z, v.w);                 }
     inline void set_uniform(GLint loc, GLint x)                               { glUniform1i(loc, x);                                  }
+    inline void set_uniform(GLint loc, GLuint x)                              { glUniform1ui(loc, x);                                 }
     inline void set_uniform(GLint loc, const vec2i &v)                        { glUniform2i(loc, v.x, v.y);                           }
     inline void set_uniform(GLint loc, const vec3i &v)                        { glUniform3i(loc, v.x, v.y, v.z);                      }
     inline void set_uniform(GLint loc, const vec4i &v)                        { glUniform4i(loc, v.x, v.y, v.z, v.w);                 }
