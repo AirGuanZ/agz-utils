@@ -64,7 +64,7 @@ public:
                 std::cout << incomplete_;
         }
         std::cout << "] " << int(progress * 100.0) << "% "
-            << float(time_elapsed) / 1000.0 << "s\r";
+            << float(time_elapsed) / 1000.0 << "s   \r";
         std::cout.flush();
     }
 
@@ -129,7 +129,7 @@ public:
                 std::cout << incomplete_;
         }
         std::cout << "] " << int(percent_) << "% "
-                  << float(time_elapsed) / 1000.0 << "s\r";
+                  << float(time_elapsed) / 1000.0 << "s   \r";
         std::cout.flush();
     }
 

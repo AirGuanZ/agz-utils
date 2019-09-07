@@ -412,10 +412,19 @@ tmat4_c<T> operator*(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
 template<typename T>
 tvec4<T> operator*(const tmat4_c<T> &lhs, const tvec4<T> &rhs) noexcept
 {
-    return tvec4<T>(dot(lhs.get_row(0), rhs),
+    /*return tvec4<T>(dot(lhs.get_row(0), rhs),
                     dot(lhs.get_row(1), rhs),
                     dot(lhs.get_row(2), rhs),
-                    dot(lhs.get_row(3), rhs));
+                    dot(lhs.get_row(3), rhs));*/
+    tvec4<T> col0_rhs = rhs[0] * lhs.data[0];
+    tvec4<T> col1_rhs = rhs[1] * lhs.data[1];
+    tvec4<T> col2_rhs = rhs[2] * lhs.data[2];
+    tvec4<T> col3_rhs = rhs[3] * lhs.data[3];
+    return col0_rhs + col1_rhs + col2_rhs + col3_rhs;
+    /*return tvec4<T>(col0_rhs[0] + col1_rhs[0] + col2_rhs[0] + col3_rhs[0],
+                    col0_rhs[1] + col1_rhs[1] + col2_rhs[1] + col3_rhs[1],
+                    col0_rhs[2] + col1_rhs[2] + col2_rhs[2] + col3_rhs[2],
+                    col0_rhs[3] + col1_rhs[3] + col2_rhs[3] + col3_rhs[3]);*/
 }
 
 template<typename T>
