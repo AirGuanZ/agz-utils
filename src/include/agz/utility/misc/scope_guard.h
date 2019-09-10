@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <functional>
 
@@ -8,7 +8,7 @@ namespace agz::misc
 {
    
 /**
- * @brief Àë¿ª×÷ÓÃÓòÊ±×Ô¶¯Ö´ĞĞÖ¸¶¨µÄ¹¦ÄÜ
+ * @brief ç¦»å¼€ä½œç”¨åŸŸæ—¶è‡ªåŠ¨æ‰§è¡ŒæŒ‡å®šçš„åŠŸèƒ½
  */
 class scope_guard_t : public uncopyable_t
 {
@@ -30,7 +30,7 @@ public:
     }
 
     /**
-     * @brief ÌáÇ°È¡Ïû¹¦ÄÜµÄÖ´ĞĞ
+     * @brief æå‰å–æ¶ˆåŠŸèƒ½çš„æ‰§è¡Œ
      */
     void dismiss()
     {
@@ -39,9 +39,9 @@ public:
 };
 
 /**
- * @brief ¶¨ÒåÒ»¸ö×Ô¶¯ÃüÃûµÄscope guard£¬Àë¿ª¶¨Òå×÷ÓÃÓòÊ±×Ô¶¯µ÷ÓÃÖ¸¶¨µÄ²Ù×÷
+ * @brief å®šä¹‰ä¸€ä¸ªè‡ªåŠ¨å‘½åçš„scope guardï¼Œç¦»å¼€å®šä¹‰ä½œç”¨åŸŸæ—¶è‡ªåŠ¨è°ƒç”¨æŒ‡å®šçš„æ“ä½œ
  * 
- * ÓÉÓÚÃüÃûÊÇ¸ù¾İĞĞºÅ×Ô¶¯½øĞĞµÄ£¬ºÜÄÑ¶ÔÆäµ÷ÓÃdismiss²Ù×÷¡£ÈçÓĞ´ËĞèÒª£¬¿ÉÏÔÊ½Ê¹ÓÃ agz::scope_guard_t
+ * ç”±äºå‘½åæ˜¯æ ¹æ®è¡Œå·è‡ªåŠ¨è¿›è¡Œçš„ï¼Œå¾ˆéš¾å¯¹å…¶è°ƒç”¨dismissæ“ä½œã€‚å¦‚æœ‰æ­¤éœ€è¦ï¼Œå¯æ˜¾å¼ä½¿ç”¨ agz::scope_guard_t
  */
 #define AGZ_SCOPE_GUARD(X)             AGZ_SCOPE_GUARD_IMPL0(X, __LINE__)
 #define AGZ_SCOPE_GUARD_IMPL0(X, LINE) AGZ_SCOPE_GUARD_IMPL1(X, LINE)
