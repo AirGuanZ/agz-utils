@@ -27,8 +27,8 @@ auto nearest_sample(const math::tvec2<F> &uv, const Tex &tex, int width, int hei
     -> decltype(tex(std::declval<int>(), std::declval<int>()))
 {
     assert(width > 0 && height > 0);
-    int x = uv.x * width;
-    int y = uv.y * height;
+    int x = int(uv.x * width);
+    int y = int(uv.y * height);
     x = math::clamp(x, 0, width - 1);
     y = math::clamp(y, 0, height - 1);
     return tex(x, y);
