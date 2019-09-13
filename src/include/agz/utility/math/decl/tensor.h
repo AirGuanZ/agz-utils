@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "../../misc/type_list.h"
 #include "common.h"
 #include "vec.h"

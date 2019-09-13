@@ -187,4 +187,24 @@ const typename texture2d_t<T>::data_t &texture2d_t<T>::get_data() const noexcept
     return data_;
 }
 
+template<typename T>
+template<typename Func>
+auto texture2d_t<T>::map(Func &&func) const
+{
+    using ret_pixel_t = rm_rcv_t<decltype(func(data_.at(0, 0)))>;
+    return texture2d_t<ret_pixel_t>(data_.map(std::forward<Func>(func)));
+}
+
+template<typename T>
+T *texture2d_t<T>::raw_data() noexcept
+{
+    return is_available() ? data_.raw_data() : nullptr;
+}
+
+template<typename T>
+const T *texture2d_t<T>::raw_data() const noexcept
+{
+    return is_available() ? data_.raw_data() : nullptr;
+}
+
 } // namespace agz::texture

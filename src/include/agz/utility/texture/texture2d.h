@@ -6,7 +6,7 @@ namespace agz::texture
 {
 
 /**
- * @brief ¶þÎ¬ÎÆÀí¶ÔÏó
+ * @brief 二维纹理对象
  */
 template<typename T>
 class texture2d_t
@@ -34,6 +34,8 @@ public:
     texture2d_t(self_t &&move_from)               noexcept;
     texture2d_t<T> &operator=(self_t &&move_from) noexcept;
 
+    ~texture2d_t() = default;
+
     void initialize(int h, int w,            uninitialized_t);
     void initialize(const math::vec2i &size, uninitialized_t);
     void initialize(int h, int w,            const texel_t *data);
@@ -59,6 +61,12 @@ public:
 
           data_t &get_data()       noexcept;
     const data_t &get_data() const noexcept;
+
+    template<typename Func>
+    auto map(Func &&func) const;
+
+    const T *raw_data() const noexcept;
+          T *raw_data()       noexcept;
 
 protected:
 
