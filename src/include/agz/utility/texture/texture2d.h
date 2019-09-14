@@ -68,6 +68,10 @@ public:
     const T *raw_data() const noexcept;
           T *raw_data()       noexcept;
 
+    void clear(const T &value);
+
+    self_t subtex(int y_beg, int y_end, int x_beg, int x_end) const;
+
 protected:
 
     data_t data_;

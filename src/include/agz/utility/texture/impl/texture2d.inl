@@ -191,7 +191,7 @@ template<typename T>
 template<typename Func>
 auto texture2d_t<T>::map(Func &&func) const
 {
-    using ret_pixel_t = rm_rcv_t<decltype(func(data_.at(0, 0)))>;
+    using ret_pixel_t = rm_rcv_t<decltype(func(data_.at({ 0, 0 }))) > ;
     return texture2d_t<ret_pixel_t>(data_.map(std::forward<Func>(func)));
 }
 
@@ -205,6 +205,31 @@ template<typename T>
 const T *texture2d_t<T>::raw_data() const noexcept
 {
     return is_available() ? data_.raw_data() : nullptr;
+}
+
+template<typename T>
+void texture2d_t<T>::clear(const T &value)
+{
+    if(!is_available())
+        return;
+    for(int i = 0; i < data_.elem_count(); ++i)
+        data_.raw_data()[i] = value;
+}
+
+template<typename T>
+typename texture2d_t<T>::self_t texture2d_t<T>::subtex(int y_beg, int y_end, int x_beg, int x_end) const
+{
+    assert(is_available());
+    assert(0 <= y_beg && y_beg < y_end && y_end < height());
+    assert(0 <= x_beg && x_beg < x_end && x_end < width());
+    int y_size = y_end - y_beg, x_size = x_end - x_beg;
+    self_t ret(y_size, x_size);
+    for(int ly = 0, y = y_beg; ly < y_size; ++ly, ++y)
+    {
+        for(int lx = 0, x = x_beg; lx < x_size; ++lx, ++x)
+            ret(ly, lx) = at(y, x);
+    }
+    return ret;
 }
 
 } // namespace agz::texture
