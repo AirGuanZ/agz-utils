@@ -111,6 +111,11 @@ public:
         assert(!empty());
         return *(elems_ + size_ - 1);
     }
+
+    operator span<const T>() const noexcept
+    {
+        return span<const T>(elems_, size_);
+    }
 };
 
 } // namespace agz::misc
