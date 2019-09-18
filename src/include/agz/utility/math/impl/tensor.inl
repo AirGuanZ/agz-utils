@@ -79,12 +79,10 @@ tensor_t<P, D>::tensor_t(from_indexed_func_t, const vec<int, D> &shape, F &&func
 
     int constructed_count = 0;
     P *data = std::allocator<P>().allocate(elem_count_);
-    //P *data = operator new[](sizeof(P), static_cast<std::align_val_t>(alignof(P)));
     misc::scope_guard_t guard([&]
     {
         alloc::call_destructor(data, constructed_count);
         std::allocator<P>().deallocate(data, elem_count_);
-        //operator delete[](elem_count_, static_cast<std::align_val_t>(alignof(P)));
     });
 
     index_t index(0);
