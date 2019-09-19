@@ -32,6 +32,8 @@ public:
     self_t clamp_low (T min_v)     const noexcept;
     self_t clamp_high(T max_v)     const noexcept;
 
+    self_t saturate() const noexcept;
+
     auto sum()     const noexcept;
     auto product() const noexcept;
 

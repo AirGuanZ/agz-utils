@@ -73,6 +73,12 @@ typename tcolor4<T>::self_t tcolor4<T>::clamp_high(T max_v) const noexcept
 }
 
 template<typename T>
+typename tcolor4<T>::self_t tcolor4<T>::saturate() const noexcept
+{
+    return self_t(::agz::math::saturate(r), ::agz::math::saturate(g), ::agz::math::saturate(b), ::agz::math::saturate(a));
+}
+
+template<typename T>
 auto tcolor4<T>::lum() const noexcept
 {
     return T(0.2126) * r + T(0.7152) * g + T(0.0722) * b;

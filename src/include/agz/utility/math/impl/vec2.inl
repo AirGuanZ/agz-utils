@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "../decl/common.h"
+
 namespace agz::math {
 
 template<typename T>
@@ -86,6 +88,12 @@ template<typename T>
 typename tvec2<T>::self_t tvec2<T>::clamp_high(T max_v) const noexcept
 {
     return self_t(std::min(x, max_v), std::min(y, max_v));
+}
+
+template<typename T>
+typename tvec2<T>::self_t tvec2<T>::saturate() const noexcept
+{
+    return self_t(::agz::math::saturate(x), ::agz::math::saturate(y));
 }
 
 template<typename T>

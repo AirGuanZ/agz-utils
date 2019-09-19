@@ -13,6 +13,13 @@ T clamp(T val, T min_v, T max_v) noexcept
     return std::min(std::max(val, min_v), max_v);
 }
 
+
+template<typename T>
+auto saturate(T val) noexcept
+{
+    return clamp<T>(val, T(0), T(1));
+}
+
 template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
 T determinant(T m00, T m01,
               T m10, T m11) noexcept

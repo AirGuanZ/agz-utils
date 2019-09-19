@@ -60,6 +60,12 @@ typename tcolor2<T>::self_t tcolor2<T>::clamp_high(T max_v) const noexcept
 }
 
 template<typename T>
+typename tcolor2<T>::self_t tcolor2<T>::saturate() const noexcept
+{
+    return self_t(::agz::math::saturate(c), ::agz::math::saturate(a));
+}
+
+template<typename T>
 bool tcolor2<T>::is_finite() const noexcept
 {
     return math::is_finite(c) && math::is_finite(a);

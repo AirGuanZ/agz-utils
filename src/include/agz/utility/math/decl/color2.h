@@ -24,6 +24,8 @@ public:
     self_t clamp_low(T min_v)      const noexcept;
     self_t clamp_high(T max_v)     const noexcept;
 
+    self_t saturate() const noexcept;
+
     bool is_finite() const noexcept;
 
     template<typename F> auto map(F &&f) const noexcept;
