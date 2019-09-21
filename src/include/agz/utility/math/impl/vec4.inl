@@ -121,6 +121,18 @@ auto tvec4<T>::product() const noexcept
 }
 
 template<typename T>
+T tvec4<T>::max_elem() const noexcept
+{
+    return (std::max)({ x, y, z, w });
+}
+
+template<typename T>
+T tvec4<T>::min_elem() const noexcept
+{
+    return (std::min)({ x, y, z, w });
+}
+
+template<typename T>
 template<typename F>
 auto tvec4<T>::map(F &&f) const noexcept
 {

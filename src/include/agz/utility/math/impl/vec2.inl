@@ -109,6 +109,18 @@ auto tvec2<T>::product() const noexcept
 }
 
 template<typename T>
+T tvec2<T>::max_elem() const noexcept
+{
+    return x > y ? x : y;
+}
+
+template<typename T>
+T tvec2<T>::min_elem() const noexcept
+{
+    return x < y ? x : y;
+}
+
+template<typename T>
 template<typename F>
 auto tvec2<T>::map(F &&f) const noexcept
 {

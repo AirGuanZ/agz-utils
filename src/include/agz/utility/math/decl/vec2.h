@@ -37,6 +37,9 @@ public:
     auto sum()     const noexcept;
     auto product() const noexcept;
 
+    T max_elem() const noexcept;
+    T min_elem() const noexcept;
+
     template<typename F> auto map(F &&f) const noexcept;
 
     bool operator!() const noexcept;
