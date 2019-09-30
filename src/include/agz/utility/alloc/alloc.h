@@ -69,6 +69,10 @@ inline void *aligned_alloc(size_t byte_size, size_t align)
 
     void *ret = _aligned_malloc(byte_size, align);
 
+#elif defined(AGZ_CC_GCC)
+
+    void *ret = aligned_alloc(byte_size, align);
+
 #else
 
     void *ret = std::aligned_alloc(byte_size, align);
