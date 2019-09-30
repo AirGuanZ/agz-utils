@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <variant>
 
@@ -6,7 +6,7 @@ namespace agz::misc
 {
    
 /**
- * @brief ÔÚstd::variantµÄ»ù´¡ÉÏÌí¼ÓÁËis£¬asÒÔ¼°as_ifº¯Êı
+ * @brief åœ¨std::variantçš„åŸºç¡€ä¸Šæ·»åŠ äº†isï¼Œasä»¥åŠas_ifå‡½æ•°
  */
 template<typename...Types>
 class variant_t : public std::variant<Types...>
@@ -36,7 +36,6 @@ public:
 
     template<typename T>
     variant_t<Types...> &operator=(T &&rhs)
-        noexcept(noexcept(*static_cast<std_variant_t*>(this) = std::forward<T>(rhs)))
     {
         *static_cast<std_variant_t*>(this) = std::forward<T>(rhs);
         return *this;
@@ -82,11 +81,11 @@ namespace variant_impl
 } // namespace variant_impl
 
 /**
- * @brief ÓÃÒ»×é¿Éµ÷ÓÃ¶ÔÏó¹¹ÔìÒ»¸övariant visitor£¬²¢ÓÃÒÔÆ¥ÅäÒ»¸östd::variant»òmisc::variant_t¶ÔÏó
- * @param e ±»Æ¥ÅäµÄvariant¶ÔÏó
- * @param vs ÓÃÓÚ´¦Àí¸÷variant·ÖÖ§µÄfunctor classÊµÀı¡£
- *			  ËüÃÇµÄoperator()·µ»ØÖµÀàĞÍ±ØĞëÈ«²¿ÏàÍ¬£¬ÇÒ²ÎÊıÄÜ¸²¸ÇËùÓĞµÄvariantÇéĞÎ¡£
- *			  ¿ÉÒÔÓÃ[](auto){ ... }À´´¦ÀíÄ¬ÈÏ·ÖÖ§£¬ÀàËÆÄ£Ê½Æ¥ÅäÖĞµÄ¡°_¡±¡£
+ * @brief ç”¨ä¸€ç»„å¯è°ƒç”¨å¯¹è±¡æ„é€ ä¸€ä¸ªvariant visitorï¼Œå¹¶ç”¨ä»¥åŒ¹é…ä¸€ä¸ªstd::variantæˆ–misc::variant_tå¯¹è±¡
+ * @param e è¢«åŒ¹é…çš„variantå¯¹è±¡
+ * @param vs ç”¨äºå¤„ç†å„variantåˆ†æ”¯çš„functor classå®ä¾‹ã€‚
+ *			  å®ƒä»¬çš„operator()è¿”å›å€¼ç±»å‹å¿…é¡»å…¨éƒ¨ç›¸åŒï¼Œä¸”å‚æ•°èƒ½è¦†ç›–æ‰€æœ‰çš„variantæƒ…å½¢ã€‚
+ *			  å¯ä»¥ç”¨[](auto){ ... }æ¥å¤„ç†é»˜è®¤åˆ†æ”¯ï¼Œç±»ä¼¼æ¨¡å¼åŒ¹é…ä¸­çš„â€œ_â€ã€‚
  */
 template<typename E, typename...Vs>
 auto match_variant(E &&e, Vs...vs)
