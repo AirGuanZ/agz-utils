@@ -1,4 +1,6 @@
 #include <cassert>
+#include <stdexcept>
+
 #include <agz/utility/file/file_raw.h>
 #include <agz/utility/image/save_image.h>
 

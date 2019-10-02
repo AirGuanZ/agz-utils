@@ -5,6 +5,7 @@
 #endif
 
 #include <cassert>
+#include <stdexcept>
 
 #include "../math.h"
 
