@@ -17,6 +17,7 @@
 #endif
 
 #if defined(_DEBUG) || defined(DEBUG)
+    #define AGZ_DEBUG
     #define AGZ_WHEN_DEBUG(X) do { X; } while(false)
 #else
     #define AGZ_WHEN_DEBUG(X) do { } while(false)
