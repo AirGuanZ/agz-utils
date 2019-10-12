@@ -29,7 +29,7 @@ shared_lib_handle_t *load_lib(const std::string &filename, std::string *err_msg)
 
 #ifdef AGZ_OS_WIN32
 
-    ret->handle = LoadLibrary(filename.c_str());
+    ret->handle = LoadLibraryA(filename.c_str());
     if(!ret->handle)
     {
         if(err_msg)
