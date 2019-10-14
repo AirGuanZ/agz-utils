@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <iterator>
 
@@ -53,7 +53,7 @@ namespace misc_impl
 }
 
 /**
- * @brief ´´½¨Ò»¸öµ÷ÓÃÈÝÆ÷µÄpush·½·¨µÄinserter iterator
+ * @brief åˆ›å»ºä¸€ä¸ªè°ƒç”¨å®¹å™¨çš„pushæ–¹æ³•çš„inserter iterator
  */
 template<typename Container>
 misc_impl::push_insert_iterator<Container> push_inserter(Container &container)

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <atomic>
 
@@ -8,7 +8,7 @@ namespace agz::thread
 {
     
 /**
- * @brief ±ê×¼×ÔĞıËø£¬Ã»É¶ºÃËµµÄ£¬¿ÉÓÃÓÚstd::lock_guard
+ * @brief æ ‡å‡†è‡ªæ—‹é”ï¼Œæ²¡å•¥å¥½è¯´çš„ï¼Œå¯ç”¨äºstd::lock_guard
  */
 class spinlock_t : public misc::uncopyable_t
 {

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 namespace agz::misc
 {
@@ -42,24 +42,24 @@ namespace type_list_impl
 } // namespace type_list_impl
 
 /**
- * @brief ÀàĞÍÁĞ±í
+ * @brief ç±»å‹åˆ—è¡¨
  */
 template<typename...Ts>
 class type_list_t
 {
 public:
 
-    static constexpr int length = type_list_impl::length<Ts...>(); // ÀàĞÍÁĞ±í³¤¶È
-    static constexpr int size   = length;                          // ÀàĞÍÁĞ±í³¤¶È
+    static constexpr int length = type_list_impl::length<Ts...>(); // ç±»å‹åˆ—è¡¨é•¿åº¦
+    static constexpr int size   = length;                          // ç±»å‹åˆ—è¡¨é•¿åº¦
 
     template<int I>
-    using at = typename type_list_impl::at_aux<I, Ts...>::type; // ÓÃÏÂ±êÈ¡ÀàĞÍ
+    using at = typename type_list_impl::at_aux<I, Ts...>::type; // ç”¨ä¸‹æ ‡å–ç±»å‹
 
     template<int...Is>
-    using sublist = type_list_t<at<Is>...>; // ÓÃÏÂ±êĞòÁĞÈ¡×ÓÁĞ±í
+    using sublist = type_list_t<at<Is>...>; // ç”¨ä¸‹æ ‡åºåˆ—å–å­åˆ—è¡¨
 
     template<typename T>
-    static constexpr bool contains = type_list_impl::find_in<T, Ts...>(); // ÁĞ±íÖĞÊÇ·ñ°üº¬Ö¸¶¨ÀàĞÍ
+    static constexpr bool contains = type_list_impl::find_in<T, Ts...>(); // åˆ—è¡¨ä¸­æ˜¯å¦åŒ…å«æŒ‡å®šç±»å‹
 };
 
 } // namespace misc

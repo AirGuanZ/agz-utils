@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #include "../system/platform.h"
 
 namespace agz::misc
 {
     
-/** @brief ÓÃÓÚÌáÊ¾±àÒëÆ÷ÕâÊÇÒ»Ìõ²»¿Éµ½´ï·ÖÖ§ */
+/** @brief ç”¨äºæç¤ºç¼–è¯‘å™¨è¿™æ˜¯ä¸€æ¡ä¸å¯åˆ°è¾¾åˆ†æ”¯ */
 [[noreturn]] inline void unreachable()
 {
 #if defined(AGZ_CC_MSVC)
