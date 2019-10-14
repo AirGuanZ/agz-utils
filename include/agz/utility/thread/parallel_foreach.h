@@ -14,7 +14,7 @@ namespace agz::thread
  *      1. n > 0，此时创建n个线程
  *      2. n <= 0，此时创建max(1, hardware_thread_count - n)个线程
  */
-inline int actual_worker_count(int worker_count)
+inline int actual_worker_count(int worker_count) noexcept
 {
     if(worker_count <= 0)
         worker_count += static_cast<int>(std::thread::hardware_concurrency());
