@@ -3,7 +3,8 @@
 #include "common.h"
 #include "vec4.h"
 
-namespace agz::math {
+namespace agz::math
+{
 
 /**
  * @brief column-major 4x4 matrix
@@ -51,20 +52,6 @@ public:
     static const self_t &one()      noexcept;
     static const self_t &identity() noexcept;
 
-    static self_t translate(const tvec3<T> &offset) noexcept;
-    static self_t translate(T x, T y, T z) noexcept;
-
-    static self_t rotate(const tvec3<T> &_axis, T rad) noexcept;
-    static self_t rotate_x(T rad) noexcept;
-    static self_t rotate_y(T rad) noexcept;
-    static self_t rotate_z(T rad) noexcept;
-
-    static self_t scale(const tvec3<T> &ratio) noexcept;
-    static self_t scale(T x, T y, T z)         noexcept;
-
-    static self_t perspective(T fov_y_rad, T w_over_h, T near_plane, T far_plane)       noexcept;
-    static self_t look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept;
-
     self_t inv_from_adj(const self_t &adj) const noexcept;
 
           col_t &operator[](size_t idx)       noexcept;
@@ -94,6 +81,40 @@ public:
 
     self_t &operator*=(T rhs) noexcept;
     self_t &operator/=(T rhs) noexcept;
+
+    struct left_transform
+    {
+        static self_t translate(const tvec3<T> &offset) noexcept;
+        static self_t translate(T x, T y, T z) noexcept;
+
+        static self_t rotate(const tvec3<T> &_axis, T rad) noexcept;
+        static self_t rotate_x(T rad) noexcept;
+        static self_t rotate_y(T rad) noexcept;
+        static self_t rotate_z(T rad) noexcept;
+
+        static self_t scale(const tvec3<T> &ratio) noexcept;
+        static self_t scale(T x, T y, T z)         noexcept;
+
+        static self_t perspective(T fov_y_rad, T w_over_h, T near_plane, T far_plane)       noexcept;
+        static self_t look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept;
+    };
+
+    struct right_transform
+    {
+        static self_t translate(const tvec3<T> &offset) noexcept;
+        static self_t translate(T x, T y, T z) noexcept;
+
+        static self_t rotate(const tvec3<T> &_axis, T rad) noexcept;
+        static self_t rotate_x(T rad) noexcept;
+        static self_t rotate_y(T rad) noexcept;
+        static self_t rotate_z(T rad) noexcept;
+
+        static self_t scale(const tvec3<T> &ratio) noexcept;
+        static self_t scale(T x, T y, T z)         noexcept;
+
+        static self_t perspective(T fov_y_rad, T w_over_h, T near_plane, T far_plane)       noexcept;
+        static self_t look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept;
+    };
 };
 
 template<typename T> tmat4_c<T> operator+(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept;
