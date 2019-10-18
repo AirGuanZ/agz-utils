@@ -33,43 +33,43 @@ ttransform3<T, C>::ttransform3(uninitialized_t) noexcept
 template<typename T, bool COLUMN_MAJOR>
 typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::translate(const tvec3<T> &offset) noexcept
 {
-    return self_t(mat_t::translate(offset), mat_t::translate(-offset));
+    return self_t(mat_t::left_transform::translate(offset), mat_t::left_transform::translate(-offset));
 }
 
 template<typename T, bool COLUMN_MAJOR>
 typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::translate(T x, T y, T z) noexcept
 {
-    return self_t(mat_t::translate(x, y, z), mat_t::translate(-x, -y, -z));
+    return self_t(mat_t::left_transform::translate(x, y, z), mat_t::left_transform::translate(-x, -y, -z));
 }
 
 template<typename T, bool COLUMN_MAJOR>
 typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::rotate(const tvec3<T> &axis, T rad) noexcept
 {
-    return self_t(mat_t::rotate(axis, rad), mat_t::rotate(axis, -rad));
+    return self_t(mat_t::left_transform::rotate(axis, rad), mat_t::left_transform::rotate(axis, -rad));
 }
 
 template<typename T, bool COLUMN_MAJOR>
 typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::rotate_x(T rad) noexcept
 {
-    return self_t(mat_t::rotate_x(rad), mat_t::rotate_x(-rad));
+    return self_t(mat_t::left_transform::rotate_x(rad), mat_t::left_transform::rotate_x(-rad));
 }
 
 template<typename T, bool COLUMN_MAJOR>
 typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::rotate_y(T rad) noexcept
 {
-    return self_t(mat_t::rotate_y(rad), mat_t::rotate_y(-rad));
+    return self_t(mat_t::left_transform::rotate_y(rad), mat_t::left_transform::rotate_y(-rad));
 }
 
 template<typename T, bool COLUMN_MAJOR>
 typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::rotate_z(T rad) noexcept
 {
-    return self_t(mat_t::rotate_z(rad), mat_t::rotate_z(-rad));
+    return self_t(mat_t::left_transform::rotate_z(rad), mat_t::left_transform::rotate_z(-rad));
 }
 
 template<typename T, bool COLUMN_MAJOR>
 typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::scale(T x, T y, T z) noexcept
 {
-    return self_t(mat_t::scale(x, y, z), mat_t::scale(1 / x, 1 / y, 1 / z));
+    return self_t(mat_t::left_transform::scale(x, y, z), mat_t::left_transform::scale(1 / x, 1 / y, 1 / z));
 }
 
 template<typename T, bool COLUMN_MAJOR>
