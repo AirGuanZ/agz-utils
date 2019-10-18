@@ -10,7 +10,7 @@ namespace agz::math {
 template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
 T clamp(T val, T min_v, T max_v) noexcept
 {
-    return std::min(std::max(val, min_v), max_v);
+    return (std::min)((std::max)(val, min_v), max_v);
 }
 
 
