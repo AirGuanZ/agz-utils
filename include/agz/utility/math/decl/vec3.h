@@ -1,7 +1,9 @@
 #pragma once
 
+#include <functional>
+
+#include "../../misc/hash.h"
 #include "common.h"
-#include "vec.h"
 
 namespace agz::math {
 
@@ -87,3 +89,15 @@ using vec3d = tvec3<double>;
 using vec3i = tvec3<int>;
 
 } // namespace agz::math
+
+namespace std
+{
+    template<typename T>
+    struct hash<agz::math::tvec3<T>>
+    {
+        size_t operator()(const agz::math::tvec3<T> &vec) const noexcept
+        {
+            return agz::misc::hash(vec.x, vec.y, vec.z);
+        }
+    };
+}

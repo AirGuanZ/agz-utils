@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <codecvt>
+#include <locale>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -147,6 +149,11 @@ inline std::string align_left (std::string_view str, size_t width, char padder =
  * @brief 用给定字符填充str的右侧，使其长度不小于width，返回填充得到的新串
  */
 inline std::string align_right(std::string_view str, size_t width, char padder = ' ');
+
+/**
+ * @brief 将以std::string存储的utf-8字符串转为本平台上的宽字符串
+ */
+inline std::wstring u8_to_wstr(const std::string &str);
 
 } // namespace agz::stdstr
 
