@@ -12,9 +12,21 @@ texture2d_t<T>::texture2d_t(int h, int w, const texel_t *data)
 
 template<typename T>
 texture2d_t<T>::texture2d_t(const math::vec2i &size, const texel_t *data)
-    : data_({ size[0], size[1] }, data)
+    : data_({ size[0], size[1] }, UNINIT)
 {
-
+    if constexpr(std::is_trivially_copy_constructible_v<T>)
+    {
+        std::memcpy(data_.raw_data(), data, sizeof(texel_t) * size[0] * size[1]);
+    }
+    else
+    {
+        int k = 0;
+        for(int y = 0; y < height(); ++y)
+        {
+            for(int x = 0; x < width(); ++x)
+                at(y, x) = data[k++];
+        }
+    }
 }
 
 template<typename T>

@@ -84,5 +84,6 @@ template<typename T> auto cos  (const tvec2<T> &lhs, const tvec2<T> &rhs) noexce
 using vec2f = tvec2<float>;
 using vec2d = tvec2<double>;
 using vec2i = tvec2<int>;
+using vec2b = tvec2<uint8_t>;
 
 } // namespace agz::math

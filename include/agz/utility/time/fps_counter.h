@@ -35,7 +35,7 @@ public:
         fps_start_time_ = now;
     }
 
-    void update() noexcept
+    void frame_end() noexcept
     {
         time_point now = clock::now();
 
@@ -56,6 +56,12 @@ public:
     duration elasped_time() const noexcept
     {
         return last_update_interval_;
+    }
+
+    float elasped_microseconds() const noexcept
+    {
+        return float(std::chrono::duration_cast<std::chrono::microseconds>(
+                        last_update_interval_).count());
     }
 
     int fps() const noexcept
