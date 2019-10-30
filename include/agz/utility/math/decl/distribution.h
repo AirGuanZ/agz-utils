@@ -52,8 +52,6 @@ public:
 /**
  * @brief 基于Alias Method在常数时间内按离散分布律进行采样
  * 
- * FIXME
- * 
  * 参见 https://en.wikipedia.org/wiki/Alias_methods
  */
 template<typename F, typename T = int>

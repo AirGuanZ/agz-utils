@@ -7,7 +7,10 @@ namespace agz::misc
     
 inline size_t hash_combine(size_t a, size_t b)
 {
-    return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
+    if constexpr(sizeof(size_t) == 4)
+        return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
+    else
+        return a ^ (b + 0x9e3779b97f4a7c15 + (a << 6) + (a >> 2));
 }
 
 namespace hash_impl

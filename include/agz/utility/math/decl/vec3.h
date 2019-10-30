@@ -1,7 +1,9 @@
 #pragma once
 
+#include <functional>
+
+#include "../../misc/hash.h"
 #include "common.h"
-#include "vec.h"
 
 namespace agz::math {
 
@@ -85,5 +87,18 @@ template<typename T> auto cos(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept
 using vec3f = tvec3<float>;
 using vec3d = tvec3<double>;
 using vec3i = tvec3<int>;
+using vec3b = tvec3<uint8_t>;
 
 } // namespace agz::math
+
+namespace std
+{
+    template<typename T>
+    struct hash<agz::math::tvec3<T>>
+    {
+        size_t operator()(const agz::math::tvec3<T> &vec) const noexcept
+        {
+            return agz::misc::hash(vec.x, vec.y, vec.z);
+        }
+    };
+}

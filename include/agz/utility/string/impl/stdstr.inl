@@ -320,4 +320,10 @@ inline std::string align_right(std::string_view str, size_t width, char padder)
     return std::string(width - str.length(), padder) + std::string(str);
 }
 
+inline std::wstring u8_to_wstr(const std::string &str)
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    return converter.from_bytes(str);
+}
+
 } // namespace agz::stdstr
