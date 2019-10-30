@@ -15,9 +15,9 @@ public:
 
     T x, y, z;
 
-    tvec3()                             noexcept;
-    tvec3(T x, T y, T z)                noexcept;
-    explicit tvec3(T val)               noexcept;
+    constexpr tvec3()                             noexcept;
+    constexpr tvec3(T x, T y, T z)                noexcept;
+    explicit constexpr tvec3(T val)               noexcept;
     explicit tvec3(uninitialized_t)     noexcept;
     explicit tvec3(const tvec<T, 3> &v) noexcept;
     explicit tvec3(const tcolor3<T> &c) noexcept;

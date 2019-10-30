@@ -7,21 +7,21 @@
 namespace agz::math {
 
 template<typename T>
-tvec3<T>::tvec3() noexcept
+constexpr tvec3<T>::tvec3() noexcept
     : tvec3(T(0))
 {
 
 }
 
 template<typename T>
-tvec3<T>::tvec3(T x, T y, T z) noexcept
+constexpr tvec3<T>::tvec3(T x, T y, T z) noexcept
     : x(x), y(y), z(z)
 {
 
 }
 
 template<typename T>
-tvec3<T>::tvec3(T val) noexcept
+constexpr tvec3<T>::tvec3(T val) noexcept
     : tvec3(val, val, val)
 {
 
