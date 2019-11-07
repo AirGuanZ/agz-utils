@@ -80,6 +80,8 @@ template<typename T> tvec3<T> operator*(T lhs, const tvec3<T> &rhs) noexcept;
 template<typename T> bool operator==(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T> bool operator!=(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 
+template<typename T> bool operator<(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+
 template<typename T> auto dot(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T> auto cross(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T> auto cos(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;

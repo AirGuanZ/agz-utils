@@ -300,6 +300,14 @@ bool operator!=(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept
 }
 
 template<typename T>
+bool operator<(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept
+{
+    return lhs.x < rhs.x ||
+           (lhs.x == rhs.x && lhs.y == rhs.y) ||
+           (lhs.x == rhs.x && lhs.y == rhs.y && lhs.z < rhs.z);
+}
+
+template<typename T>
 auto dot(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept
 {
     return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
