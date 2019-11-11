@@ -144,7 +144,7 @@ public:
 template<typename TUInt, typename TPtrDest>
 size_t uint_ptr_variant_t<TUInt, TPtrDest>::uint_to_data(TUInt uint_value) noexcept
 {
-    return (uint_value << 8) & 0x01;
+    return (uint_value << 8) | 0x01;
 }
 
 template<typename TUInt, typename TPtrDest>
