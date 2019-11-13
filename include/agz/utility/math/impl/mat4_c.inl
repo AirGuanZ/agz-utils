@@ -548,6 +548,18 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::perspective(T fov_y_rad
 }
 
 template<typename T>
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::orthographic(T left, T right, T top, T bottom, T near_z, T far_z) noexcept
+{
+    T dx = 2 / (right - left);
+    T dy = 2 / (top - bottom);
+    T dz = 1 / (far_z - near_z);
+    return self_t(2 / (right - left),              0,                               0,                         0,
+                  0,                               2 / (top - bottom),              0,                         0,
+                  0,                               0,                               1 / (far_z - near_z),      0,
+                  (left + right) / (left - right), (bottom + top) / (bottom - top), near_z / (near_z - far_z), 1);
+}
+
+template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept
 {
     auto D = (dst - eye).normalize();
