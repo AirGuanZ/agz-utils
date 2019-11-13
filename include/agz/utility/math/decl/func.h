@@ -23,6 +23,15 @@ auto mix(const T &left, const T &right, F factor) noexcept(noexcept((1 - factor)
 }
 
 /**
+ * @brief 线性插值，同mix
+ */
+template<typename T, typename F>
+auto lerp(const T &left, const T &right, F factor) noexcept(noexcept((1 - factor) * left + factor * right))
+{
+    return ::agz::math::mix(left, right, factor);
+}
+
+/**
  * @brief 测试一个浮点数是否具有有限值
  */
 template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>

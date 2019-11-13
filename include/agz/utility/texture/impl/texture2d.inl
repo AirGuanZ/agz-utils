@@ -5,18 +5,11 @@ namespace agz::texture
 
 template<typename T>
 texture2d_t<T>::texture2d_t(int h, int w, const texel_t *data)
-    : texture2d_t({ h, w }, data)
-{
-    
-}
-
-template<typename T>
-texture2d_t<T>::texture2d_t(const math::vec2i &size, const texel_t *data)
-    : data_({ size[0], size[1] }, UNINIT)
+    : data_({ h, w }, UNINIT)
 {
     if constexpr(std::is_trivially_copy_constructible_v<T>)
     {
-        std::memcpy(data_.raw_data(), data, sizeof(texel_t) * size[0] * size[1]);
+        std::memcpy(data_.raw_data(), data, sizeof(texel_t) * h * w);
     }
     else
     {
@@ -31,28 +24,14 @@ texture2d_t<T>::texture2d_t(const math::vec2i &size, const texel_t *data)
 
 template<typename T>
 texture2d_t<T>::texture2d_t(int h, int w, uninitialized_t)
-    : texture2d_t({ h, w }, UNINIT)
-{
-    
-}
-
-template<typename T>
-texture2d_t<T>::texture2d_t(const math::vec2i &size, uninitialized_t)
-    : data_({ size[0], size[1] }, UNINIT)
+    : data_({ h, w }, UNINIT)
 {
     
 }
 
 template<typename T>
 texture2d_t<T>::texture2d_t(int h, int w, const texel_t &init_texel)
-    : texture2d_t({ h, w }, init_texel)
-{
-    
-}
-
-template<typename T>
-texture2d_t<T>::texture2d_t(const math::vec2i &size, const texel_t &init_texel)
-    : data_({ size[0], size[1] }, init_texel)
+    : data_({ h, w }, init_texel)
 {
     
 }
@@ -93,13 +72,6 @@ void texture2d_t<T>::initialize(int h, int w, uninitialized_t)
 }
 
 template<typename T>
-void texture2d_t<T>::initialize(const math::vec2i &size, uninitialized_t)
-{
-    self_t t(size, UNINIT);
-    this->swap(t);
-}
-
-template<typename T>
 void texture2d_t<T>::initialize(int h, int w, const texel_t &init_texel)
 {
     self_t t(h, w, init_texel);
@@ -107,23 +79,9 @@ void texture2d_t<T>::initialize(int h, int w, const texel_t &init_texel)
 }
 
 template<typename T>
-void texture2d_t<T>::initialize(const math::vec2i &size, const texel_t &init_texel)
-{
-    self_t t(size, init_texel);
-    this->swap(t);
-}
-
-template<typename T>
 void texture2d_t<T>::initialize(int h, int w, const texel_t *data)
 {
     self_t t(h, w, data);
-    this->swap(t);
-}
-
-template<typename T>
-void texture2d_t<T>::initialize(const math::vec2i &size, const texel_t *data)
-{
-    self_t t(size, data);
     this->swap(t);
 }
 
@@ -203,7 +161,7 @@ template<typename T>
 template<typename Func>
 auto texture2d_t<T>::map(Func &&func) const
 {
-    using ret_pixel_t = rm_rcv_t<decltype(func(data_.at({ 0, 0 }))) > ;
+    using ret_pixel_t = rm_rcv_t<decltype(func(data_.at({ 0, 0 })))> ;
     return texture2d_t<ret_pixel_t>(data_.map(std::forward<Func>(func)));
 }
 
