@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "misc/bitcast.h"
 #include "misc/construct_from_tuple.h"

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "texture/mipmap.h"
 #include "texture/sample.h"

@@ -1,4 +1,4 @@
-#define SWIZZLE2(A, B)       _SWIZZLE2(A, B)
+﻿#define SWIZZLE2(A, B)       _SWIZZLE2(A, B)
 #define SWIZZLE3(A, B, C)    _SWIZZLE3(A, B, C)
 #define SWIZZLE4(A, B, C, D) _SWIZZLE4(A, B, C, D)
 

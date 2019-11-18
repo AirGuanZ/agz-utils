@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <sstream>
 
 #include <agz/utility/file/file_raw.h>

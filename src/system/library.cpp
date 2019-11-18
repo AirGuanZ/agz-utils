@@ -1,4 +1,4 @@
-#include <string>
+﻿#include <string>
 
 #include <agz/utility/misc/scope_guard.h>
 #include <agz/utility/system/library.h>

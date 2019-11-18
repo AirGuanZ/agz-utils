@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef AGZ_ENABLE_OPENGL
 
