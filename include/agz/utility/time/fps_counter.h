@@ -58,9 +58,9 @@ public:
         return last_update_interval_;
     }
 
-    float elasped_microseconds() const noexcept
+    double elasped_microseconds() const noexcept
     {
-        return float(std::chrono::duration_cast<std::chrono::microseconds>(
+        return double(std::chrono::duration_cast<std::chrono::microseconds>(
                         last_update_interval_).count());
     }
 
