@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "common.h"
+#include "quaternion.h"
 #include "vec4.h"
 
 namespace agz::math
@@ -115,6 +116,8 @@ public:
         static self_t perspective(T fov_y_rad, T w_over_h, T near_plane, T far_plane)       noexcept;
         static self_t orthographic(T left, T right, T top, T bottom, T near_z, T far_z)     noexcept;
         static self_t look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept;
+
+        static self_t from_quaternion(const tquaternion_t<T> &quaternion) noexcept;
     };
 };
 

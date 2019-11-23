@@ -29,7 +29,7 @@ tquaternion_t<T>::tquaternion_t(T a, const tvec3<T> &b) noexcept
 template<typename T>
 typename tquaternion_t<T>::self_t tquaternion_t<T>::construct_quaternion(const tvec3<T> &axis, T rad) noexcept
 {
-    T half_angle = T(0.5) * rad;
+    T half_angle = T(-0.5) * rad;
     return self_t(std::cos(half_angle), std::sin(half_angle) * axis.normalize());
 }
 
@@ -100,6 +100,26 @@ template<typename T>
 typename tquaternion_t<T>::self_t tquaternion_t<T>::inverse() const noexcept
 {
     return this->conjugate() / this->length_square();
+}
+
+template<typename T>
+tquaternion_t<T> operator*(T lhs, const tquaternion_t<T> &rhs) noexcept
+{
+    return rhs * lhs;
+}
+
+template<typename T>
+tquaternion_t<T> slerp(const tquaternion_t<T> &a, const tquaternion_t<T> &b, T interp_factor) noexcept
+{
+    tquaternion_t<T> delta = b * a.inverse();
+    T cos_half_theta = delta.a;
+    T half_theta     = std::acos(cos_half_theta);
+    T t_theta        = interp_factor * half_theta;
+    T cos_t_theta    = std::cos(t_theta);
+    T sin_t_theta    = std::sin(t_theta);
+
+    tquaternion_t<T> t_delta = tquaternion_t<T>(cos_t_theta, sin_t_theta * delta.b.normalize());
+    return t_delta * a;
 }
 
 } // namespace agz::math

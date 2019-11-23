@@ -54,9 +54,9 @@ public:
 };
 
 template<typename T>
-tquaternion_t<T> operator*(T lhs, const tquaternion_t<T> &rhs) noexcept
-{
-    return rhs * lhs;
-}
+tquaternion_t<T> operator*(T lhs, const tquaternion_t<T> &rhs) noexcept;
+
+template<typename T>
+tquaternion_t<T> slerp(const tquaternion_t<T> &a, const tquaternion_t<T> &b, T interp_factor) noexcept;
 
 } // namespace agz::math
