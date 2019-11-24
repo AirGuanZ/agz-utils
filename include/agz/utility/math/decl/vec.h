@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <ostream>
 #include <tuple>
 
 #include "../../misc/type_list.h"
@@ -77,6 +78,8 @@ template<typename T, int D> bool operator!=(const tvec<T, D> &lhs, const tvec<T,
 
 template<typename T, int D> auto dot(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept;
 template<typename T, int D> auto cos(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept;
+
+template<typename T, int D> std::ostream &operator<<(std::ostream &out, const tvec<T, D> &vec);
 
 template<typename T, int D>
 using vec = tvec<T, D>;

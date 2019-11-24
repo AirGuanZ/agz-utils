@@ -111,7 +111,7 @@ tquaternion_t<T> operator*(T lhs, const tquaternion_t<T> &rhs) noexcept
 template<typename T>
 tquaternion_t<T> slerp(const tquaternion_t<T> &a, const tquaternion_t<T> &b, T interp_factor) noexcept
 {
-    tquaternion_t<T> delta = b * a.inverse();
+    /*tquaternion_t<T> delta = b * a.inverse();
     T cos_half_theta = delta.a;
     T half_theta     = std::acos(cos_half_theta);
     T t_theta        = interp_factor * half_theta;
@@ -119,7 +119,26 @@ tquaternion_t<T> slerp(const tquaternion_t<T> &a, const tquaternion_t<T> &b, T i
     T sin_t_theta    = std::sin(t_theta);
 
     tquaternion_t<T> t_delta = tquaternion_t<T>(cos_t_theta, sin_t_theta * delta.b.normalize());
-    return t_delta * a;
+    return t_delta * a;*/
+
+    T cos = a.a * b.a + dot(a.b, b.b);
+
+    auto _b = b;
+    if(cos < T(0))
+    {
+        cos = -cos;
+        _b = tquaternion_t<T>(-_b.a, -_b.b);
+    }
+
+    T linear_a, linear_b;
+    T theta  = std::acos(cos);
+    T sin    = std::sin(theta);
+    linear_a = std::sin((T(1) - interp_factor) * theta) / sin;
+    linear_b = std::sin(interp_factor          * theta) / sin;
+
+    return tquaternion_t<T>(
+        linear_a * a.a + linear_b * _b.a,
+        linear_a * a.b + linear_b * _b.b);
 }
 
 } // namespace agz::math

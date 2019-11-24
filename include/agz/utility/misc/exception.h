@@ -14,7 +14,7 @@ namespace agz::misc
 template<typename TIt>
 void extract_hierarchy_exceptions(const std::exception &e, TIt out_it)
 {
-    *out_it++ = typename TIt::container_type::value_type(e.what());
+    *out_it++ = e.what();
     try
     {
         std::rethrow_if_nested(e);
@@ -25,7 +25,7 @@ void extract_hierarchy_exceptions(const std::exception &e, TIt out_it)
     }
     catch(...)
     {
-        *out_it++ = typename TIt::container_type::value_type("an unknown exception was thrown");
+        *out_it++ = "an unknown exception was thrown";
     }
 }
 

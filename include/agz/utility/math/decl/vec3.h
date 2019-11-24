@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <functional>
+#include <ostream>
 
 #include "../../misc/hash.h"
 #include "common.h"
@@ -85,6 +86,8 @@ template<typename T> bool operator<(const tvec3<T> &lhs, const tvec3<T> &rhs) no
 template<typename T> auto dot(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T> auto cross(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T> auto cos(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+
+template<typename T> std::ostream &operator<<(std::ostream &out, const tvec3<T> &vec);
 
 using vec3f = tvec3<float>;
 using vec3d = tvec3<double>;

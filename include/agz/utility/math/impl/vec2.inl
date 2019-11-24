@@ -306,4 +306,10 @@ auto cos(const tvec2<T> &lhs, const tvec2<T> &rhs) noexcept
     return dot(lhs, rhs) / (lhs.length() * rhs.length());
 }
 
+template<typename T>
+std::ostream &operator<<(std::ostream &out, const tvec2<T> &vec)
+{
+    return out << "(" << vec.x << ", " << vec.y << ")";
+}
+
 } // namespace agz::math

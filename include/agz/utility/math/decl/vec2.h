@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <ostream>
+
 #include "common.h"
 #include "vec.h"
 
@@ -80,6 +82,8 @@ template<typename T> bool operator!=(const tvec2<T> &lhs, const tvec2<T> &rhs) n
 template<typename T> auto dot  (const tvec2<T> &lhs, const tvec2<T> &rhs) noexcept;
 template<typename T> auto cross(const tvec2<T> &lhs, const tvec2<T> &rhs) noexcept;
 template<typename T> auto cos  (const tvec2<T> &lhs, const tvec2<T> &rhs) noexcept;
+
+template<typename T> std::ostream &operator<<(std::ostream &out, const tvec2<T> &vec);
 
 using vec2f = tvec2<float>;
 using vec2d = tvec2<double>;
