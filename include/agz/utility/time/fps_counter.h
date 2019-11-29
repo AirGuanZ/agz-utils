@@ -44,13 +44,14 @@ public:
         if(last_update_interval_ >= update_timeout_interval_)
             last_update_interval_ = expected_update_interval_;
 
-        ++fps_counter_;
         if(now - fps_start_time_ > fps_interval_)
         {
             fps_ = fps_counter_;
             fps_counter_ = 0;
             fps_start_time_ = now;
         }
+        else
+            ++fps_counter_;
     }
 
     duration elasped_time() const noexcept

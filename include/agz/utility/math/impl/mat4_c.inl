@@ -572,9 +572,9 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::look_at(const tvec3<T> 
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::from_quaternion(const tquaternion_t<T> &quaternion) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::from_quaternion(const tquaternion_t<T> &q) noexcept
 {
-    float s = quaternion.length();
+    /*float s = quaternion.length();
     float r = quaternion.a;
     float i = quaternion.b.x;
     float j = quaternion.b.y;
@@ -584,7 +584,21 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::from_quaternion(const t
                   2 * s * (i * j + k * r), 1 - 2 * s * (i2 + k2),   2 * s * (j * k - i * r), 0,
                   2 * s * (i * k - j * r), 2 * s * (j * k + i * r), 1 - 2 * s * (i2 + j2),   0,
                   0,                       0,                       0,                       1
-            ).transpose();
+            ).transpose();*/
+    T x = q.x, y = q.y, z = q.z, w = q.w;
+    T r0c0 = 1 - 2 * (y * y + z * z);
+    T r0c1 = 2 * (x * y - z * w);
+    T r0c2 = 2 * (x * z + y * w);
+    T r1c0 = 2 * (x * y + z * w);
+    T r1c1 = 1 - 2 * (x * x + z * z);
+    T r1c2 = 2 * (y * z - x * w);
+    T r2c0 = 2 * (x * z - y * w);
+    T r2c1 = 2 * (y * z + x * w);
+    T r2c2 = 1 - 2 * (x * x + y * y);
+    return self_t(r0c0, r0c1, r0c2, 0,
+                  r1c0, r1c1, r1c2, 0,
+                  r2c0, r2c1, r2c2, 0,
+                  0,    0,    0,    1).transpose();
 }
 
 } // namespace agz::math

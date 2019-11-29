@@ -2,143 +2,106 @@
 
 #include <cmath>
 
+#include "../decl/func.h"
+
 namespace agz::math
 {
 
 template<typename T>
 tquaternion_t<T>::tquaternion_t() noexcept
-    : tquaternion_t(0, tvec3<T>(0))
+    : w(1), x(0), y(0), z(0)
 {
     
 }
 
 template<typename T>
-tquaternion_t<T>::tquaternion_t(T a, T b, T c, T d) noexcept
-    : a(a), b(b, c, d)
+tquaternion_t<T>::tquaternion_t(T w, T x, T y, T z) noexcept
+    : w(w), x(x), y(y), z(z)
 {
     
 }
 
 template<typename T>
-tquaternion_t<T>::tquaternion_t(T a, const tvec3<T> &b) noexcept
-    : a(a), b(b)
+tquaternion_t<T>::tquaternion_t(const tvec3<T> &axis, T rad) noexcept
 {
-    
+    tvec3<T> normalized_axis = axis.normalize();
+    T half_theta = T(0.5) * rad;
+    T sin_angle = std::sin(half_theta);
+    T cos_angle = std::cos(half_theta);
+    x = sin_angle * axis.x;
+    y = sin_angle * axis.y;
+    z = sin_angle * axis.z;
+    w = cos_angle;
 }
 
 template<typename T>
-typename tquaternion_t<T>::self_t tquaternion_t<T>::construct_quaternion(const tvec3<T> &axis, T rad) noexcept
+typename tquaternion_t<T>::self_t tquaternion_t<T>::normalize() const noexcept
 {
-    T half_angle = T(-0.5) * rad;
-    return self_t(std::cos(half_angle), std::sin(half_angle) * axis.normalize());
-}
-
-template<typename T>
-tvec3<T> tquaternion_t<T>::apply_to_vector(const tvec3<T> &vec) noexcept
-{
-    return (*this * self_t(0, vec) * conjugate()).b;
-}
-
-template<typename T>
-typename tquaternion_t<T>::self_t tquaternion_t<T>::operator*(const self_t &rhs) const noexcept
-{
-    T new_a = a * rhs.a - dot(b, rhs.b);
-    tvec3<T> new_b = a * rhs.b + b * rhs.a + cross(b, rhs.b);
-    return self_t(new_a, new_b);
-}
-
-template<typename T>
-typename tquaternion_t<T>::self_t tquaternion_t<T>::operator*(T rhs) const noexcept
-{
-    return self_t(a * rhs, b * rhs);
-}
-
-template<typename T>
-typename tquaternion_t<T>::self_t tquaternion_t<T>::operator/(T rhs) const noexcept
-{
-    return self_t(a / rhs, b / rhs);
-}
-
-template<typename T>
-typename tquaternion_t<T>::self_t& tquaternion_t<T>::operator*=(const self_t &rhs) noexcept
-{
-    *this = *this * rhs;
+    T len = std::sqrt(x * x + y * y + z * z + w * w);
+    if(len)
+    {
+        T inv_len = 1 / len;
+        return self_t(w * inv_len, x * inv_len, y * inv_len, z * inv_len);
+    }
     return *this;
-}
-
-template<typename T>
-bool tquaternion_t<T>::operator==(const self_t &rhs) const noexcept
-{
-    return a == rhs.a && b == rhs.b;
-}
-
-template<typename T>
-bool tquaternion_t<T>::operator!=(const self_t &rhs) const noexcept
-{
-    return !(*this == rhs);
-}
-
-template<typename T>
-T tquaternion_t<T>::length_square() const noexcept
-{
-    return a * a + b.length_square();
-}
-
-template<typename T>
-T tquaternion_t<T>::length() const noexcept
-{
-    return std::sqrt(this->length_square());
 }
 
 template<typename T>
 typename tquaternion_t<T>::self_t tquaternion_t<T>::conjugate() const noexcept
 {
-    return self_t(a, -b);
+    return self_t(w, -x, -y, -z);
 }
 
 template<typename T>
-typename tquaternion_t<T>::self_t tquaternion_t<T>::inverse() const noexcept
+tvec3<T> tquaternion_t<T>::apply_to_vector(const tvec3<T> &rhs) const noexcept
 {
-    return this->conjugate() / this->length_square();
+    self_t rhs_q(0, rhs.x, rhs.y, rhs.z);
+    self_t inv_this = conjugate();
+    self_t ret = *this * rhs_q * conjugate();
+    return tvec3<T>(ret.x, ret.y, ret.z);
 }
 
 template<typename T>
-tquaternion_t<T> operator*(T lhs, const tquaternion_t<T> &rhs) noexcept
+typename tquaternion_t<T>::self_t tquaternion_t<T>::operator*(const self_t &rhs) const noexcept
 {
-    return rhs * lhs;
+    return self_t(w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z,
+                  w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
+                  w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
+                  w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x);
 }
 
 template<typename T>
-tquaternion_t<T> slerp(const tquaternion_t<T> &a, const tquaternion_t<T> &b, T interp_factor) noexcept
+tquaternion_t<T> slerp(const tquaternion_t<T> &lhs, const tquaternion_t<T> &rhs, T interp_factor)
 {
-    /*tquaternion_t<T> delta = b * a.inverse();
-    T cos_half_theta = delta.a;
-    T half_theta     = std::acos(cos_half_theta);
-    T t_theta        = interp_factor * half_theta;
-    T cos_t_theta    = std::cos(t_theta);
-    T sin_t_theta    = std::sin(t_theta);
-
-    tquaternion_t<T> t_delta = tquaternion_t<T>(cos_t_theta, sin_t_theta * delta.b.normalize());
-    return t_delta * a;*/
-
-    T cos = a.a * b.a + dot(a.b, b.b);
-
-    auto _b = b;
-    if(cos < T(0))
+    T cos_theta = lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
+    tquaternion_t<T> real_rhs = rhs;
+    if(cos_theta < 0)
     {
-        cos = -cos;
-        _b = tquaternion_t<T>(-_b.a, -_b.b);
+        cos_theta = -cos_theta;
+        real_rhs.x = -real_rhs.x;
+        real_rhs.y = -real_rhs.y;
+        real_rhs.z = -real_rhs.z;
+        real_rhs.w = -real_rhs.w;
     }
 
-    T linear_a, linear_b;
-    T theta  = std::acos(cos);
-    T sin    = std::sin(theta);
-    linear_a = std::sin((T(1) - interp_factor) * theta) / sin;
-    linear_b = std::sin(interp_factor          * theta) / sin;
+    T lhs_w, rhs_w;
+    if(1 - cos_theta > T(1e-4))
+    {
+        T theta     = std::acos(cos_theta);
+        T sin_theta = std::sin(theta);
+        lhs_w = std::sin((1 - interp_factor) * theta) / sin_theta;
+        rhs_w = std::sin(interp_factor       * theta) / sin_theta;
+    }
+    else
+    {
+        lhs_w = 1 - interp_factor;
+        rhs_w = interp_factor;
+    }
 
-    return tquaternion_t<T>(
-        linear_a * a.a + linear_b * _b.a,
-        linear_a * a.b + linear_b * _b.b);
+    return tquaternion_t<T>(lhs_w * lhs.w + rhs_w * real_rhs.w,
+                            lhs_w * lhs.x + rhs_w * real_rhs.x,
+                            lhs_w * lhs.y + rhs_w * real_rhs.y,
+                            lhs_w * lhs.z + rhs_w * real_rhs.z);
 }
 
 } // namespace agz::math
