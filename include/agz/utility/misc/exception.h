@@ -13,6 +13,7 @@ namespace agz::misc
  */
 template<typename TIt>
 void extract_hierarchy_exceptions(const std::exception &e, TIt out_it)
+        noexcept(noexcept(*out_it++ = e.what()) && noexcept(*out_it++ = ""))
 {
     *out_it++ = e.what();
     try
