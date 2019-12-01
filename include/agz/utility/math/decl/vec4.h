@@ -19,6 +19,7 @@ public:
 
     tvec4()                         noexcept;
     tvec4(T x, T y, T z, T w)       noexcept;
+    tvec4(const tvec3<T> &xyz, T w) noexcept;
     explicit tvec4(T val)           noexcept;
     explicit tvec4(uninitialized_t) noexcept;
     explicit tvec4(const tvec<T, 4> &v) noexcept;

@@ -21,6 +21,13 @@ tvec4<T>::tvec4(T x, T y, T z, T w) noexcept
 }
 
 template<typename T>
+tvec4<T>::tvec4(const tvec3<T> &xyz, T w) noexcept
+    : x(xyz.x), y(xyz.y), z(xyz.z), w(w)
+{
+    
+}
+
+template<typename T>
 tvec4<T>::tvec4(T val) noexcept
     : tvec4(val, val, val, val)
 {
