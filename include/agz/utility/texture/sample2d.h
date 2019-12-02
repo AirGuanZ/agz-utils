@@ -17,9 +17,9 @@ namespace sample_impl
 /**
  * @brief 对纹理进行最近邻采样
  * 
- * @param uv 纹理坐标，取值范围[0, 1]^2，两个维度分别对应水平和垂直
- * @param tex 可调用对象，用于取得纹素。调用参数为两个int，第一个为x下标，第二个为y下标
- * @param width 纹理宽度
+ * @param uv     纹理坐标，取值范围[0, 1]^2，两个维度分别对应水平和垂直
+ * @param tex    可调用对象，用于取得纹素。调用参数为两个int，第一个为x下标，第二个为y下标
+ * @param width  纹理宽度
  * @param height 纹理高度
  */
 template<typename F, typename Tex>
@@ -35,11 +35,11 @@ auto nearest_sample(const math::tvec2<F> &uv, const Tex &tex, int width, int hei
 }
 
 /**
- * @brief 对纹理进行最近邻采样
+ * @brief 对纹理进行双线性插值采样
  *
- * @param uv 纹理坐标，取值范围[0, 1]^2，两个维度分别对应水平和垂直
- * @param tex 可调用对象，用于取得纹素。调用参数为两个int，第一个为x下标，第二个为y下标
- * @param width 纹理宽度
+ * @param uv     纹理坐标，取值范围[0, 1]^2，两个维度分别对应水平和垂直
+ * @param tex    可调用对象，用于取得纹素。调用参数为两个int，第一个为x下标，第二个为y下标
+ * @param width  纹理宽度
  * @param height 纹理高度
  */
 template<typename F, typename Tex>

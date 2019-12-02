@@ -91,4 +91,27 @@ std::pair<T, T> minmax(T a, T b) noexcept
     return a < b ? std::pair{ a, b } : std::pair{ b, a };
 }
 
+template<typename T>
+auto distance(const tvec2<T> &a, const tvec2<T> &b) noexcept
+{
+    return (a - b).length();
+}
+
+template<typename T>
+auto distance(const tvec3<T> &a, const tvec3<T> &b) noexcept
+{
+    return (a - b).length();
+}
+template<typename T>
+auto distance(const tvec4<T> &a, const tvec4<T> &b) noexcept
+{
+    return (a - b).length();
+}
+
+template<typename T, int D>
+auto distance(const tvec<T, D> &a, const tvec<T, D> &b) noexcept
+{
+    return (a - b).length();
+}
+
 } // namespace agz::math
