@@ -1,10 +1,14 @@
 ﻿#pragma once
 
+// OS
+
 #if defined(_WIN32)
     #define AGZ_OS_WIN32
 #elif defined(__linux)
     #define AGZ_OS_LINUX
 #endif
+
+// CXX
 
 #if defined(_MSC_VER)
     #define AGZ_CC_MSVC
@@ -15,6 +19,8 @@
     #define AGZ_CC_GCC
     #define AGZ_CC_IS_GNU
 #endif
+
+// DEBUG
 
 #if defined(_DEBUG) || defined(DEBUG)
     #define AGZ_DEBUG
