@@ -8,7 +8,7 @@ namespace agz::texture
 namespace sample_impl
 {
     template<typename F, typename P>
-    auto linear_interpolate(const P &u0v0, const P &u1v0, const P &u0v1, const P &u1v1, F u, F v)
+    auto linear_interpolate_2d(const P &u0v0, const P &u1v0, const P &u0v1, const P &u1v1, F u, F v)
     {
         return (u0v0 * (1 - u) + u1v0 * u) * (1 - v) + (u0v1 * (1 - u) + u1v1 * u) * v;
     }
@@ -23,7 +23,7 @@ namespace sample_impl
  * @param height 纹理高度
  */
 template<typename F, typename Tex>
-auto nearest_sample(const math::tvec2<F> &uv, const Tex &tex, int width, int height)
+auto nearest_sample2d(const math::tvec2<F> &uv, const Tex &tex, int width, int height)
     -> decltype(tex(std::declval<int>(), std::declval<int>()))
 {
     assert(width > 0 && height > 0);
@@ -43,7 +43,7 @@ auto nearest_sample(const math::tvec2<F> &uv, const Tex &tex, int width, int hei
  * @param height 纹理高度
  */
 template<typename F, typename Tex>
-auto linear_sample(const math::tvec2<F> &uv, const Tex &tex, int width, int height)
+auto linear_sample2d(const math::tvec2<F> &uv, const Tex &tex, int width, int height)
     -> decltype(tex(std::declval<int>(), std::declval<int>()))
 {
     auto fu = static_cast<F>(uv.x * width);
@@ -66,7 +66,7 @@ auto linear_sample(const math::tvec2<F> &uv, const Tex &tex, int width, int heig
     auto puapv  = tex(pu,  apv);
     auto apuapv = tex(apu, apv);
 
-    return sample_impl::linear_interpolate(pupv, apupv, puapv, apuapv, du, dv);
+    return sample_impl::linear_interpolate_2d(pupv, apupv, puapv, apuapv, du, dv);
 }
 
 } // namespace agz::texture
