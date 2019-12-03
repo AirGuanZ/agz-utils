@@ -19,7 +19,7 @@ enum class endian_type
 #if defined(__GNUC__)
     #if __BYTE_ORDER == __BIG_ENDIAN
         local = big
-    #else if __BYTE_ORDER == __LITTLE_ENDIAN
+    #elif __BYTE_ORDER == __LITTLE_ENDIAN
         local = little
     #else
         #error "platform with unknown endian"
