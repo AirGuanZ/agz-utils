@@ -1,4 +1,4 @@
-/*
+﻿/*
  Copyright (c) 2018, Sebastian Reiter (s.b.reiter@gmail.com)
  All rights reserved.
  
