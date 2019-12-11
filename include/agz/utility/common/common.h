@@ -30,4 +30,8 @@ ptrdiff_t byte_offset(M(C::*memPtr)) noexcept
          - reinterpret_cast<char*>(reinterpret_cast<C*>(0));
 }
 
+/** @brief identity_t<T> is T */
+template<typename T>
+using identity_t = T;
+
 } // namespace agz
