@@ -79,10 +79,10 @@ namespace sh_impl
 
             // 由于N_i被选取为各轴上的方向向量，故M * Ni就是M的第i列
 
-            auto PMN0 = spherical_harmonics::project_to_sh<1>(rot.get_col(0));
-            auto PMN1 = spherical_harmonics::project_to_sh<1>(rot.get_col(1));
-            auto PMN2 = spherical_harmonics::project_to_sh<1>(rot.get_col(2));
-            auto S = tmat3_c<T>::from_cols(PMN0, PMN1, PMN2);
+            const auto PMN0 = spherical_harmonics::project_to_sh<1>(rot.get_col(0));
+            const auto PMN1 = spherical_harmonics::project_to_sh<1>(rot.get_col(1));
+            const auto PMN2 = spherical_harmonics::project_to_sh<1>(rot.get_col(2));
+            const auto S = tmat3_c<T>::from_cols(PMN0, PMN1, PMN2);
 
             tvec3<T> x(coefs[0], coefs[1], coefs[2]);
             x = S * (INV_A * x);
@@ -116,13 +116,12 @@ namespace sh_impl
                              K1 * coefs[1]);
 
             // 构造S
-            // IMPROVE：N是确定的，故P(M * N)可以优化
-
-            auto PMN0 = spherical_harmonics::project_to_sh<2>(rot.get_col(0));
-            auto PMN1 = spherical_harmonics::project_to_sh<2>(rot.get_col(2));
-            auto PMN2 = spherical_harmonics::project_to_sh<2>(rot * N2);
-            auto PMN3 = spherical_harmonics::project_to_sh<2>(rot * N3);
-            auto PMN4 = spherical_harmonics::project_to_sh<2>(rot * N4);
+            
+            const auto PMN0 = spherical_harmonics::project_to_sh<2>(rot.get_col(0));
+            const auto PMN1 = spherical_harmonics::project_to_sh<2>(rot.get_col(2));
+            const auto PMN2 = spherical_harmonics::project_to_sh<2>(rot * N2);
+            const auto PMN3 = spherical_harmonics::project_to_sh<2>(rot * N3);
+            const auto PMN4 = spherical_harmonics::project_to_sh<2>(rot * N4);
 
             // 计算S(A^{-1}x)
 
@@ -247,8 +246,8 @@ namespace spherical_harmonics
     inline std::pair<int, int> from_linear_index(int index) noexcept
     {
         // IMPROVE: see https://en.wikipedia.org/wiki/Methods_of_computing_square_roots
-        int L = static_cast<int>(std::sqrt(static_cast<float>(index)));
-        int M = index - L * (L + 1);
+        const int L = static_cast<int>(std::sqrt(static_cast<float>(index)));
+        const int M = index - L * (L + 1);
         return { L, M };
     }
 
@@ -293,8 +292,8 @@ namespace spherical_harmonics
     template<int L, typename T>
     tvec<T, 2 * L + 1> project_to_sh(const tvec3<T> &v) noexcept
     {
-        auto nv = v.normalize();
-        auto sh_tab = linear_table<T>();
+        const auto nv = v.normalize();
+        const auto sh_tab = linear_table<T>();
 
         tvec<T, 2 * L + 1> ret(UNINIT);
         for(int i = 0, j = L * L; i != 2 * L + 1; ++i, ++j)

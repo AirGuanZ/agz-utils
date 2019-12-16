@@ -138,9 +138,7 @@ T alias_sampler_t<F, T>::sample(F u) const noexcept
     const T n = static_cast<T>(table_.size());
     const F nu = n * u;
 
-    T i = static_cast<T>(nu);
-    i = std::min(i, n - 1);
-
+    const T i = std::min(static_cast<T>(nu), n - 1);
     const F s = nu - i;
 
     if(s <= table_[i].accept_prob)
@@ -158,8 +156,7 @@ T alias_sampler_t<F, T>::sample(F u1, F u2) const noexcept
     const T n = static_cast<T>(table_.size());
     const F nu = n * u1;
 
-    T i = static_cast<T>(nu);
-    i = std::min(i, n - 1);
+    const T i = std::min(static_cast<T>(nu), n - 1);
 
     if(u2 <= table_[i].accept_prob)
         return i;

@@ -191,7 +191,7 @@ typename texture3d_t<T>::self_t texture3d_t<T>::subtex(
     assert(0 <= y_beg && y_beg < y_end && y_end < height());
     assert(0 <= x_beg && x_beg < x_end && x_end < width());
 
-    int x_size = x_end - x_beg, y_size = y_end - y_beg, z_size = z_end - z_beg;
+    const int x_size = x_end - x_beg, y_size = y_end - y_beg, z_size = z_end - z_beg;
     self_t ret(z_size, y_size, x_size);
     for(int lz = 0, z = z_beg; lz < z_size; ++lz, ++z)
     {

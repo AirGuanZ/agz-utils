@@ -89,6 +89,28 @@ public:
         queue_.pop();
         return std::make_optional(std::move(ret));
     }
+
+    /**
+     * @brief 尝试取出一个数据，或得知不会再有数据到来
+     *
+     * 返回数据，则取出成功，此时stop不会被改变
+     * 返回std::nullopt且stop为true，则stop
+     * 返回std::nullopt且stop为false，则表示队列为空
+     */
+    std::optional<data_t> try_pop_or_stop(bool *stop)
+    {
+        std::unique_ptr lk(mut_);
+
+        if(queue_.empty())
+        {
+            *stop = stop_;
+            return std::nullopt;
+        }
+
+        auto ret = std::move(queue_.front());
+        queue_.pop();
+        return std::make_optional(std::move(ret));
+    }
 };
 
 /**

@@ -61,7 +61,7 @@ static std::vector<triangle_t> load_obj(const std::string &filename)
             throw std::runtime_error("invalid obj index count: " + std::to_string(shape.mesh.indices.size()));
 
         build_triangles.reserve(build_triangles.size() + shape.mesh.indices.size() / 3);
-        size_t triangle_count = shape.mesh.indices.size() / 3;
+        const size_t triangle_count = shape.mesh.indices.size() / 3;
 
         for(size_t i = 0, j = 0; i < triangle_count; ++i, j += 3)
         {

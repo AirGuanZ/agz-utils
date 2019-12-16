@@ -112,11 +112,11 @@ T determinant(T m00, T m01, T m02,
               T m20, T m21, T m22) noexcept
 {
     return m00 * determinant(m11, m12,
-        m21, m22)
-        - m01 * determinant(m10, m12,
-            m20, m22)
-        + m02 * determinant(m10, m11,
-            m20, m21);
+                             m21, m22)
+         - m01 * determinant(m10, m12,
+                             m20, m22)
+         + m02 * determinant(m10, m11,
+                             m20, m21);
 }
 
 template<typename T, typename>
@@ -126,17 +126,17 @@ T determinant(T m00, T m01, T m02, T m03,
               T m30, T m31, T m32, T m33) noexcept
 {
     return m00 * determinant(m11, m12, m13,
-        m21, m22, m23,
-        m31, m32, m33)
-        - m01 * determinant(m10, m12, m13,
-            m20, m22, m23,
-            m30, m32, m33)
-        + m02 * determinant(m10, m11, m13,
-            m20, m21, m23,
-            m30, m31, m33)
-        - m03 * determinant(m10, m11, m12,
-            m20, m21, m22,
-            m30, m31, m32);
+                             m21, m22, m23,
+                             m31, m32, m33)
+         - m01 * determinant(m10, m12, m13,
+                             m20, m22, m23,
+                             m30, m32, m33)
+         + m02 * determinant(m10, m11, m13,
+                             m20, m21, m23,
+                             m30, m31, m33)
+         - m03 * determinant(m10, m11, m12,
+                             m20, m21, m22,
+                             m30, m31, m32);
 }
 
 template<typename T>

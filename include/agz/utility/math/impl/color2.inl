@@ -242,13 +242,13 @@ bool operator!=(const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept
 }
 
 template<typename T, typename>
-color3b to_color3b(const tcolor2<T> &c) noexcept
+color3b to_color2b(const tcolor2<T> &c) noexcept
 {
     return c.clamp(0, 1).map([](T s) { return static_cast<unsigned char>(s * 255); });
 }
 
 template<typename T, typename>
-tcolor2<T> from_color3b(const color3b &c) noexcept
+tcolor2<T> from_color2b(const color3b &c) noexcept
 {
     return c.map([](unsigned char s) { return s / T(255); });
 }

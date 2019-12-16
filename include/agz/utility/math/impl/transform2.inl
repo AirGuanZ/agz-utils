@@ -79,35 +79,35 @@ tvec2<T> ttransform2<T, COLUMN_MAJOR>::apply_to_point(const tvec2<T> &point) con
 template<typename T, bool COLUMN_MAJOR>
 tvec2<T> ttransform2<T, COLUMN_MAJOR>::apply_to_vector(const tvec2<T> &vector) const noexcept
 {
-    auto v3 = mat_ * tvec3<T>(vector.x, vector.y, 0);
+    const auto v3 = mat_ * tvec3<T>(vector.x, vector.y, 0);
     return tvec2<T>(v3.x, v3.y);
 }
 
 template<typename T, bool COLUMN_MAJOR>
 tvec2<T> ttransform2<T, COLUMN_MAJOR>::apply_to_normal(const tvec2<T> &normal) const noexcept
 {
-    auto v4 = (inv_.t() * tvec3<T>(normal.x, normal.y, 0)).normalize();
+    const auto v4 = (inv_.t() * tvec3<T>(normal.x, normal.y, 0)).normalize();
     return tvec2<T>(v4.x, v4.y).normalize();
 }
 
 template<typename T, bool COLUMN_MAJOR>
 tvec2<T> ttransform2<T, COLUMN_MAJOR>::apply_inverse_to_point(const tvec2<T> &point) const noexcept
 {
-    auto p3 = inv_ * tvec3<T>(point.x, point.y, 1);
+    const auto p3 = inv_ * tvec3<T>(point.x, point.y, 1);
     return tvec2<T>(p3.x, p3.y) / p3.z;
 }
 
 template<typename T, bool COLUMN_MAJOR>
 tvec2<T> ttransform2<T, COLUMN_MAJOR>::apply_inverse_to_vector(const tvec2<T> &vector) const noexcept
 {
-    auto v3 = inv_ * tvec3<T>(vector.x, vector.y, 0);
+    const auto v3 = inv_ * tvec3<T>(vector.x, vector.y, 0);
     return tvec2<T>(v3.x, v3.y);
 }
 
 template<typename T, bool COLUMN_MAJOR>
 tvec2<T> ttransform2<T, COLUMN_MAJOR>::apply_inverse_to_normal(const tvec2<T> &normal) const noexcept
 {
-    auto v3 = (mat_.t() * tvec3<T>(normal.x, normal.y, 0)).normalize();
+    const auto v3 = (mat_.t() * tvec3<T>(normal.x, normal.y, 0)).normalize();
     return tvec3<T>(v3.x, v3.y).normalize();
 }
 

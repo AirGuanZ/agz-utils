@@ -63,7 +63,7 @@ namespace tensor_impl
     {
         static int eval(const tvec<int, 3> &shape, const tvec<int, 3> &index) noexcept
         {
-            int s2 = shape[2], s1 = shape[1] * shape[2];
+            const int s2 = shape[2], s1 = shape[1] * shape[2];
             return index[0] * s1 + index[1] * s2 + index[2];
         }
     };
@@ -94,7 +94,6 @@ tensor_t<P, D>::tensor_t(from_indexed_func_t, const vec<int, D> &shape, F &&func
     }
 
     data_ = data;
-
     guard.dismiss();
 }
 
@@ -117,7 +116,6 @@ tensor_t<P, D>::tensor_t(from_linear_indexed_func_t, const vec<int, D> &shape, F
         new(&data[i]) P(func(i));
 
     data_ = data;
-
     guard.dismiss();
 }
 
@@ -256,7 +254,7 @@ template<typename P, int D>
 P &tensor_t<P, D>::at(const index_t &index) noexcept
 {
     assert(is_available());
-    int linear_index = tensor_impl::to_linear_index_aux<D>::eval(shape_, index);
+    const int linear_index = tensor_impl::to_linear_index_aux<D>::eval(shape_, index);
     assert(linear_index < elem_count_);
     return data_[linear_index];
 }
@@ -265,7 +263,7 @@ template<typename P, int D>
 const P &tensor_t<P, D>::at(const index_t &index) const noexcept
 {
     assert(is_available());
-    int linear_index = tensor_impl::to_linear_index_aux<D>::eval(shape_, index);
+    const int linear_index = tensor_impl::to_linear_index_aux<D>::eval(shape_, index);
     assert(linear_index < elem_count_);
     return data_[linear_index];
 }

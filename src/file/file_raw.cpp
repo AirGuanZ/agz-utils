@@ -10,7 +10,7 @@ std::vector<unsigned char> agz::file::read_raw_file(const std::string &filename)
         return { };
 
     fin.seekg(0, std::ios::end);
-    auto len = fin.tellg();
+    const auto len = fin.tellg();
     fin.seekg(0, std::ios::beg);
 
     std::vector<unsigned char> ret(static_cast<size_t>(len));

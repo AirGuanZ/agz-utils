@@ -30,17 +30,17 @@ public:
           fps_interval_(fps_interval), expected_update_interval_(expected_update_interval),
           update_timeout_interval_(timeout_interval)
     {
-        time_point now = clock::now();
+        const time_point now = clock::now();
         last_update_time_ = now;
-        fps_start_time_ = now;
+        fps_start_time_   = now;
     }
 
     void frame_end() noexcept
     {
-        time_point now = clock::now();
+        const time_point now = clock::now();
 
         last_update_interval_ = now - last_update_time_;
-        last_update_time_ = now;
+        last_update_time_     = now;
         if(last_update_interval_ >= update_timeout_interval_)
             last_update_interval_ = expected_update_interval_;
 
@@ -72,7 +72,7 @@ public:
 
     void restart() noexcept
     {
-        time_point now = clock::now();
+        const time_point now = clock::now();
         last_update_interval_ = expected_update_interval_;
         last_update_time_ = now;
         fps_start_time_ = now;

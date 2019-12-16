@@ -12,7 +12,7 @@ namespace collision_impl
         F ret = 0;
         for(int i = 0; i < 3; ++i)
         {
-            F v = p[i];
+            const F v = p[i];
             if(v < low[i])
                 ret += (low[i] - v) * (low[i] - v);
             if(v > high[i])
@@ -31,7 +31,7 @@ std::pair<tvec3<F>, F> compute_bounding_sphere(const tvec3<F> *vertices, size_t 
     static_assert(std::is_floating_point_v<F>);
 
     tvec3<F> center;
-    F ratio = F(1) / vertex_count;
+    const F ratio = F(1) / vertex_count;
     for(size_t i = 0; i < vertex_count; ++i)
         center += ratio * vertices[i];
 

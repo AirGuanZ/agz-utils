@@ -89,21 +89,21 @@ typename ttransform3<T, COLUMN_MAJOR>::self_t ttransform3<T, COLUMN_MAJOR>::oper
 template<typename T, bool COLUMN_MAJOR>
 tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_point(const tvec3<T> &point) const noexcept
 {
-    auto p4 = mat_ * tvec4<T>(point.x, point.y, point.z, 1);
+    const auto p4 = mat_ * tvec4<T>(point.x, point.y, point.z, 1);
     return tvec3<T>(p4.x, p4.y, p4.z) / p4.w;
 }
 
 template<typename T, bool COLUMN_MAJOR>
 tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_vector(const tvec3<T> &vector) const noexcept
 {
-    auto v4 = mat_ * tvec4<T>(vector.x, vector.y, vector.z, 0);
+    const auto v4 = mat_ * tvec4<T>(vector.x, vector.y, vector.z, 0);
     return tvec3<T>(v4.x, v4.y, v4.z);
 }
 
 template<typename T, bool COLUMN_MAJOR>
 tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_normal(const tvec3<T> &normal) const noexcept
 {
-    auto v4 = (inv_.t() * tvec4<T>(normal.x, normal.y, normal.z, 0)).normalize();
+    const auto v4 = (inv_.t() * tvec4<T>(normal.x, normal.y, normal.z, 0)).normalize();
     return tvec3<T>(v4.x, v4.y, v4.z).normalize();
 }
 
@@ -118,21 +118,21 @@ tcoord3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_coord(const tcoord3<T> &coord)
 template<typename T, bool COLUMN_MAJOR>
 tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_point(const tvec3<T> &point) const noexcept
 {
-    auto p4 = inv_ * tvec4<T>(point.x, point.y, point.z, 1);
+    const auto p4 = inv_ * tvec4<T>(point.x, point.y, point.z, 1);
     return tvec3<T>(p4.x, p4.y, p4.z) / p4.w;
 }
 
 template<typename T, bool COLUMN_MAJOR>
 tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_vector(const tvec3<T> &vector) const noexcept
 {
-    auto v4 = inv_ * tvec4<T>(vector.x, vector.y, vector.z, 0);
+    const auto v4 = inv_ * tvec4<T>(vector.x, vector.y, vector.z, 0);
     return tvec3<T>(v4.x, v4.y, v4.z);
 }
 
 template<typename T, bool COLUMN_MAJOR>
 tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_normal(const tvec3<T> &normal) const noexcept
 {
-    auto v4 = (mat_.t() * tvec4<T>(normal.x, normal.y, normal.z, 0)).normalize();
+    const auto v4 = (mat_.t() * tvec4<T>(normal.x, normal.y, normal.z, 0)).normalize();
     return tvec3<T>(v4.x, v4.y, v4.z).normalize();
 }
 

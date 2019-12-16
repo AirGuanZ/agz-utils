@@ -192,7 +192,7 @@ typename texture2d_t<T>::self_t texture2d_t<T>::subtex(int y_beg, int y_end, int
     assert(is_available());
     assert(0 <= y_beg && y_beg < y_end && y_end < height());
     assert(0 <= x_beg && x_beg < x_end && x_end < width());
-    int y_size = y_end - y_beg, x_size = x_end - x_beg;
+    const int y_size = y_end - y_beg, x_size = x_end - x_beg;
     self_t ret(y_size, x_size);
     for(int ly = 0, y = y_beg; ly < y_size; ++ly, ++y)
     {

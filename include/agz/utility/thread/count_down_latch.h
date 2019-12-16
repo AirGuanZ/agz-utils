@@ -20,6 +20,12 @@ class count_down_latch_t : public misc::uncopyable_t
 
 public:
 
+    count_down_latch_t()
+        : counter_(0)
+    {
+        
+    }
+
     explicit count_down_latch_t(int counter)
         : counter_(counter)
     {
@@ -45,14 +51,12 @@ public:
     }
 
     /**
-     * @brief 使counter减一并在为0时通知等在counter上的线程
+     * @brief 使counter减一并在不为正时通知等在counter上的线程
      */
     void count_down()
     {
         std::lock_guard lk(mutex_);
-        assert(counter_);
-        --counter_;
-        if(counter_ <= 0)
+        if(--counter_ <= 0)
             cond_.notify_all();
     }
 };
