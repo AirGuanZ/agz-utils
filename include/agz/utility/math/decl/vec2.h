@@ -91,3 +91,15 @@ using vec2i = tvec2<int>;
 using vec2b = tvec2<uint8_t>;
 
 } // namespace agz::math
+
+namespace std
+{
+    template<typename T>
+    struct hash<agz::math::tvec2<T>>
+    {
+        size_t operator()(const agz::math::tvec2<T> &vec) const noexcept
+        {
+            return agz::misc::hash(vec.x, vec.y);
+        }
+    };
+}

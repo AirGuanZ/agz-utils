@@ -122,6 +122,100 @@ static std::vector<triangle_t> load_stl(const std::string &filename)
     return ret;
 }
 
+std::vector<face_t> load_from_obj(const std::string &filename)
+{
+    std::string src = file::read_txt_file(filename);
+    stdstr::replace_(src, "\\\n", " ");
+    stdstr::replace_(src, "\\\r\n", " ");
+
+    tinyobj::ObjReader reader;
+    tinyobj::ObjReaderConfig reader_config;
+    reader_config.triangulate = false;
+    if(!reader.ParseFromString(src, "", reader_config))
+        throw std::runtime_error(reader.Error());
+
+    auto &attrib = reader.GetAttrib();
+    
+    auto get_pos = [&](size_t index)
+    {
+        if(3 * index + 2 >= attrib.vertices.size())
+            throw std::runtime_error("invalid obj vertex index: out of range");
+        return math::vec3f(attrib.vertices[3 * index + 0],
+                           attrib.vertices[3 * index + 1],
+                           attrib.vertices[3 * index + 2]);
+    };
+
+    auto get_nor = [&](size_t index)
+    {
+        if(3 * index + 2 >= attrib.normals.size())
+            throw std::runtime_error("invalid obj normal index: out of range");
+        return math::vec3f(attrib.normals[3 * index + 0],
+                           attrib.normals[3 * index + 1],
+                           attrib.normals[3 * index + 2]);
+    };
+
+    auto get_uv = [&](size_t index)
+    {
+        if(2 * index + 1 >= attrib.texcoords.size())
+            throw std::runtime_error("invalid obj texcoord index: out of range");
+        return math::vec2f(attrib.texcoords[2 * index + 0],
+                           attrib.texcoords[2 * index + 1]);
+    };
+
+    std::vector<face_t> build_faces;
+
+    for(auto &shape : reader.GetShapes())
+    {
+        int cur_idx = 0;
+
+        for(auto face_vertex_count : shape.mesh.num_face_vertices)
+        {
+            if(face_vertex_count != 3 && face_vertex_count != 4)
+                throw std::runtime_error("invalid obj face vertex count: " + std::to_string(face_vertex_count));
+
+            face_t face;
+            face.is_quad = face_vertex_count == 4;
+
+            for(int i = 0; i < face_vertex_count; ++i)
+            {
+                auto &idx = shape.mesh.indices[cur_idx + i];
+                face.vertices[i].position = get_pos(idx.vertex_index);
+            }
+
+            for(int i = 0; i < face_vertex_count; ++i)
+            {
+                auto &idx = shape.mesh.indices[cur_idx + i];
+                if(idx.normal_index < 0)
+                {
+                    face.vertices[i].normal = cross(
+                        face.vertices[1].position - face.vertices[0].position,
+                        face.vertices[2].position - face.vertices[0].position).normalize();
+                }
+                else
+                {
+                    face.vertices[i].normal = get_nor(idx.normal_index);
+                    if(!face.vertices[i].normal)
+                    {
+                        face.vertices[i].normal = cross(
+                            face.vertices[1].position - face.vertices[0].position,
+                            face.vertices[2].position - face.vertices[0].position).normalize();
+                    }
+                }
+
+                if(idx.texcoord_index < 0)
+                    face.vertices[i].tex_coord = math::vec2f();
+                else
+                    face.vertices[i].tex_coord = get_uv(idx.texcoord_index); 
+            }
+
+            build_faces.push_back(face);
+            cur_idx += face_vertex_count;
+        }
+    }
+
+    return build_faces;
+}
+
 std::vector<triangle_t> load_from_file(const std::string &filename)
 {
     if(stdstr::ends_with(filename, ".obj"))

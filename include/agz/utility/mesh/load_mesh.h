@@ -17,6 +17,17 @@ struct triangle_t
     vertex_t vertices[3];
 };
 
+struct face_t
+{
+    bool is_quad = false;
+    vertex_t vertices[4];
+};
+
+/**
+ * @brief 从.obj文件中加载网格
+ */
+std::vector<face_t> load_from_obj(const std::string &filename);
+
 /**
  * @brief 从.obj/.stl文件中加载三角网格
  */
