@@ -25,6 +25,8 @@ public:
 
     ComPtr<ID3D11ShaderResourceView> LoadFromFile(const std::string &filename) const;
 
+    ComPtr<ID3D11ShaderResourceView> LoadRGBFromMemory(int width, int height, const float *data) const;
+
     ComPtr<ID3D11ShaderResourceView> LoadFromMemory(int width, int height, const Vec3 *texel) const;
 
     ComPtr<ID3D11ShaderResourceView> LoadFromMemory(int width, int height, const Vec4 *texel) const;
@@ -68,7 +70,7 @@ inline ComPtr<ID3D11ShaderResourceView> Texture2DLoader::LoadFromFile(const std:
     throw VRPGBaseException("unknown loading format");
 }
 
-inline ComPtr<ID3D11ShaderResourceView> Texture2DLoader::LoadFromMemory(int width, int height, const Vec3 *texel) const
+inline ComPtr<ID3D11ShaderResourceView> Texture2DLoader::LoadRGBFromMemory(int width, int height, const float *data) const
 {
     D3D11_TEXTURE2D_DESC texDesc;
     texDesc.Width              = static_cast<UINT>(width);
@@ -84,8 +86,8 @@ inline ComPtr<ID3D11ShaderResourceView> Texture2DLoader::LoadFromMemory(int widt
     texDesc.MiscFlags          = 0;
 
     D3D11_SUBRESOURCE_DATA initData;
-    initData.pSysMem          = texel;
-    initData.SysMemPitch      = width * sizeof(Vec3);
+    initData.pSysMem          = data;
+    initData.SysMemPitch      = width * sizeof(float) * 3;
     initData.SysMemSlicePitch = 0;
 
     ComPtr<ID3D11Texture2D> tex = CreateTexture2D(texDesc, &initData);
@@ -107,6 +109,11 @@ inline ComPtr<ID3D11ShaderResourceView> Texture2DLoader::LoadFromMemory(int widt
     }
 
     return srv;
+}
+
+inline ComPtr<ID3D11ShaderResourceView> Texture2DLoader::LoadFromMemory(int width, int height, const Vec3 *texel) const
+{
+    return LoadRGBFromMemory(width, height, &texel->x);
 }
 
 inline ComPtr<ID3D11ShaderResourceView> Texture2DLoader::LoadFromMemory(int width, int height, const Vec4 *texel) const

@@ -114,4 +114,16 @@ auto distance(const tvec<T, D> &a, const tvec<T, D> &b) noexcept
     return (a - b).length();
 }
 
+template<typename T>
+const T &max3(const T &a, const T &b, const T &c) noexcept(noexcept((std::max)(a, b)))
+{
+    return (std::max)(a, (std::max)(b, c));
+}
+
+template<typename T>
+const T &min3(const T &a, const T &b, const T &c) noexcept(noexcept((std::min)(a, b)))
+{
+    return (std::min)(a, (std::min)(b, c));
+}
+
 } // namespace agz::math
