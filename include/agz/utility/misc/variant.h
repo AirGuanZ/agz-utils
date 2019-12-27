@@ -7,6 +7,8 @@ namespace agz::misc
    
 /**
  * @brief 在std::variant的基础上添加了is，as以及as_if函数
+ *
+ * 忽略了std::variant的异常抛出，调用的正确性由使用者保证
  */
 template<typename...Types>
 class variant_t : public std::variant<Types...>
