@@ -202,4 +202,40 @@ typename texture2d_t<T>::self_t texture2d_t<T>::subtex(int y_beg, int y_end, int
     return ret;
 }
 
+template<typename T>
+typename texture2d_t<T>::self_t texture2d_t<T>::flip_vertically() const
+{
+    if(!is_available())
+        return self_t();
+
+    const int width = this->width(), height = this->height();
+    self_t ret(height, width);
+    for(int y = 0; y < height; ++y)
+    {
+        int old_y = height - 1 - y;
+        for(int x = 0; x < width; ++x)
+            ret(y, x) = at(old_y, x);
+    }
+    return ret;
+}
+
+template<typename T>
+typename texture2d_t<T>::self_t texture2d_t<T>::flip_horizontally() const
+{
+    if(!is_available())
+        return self_t();
+
+    const int width = this->width(), height = this->height();
+    self_t ret(height, width);
+    for(int y = 0; y < height; ++y)
+    {
+        for(int x = 0; x < width; ++x)
+        {
+            int old_x = width - 1 - x;
+            ret(y, x) = at(y, old_x);
+        }
+    }
+    return ret;
+}
+
 } // namespace agz::texture

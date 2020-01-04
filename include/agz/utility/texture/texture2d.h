@@ -66,6 +66,10 @@ public:
 
     self_t subtex(int y_beg, int y_end, int x_beg, int x_end) const;
 
+    self_t flip_vertically() const;
+
+    self_t flip_horizontally() const;
+
 protected:
 
     data_t data_;
