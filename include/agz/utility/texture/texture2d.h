@@ -70,10 +70,22 @@ public:
 
     self_t flip_horizontally() const;
 
+    template<typename S>
+    auto operator+(const texture2d_t<S> &rhs) const;
+
+    template<typename S>
+    auto operator*(const texture2d_t<S> &rhs) const;
+
+    template<typename S, typename = std::enable_if_t<std::is_arithmetic_v<S>>>
+    auto operator*(S rhs) const;
+
 protected:
 
     data_t data_;
 };
+
+template<typename T, typename S, typename = std::enable_if_t<std::is_arithmetic_v<S>>>
+auto operator*(S lhs, const texture2d_t<T> &rhs);
 
 } // namespace agz::texture
 

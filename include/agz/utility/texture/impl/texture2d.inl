@@ -238,4 +238,68 @@ typename texture2d_t<T>::self_t texture2d_t<T>::flip_horizontally() const
     return ret;
 }
 
+template<typename T>
+template<typename S>
+auto texture2d_t<T>::operator+(const texture2d_t<S> &rhs) const
+{
+    assert(is_available() && rhs.is_available());
+    assert(width() == rhs.width());
+    assert(height() == rhs.height());
+
+    using texel_t = rm_rcv_t<decltype(std::declval<T>() + std::declval<S>())>;
+    texture2d_t<texel_t> ret(height(), width());
+
+    for(int y = 0; y < ret.height(); ++y)
+    {
+        for(int x = 0; x < ret.width(); ++x)
+            ret(y, x) = this->at(y, x) + rhs(y, x);
+    }
+
+    return ret;
+}
+
+template<typename T>
+template<typename S>
+auto texture2d_t<T>::operator*(const texture2d_t<S> &rhs) const
+{
+    assert(is_available() && rhs.is_available());
+    assert(width() == rhs.width());
+    assert(height() == rhs.height());
+
+    using texel_t = rm_rcv_t<decltype(std::declval<T>() * std::declval<S>())>;
+    texture2d_t<texel_t> ret(height(), width());
+
+    for(int y = 0; y < ret.height(); ++y)
+    {
+        for(int x = 0; x < ret.width(); ++x)
+            ret(y, x) = this->at(y, x) * rhs(y, x);
+    }
+
+    return ret;
+}
+
+template<typename T>
+template<typename S, typename>
+auto texture2d_t<T>::operator*(S rhs) const
+{
+    assert(is_available());
+
+    using texel_t = rm_rcv_t<decltype(std::declval<T>() * std::declval<S>())>;
+    texture2d_t<texel_t> ret(height(), width());
+
+    for(int y = 0; y < ret.height(); ++y)
+    {
+        for(int x = 0; x < ret.width(); ++x)
+            ret(y, x) = this->at(y, x) * rhs;
+    }
+
+    return ret;
+}
+
+template<typename T, typename S, typename>
+auto operator*(S lhs, const texture2d_t<T> &rhs)
+{
+    return rhs * lhs;
+}
+
 } // namespace agz::texture

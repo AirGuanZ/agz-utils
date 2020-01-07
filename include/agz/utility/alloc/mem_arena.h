@@ -83,7 +83,7 @@ inline void mem_arena_t::alloc_new_chunk()
 
 inline void *mem_arena_t::alloc_direct_chunk(size_t bytes, size_t align)
 {
-    size_t total_bytes = sizeof(chunk_t) + bytes + align;
+    const size_t total_bytes = sizeof(chunk_t) + bytes + align;
     char *new_chunk_datazone = static_cast<char*>(std::malloc(total_bytes));
     if(!new_chunk_datazone)
         throw std::bad_alloc();
@@ -103,7 +103,8 @@ inline void *mem_arena_t::alloc_direct_chunk(size_t bytes, size_t align)
     total_chunk_bytes_ += total_bytes;
 
     char *new_chunk_data_top = new_chunk_datazone + sizeof(chunk_t);
-    size_t align_pad_bytes = reinterpret_cast<size_t>(new_chunk_data_top) % align;
+    const size_t align_rest_bytes = reinterpret_cast<size_t>(new_chunk_data_top) % align;
+    const size_t align_pad_bytes = align_rest_bytes ? align - align_rest_bytes : 0;
     assert(sizeof(chunk_t) + align_pad_bytes + bytes <= total_bytes);
 
     return new_chunk_data_top + align_pad_bytes;
@@ -126,8 +127,9 @@ inline mem_arena_t::~mem_arena_t()
 
 inline void *mem_arena_t::alloc(size_t bytes, size_t align)
 {
-    size_t align_pad_bytes = reinterpret_cast<size_t>(data_top_) % align;
-    size_t total_bytes = bytes + align_pad_bytes;
+    const size_t align_rest_bytes = reinterpret_cast<size_t>(data_top_) % align;
+    const size_t align_pad_bytes = align_rest_bytes ? align - align_rest_bytes : 0;
+    const size_t total_bytes = bytes + align_pad_bytes;
     if(total_bytes > direct_alloc_threshold_)
         return alloc_direct_chunk(bytes, align);
 
