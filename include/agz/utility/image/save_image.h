@@ -75,4 +75,22 @@ void save_rgba_to_jpg_file(const std::string &filename, const math::color4b *dat
 /** @brief 将rgba图像输出到jpg文件 */
 void save_rgba_to_jpg_file(const std::string &filename, const math::tensor_t<math::color4b, 2> &data);
 
+//######################################## hdr ########################################
+
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(const float *data, int w, int h);
+
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(const math::color3f *data, int w, int h);
+
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(const math::vec3f *data, int w, int h);
+
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(const math::tensor_t<math::color3f, 2> &data);
+
+void save_rgb_to_hdr_file(const std::string &filename, const float *data, int w, int h);
+
+void save_rgb_to_hdr_file(const std::string &filename, const math::color3f *data, int w, int h);
+
+void save_rgb_to_hdr_file(const std::string &filename, const math::vec3f *data, int w, int h);
+
+void save_rgb_to_hdr_file(const std::string &filename, const math::tensor_t<math::color3f, 2> &data);
+
 } // namespace agz::img

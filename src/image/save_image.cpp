@@ -81,6 +81,21 @@ namespace
 
         return ret;
     }
+
+    std::vector<unsigned char> construct_hdr(const float *data, int w, int h)
+    {
+        std::vector<unsigned char> ret;
+        buffer_context_t bc = { &ret };
+
+        if(!stbi_write_hdr_to_func(
+            buffer_func, &bc,
+            w, h, 3, data))
+        {
+            throw std::runtime_error("failed to construct hdr file in memory");
+        }
+
+        return ret;
+    }
 }
 
 std::vector<unsigned char> save_gray_to_png_in_memory(const math::byte *data, int w, int h)
@@ -209,6 +224,50 @@ void save_rgba_to_jpg_file(const std::string &filename, const math::color4b *dat
 void save_rgba_to_jpg_file(const std::string &filename, const image_buffer<math::color4b> &data)
 {
     save_rgba_to_jpg_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
+}
+
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(const float *data, int w, int h)
+{
+    return construct_hdr(data, w, h);
+}
+
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(const math::color3f *data, int w, int h)
+{
+    return construct_hdr(&data->r, w, h);
+}
+
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(const math::vec3f *data, int w, int h)
+{
+    return construct_hdr(&data->x, w, h);
+}
+
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(const math::tensor_t<math::color3f, 2> &data)
+{
+    return save_rgb_to_hdr_in_memory(data.raw_data(), data.shape()[1], data.shape()[0]);
+}
+
+void save_rgb_to_hdr_file(const std::string &filename, const float *data, int w, int h)
+{
+    const auto content = save_rgb_to_hdr_in_memory(data, w, h);
+    file::write_raw_file(filename, content.data(), content.size());
+}
+
+void save_rgb_to_hdr_file(const std::string &filename, const math::color3f *data, int w, int h)
+{
+    const auto content = save_rgb_to_hdr_in_memory(data, w, h);
+    file::write_raw_file(filename, content.data(), content.size());
+}
+
+void save_rgb_to_hdr_file(const std::string &filename, const math::vec3f *data, int w, int h)
+{
+    const auto content = save_rgb_to_hdr_in_memory(data, w, h);
+    file::write_raw_file(filename, content.data(), content.size());
+}
+
+void save_rgb_to_hdr_file(const std::string &filename, const math::tensor_t<math::color3f, 2> &data)
+{
+    const auto content = save_rgb_to_hdr_in_memory(data);
+    file::write_raw_file(filename, content.data(), content.size());
 }
 
 } // namespace agz::img
