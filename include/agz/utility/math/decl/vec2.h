@@ -2,6 +2,7 @@
 
 #include <ostream>
 
+#include "../../misc/hash.h"
 #include "common.h"
 #include "vec.h"
 
