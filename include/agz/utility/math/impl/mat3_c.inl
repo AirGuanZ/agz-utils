@@ -212,9 +212,9 @@ tvec3<T> tmat3_c<T>::get_row(size_t idx) const noexcept
 template<typename T>
 auto tmat3_c<T>::det() const noexcept
 {
-    return determinant(data[0][0], data[1][0], data[2][0],
-                       data[0][1], data[1][1], data[2][1],
-                       data[0][2], data[1][2], data[2][2]);
+    return ::agz::math::determinant(data[0][0], data[1][0], data[2][0],
+                                    data[0][1], data[1][1], data[2][1],
+                                    data[0][2], data[1][2], data[2][2]);
 }
 
 template<typename T>
