@@ -34,4 +34,11 @@ ptrdiff_t byte_offset(M(C::*memPtr)) noexcept
 template<typename T>
 using identity_t = T;
 
+/**
+ * 用于消除一些代码检查工具的警告
+ *
+ * [[maybe_unused]]在某些情境下对一些工具不起作用
+ */
+#define AGZ_UNACCESSED(X) ((void)(X))
+
 } // namespace agz
