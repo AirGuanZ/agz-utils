@@ -1,8 +1,8 @@
 ﻿#pragma once
 
+#include <atomic>
 #include <cmath>
 
-#include "./common.h"
 #include "./vec2.h"
 #include "./vec3.h"
 #include "./vec4.h"
@@ -12,6 +12,18 @@
 
 namespace agz::math
 {
+
+/**
+ * @brief 浮点数原子加法
+ */
+template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
+void atomic_add(std::atomic<T> &original, T add_val)
+{
+    const T cur_val = original.load();
+    const T new_val = cur_val + add_val;
+    while(!original.compare_exchange_weak(cur_val, new_val))
+        ;
+}
     
 /**
  * @brief 线性插值
@@ -43,7 +55,7 @@ bool is_finite(T val) noexcept
 /**
  * @brief 平方函数
  */
-template<typename T>
+template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
 auto sqr(T val) noexcept
 {
     return val * val;
