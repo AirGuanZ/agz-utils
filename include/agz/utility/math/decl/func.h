@@ -19,7 +19,7 @@ namespace agz::math
 template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 void atomic_add(std::atomic<T> &original, T add_val)
 {
-    const T cur_val = original.load();
+    T cur_val = original.load();
     const T new_val = cur_val + add_val;
     while(!original.compare_exchange_weak(cur_val, new_val))
         ;
