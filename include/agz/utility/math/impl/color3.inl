@@ -191,6 +191,16 @@ typename tcolor3<T>::self_t &tcolor3<T>::operator/=(T rhs) noexcept
 }
 
 template<typename T>
+bool tcolor3<T>::operator<(const self_t &rhs) const noexcept
+{
+    if(r < rhs.r) return true;
+    if(r > rhs.r) return false;
+    if(g < rhs.g) return true;
+    if(g > rhs.g) return false;
+    return b < rhs.b;
+}
+
+template<typename T>
 tcolor3<T> operator-(const tcolor3<T> &color) noexcept
 {
     return tcolor3<T>(-color.r, -color.g, -color.b);

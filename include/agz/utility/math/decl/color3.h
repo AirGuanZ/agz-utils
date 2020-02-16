@@ -49,6 +49,8 @@ public:
     self_t &operator*=(T rhs) noexcept;
     self_t &operator/=(T rhs) noexcept;
 
+    bool operator<(const self_t &rhs) const noexcept;
+
 #include "../impl/swizzle_color3.inl"
 };
 
