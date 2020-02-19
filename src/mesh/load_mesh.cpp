@@ -9,9 +9,9 @@
 namespace agz::mesh
 {
     
-static std::vector<triangle_t> load_obj(const std::string &filename)
+static std::vector<triangle_t> load_obj(const std::string &_src)
 {
-    std::string src = file::read_txt_file(filename);
+    std::string src = _src;
     stdstr::replace_(src, "\\\n", " ");
     stdstr::replace_(src, "\\\r\n", " ");
 
@@ -216,12 +216,17 @@ std::vector<face_t> load_from_obj(const std::string &filename)
     return build_faces;
 }
 
+std::vector<triangle_t> load_from_obj_mem(const std::string &str)
+{
+    return load_obj(str);
+}
+
 std::vector<triangle_t> load_from_file(const std::string &filename)
 {
     if(stdstr::ends_with(filename, ".obj"))
-        return load_obj(filename);
+        return load_obj(file::read_txt_file(filename));
     if(stdstr::ends_with(filename, ".stl"))
-        return load_stl(filename);
+        return load_stl(file::read_txt_file(filename));
     throw std::runtime_error("unsupported mesh file: " + filename);
 }
 

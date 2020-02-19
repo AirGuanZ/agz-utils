@@ -29,6 +29,11 @@ struct face_t
 std::vector<face_t> load_from_obj(const std::string &filename);
 
 /**
+ * @brief 从内存中加载三角网格
+ */
+std::vector<triangle_t> load_from_obj_mem(const std::string &str);
+
+/**
  * @brief 从.obj/.stl文件中加载三角网格
  */
 std::vector<triangle_t> load_from_file(const std::string &filename);
