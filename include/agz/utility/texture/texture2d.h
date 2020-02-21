@@ -76,6 +76,9 @@ public:
     template<typename S>
     auto operator*(const texture2d_t<S> &rhs) const;
 
+    template<typename S>
+    texture2d_t<T> &operator+=(const texture2d_t<S> &rhs);
+
     template<typename S, typename = std::enable_if_t<std::is_arithmetic_v<S>>>
     auto operator*(S rhs) const;
 

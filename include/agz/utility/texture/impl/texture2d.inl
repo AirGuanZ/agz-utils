@@ -281,6 +281,23 @@ auto texture2d_t<T>::operator*(const texture2d_t<S> &rhs) const
 }
 
 template<typename T>
+template<typename S>
+texture2d_t<T> &texture2d_t<T>::operator+=(const texture2d_t<S> &rhs)
+{
+    assert(is_available() && rhs.is_available());
+    assert(width() == rhs.width());
+    assert(height() == rhs.height());
+
+    for(int y = 0; y < height(); ++y)
+    {
+        for(int x = 0; x < width(); ++x)
+            at(y, x) += rhs.at(y, x);
+    }
+
+    return *this;
+}
+
+template<typename T>
 template<typename S, typename>
 auto texture2d_t<T>::operator*(S rhs) const
 {
