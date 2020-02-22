@@ -17,6 +17,12 @@ struct triangle_t
     vertex_t vertices[3];
 };
 
+struct mesh_t
+{
+    std::string name;
+    std::vector<triangle_t> triangles;
+};
+
 struct face_t
 {
     bool is_quad = false;
@@ -37,5 +43,15 @@ std::vector<triangle_t> load_from_obj_mem(const std::string &str);
  * @brief 从.obj/.stl文件中加载三角网格
  */
 std::vector<triangle_t> load_from_file(const std::string &filename);
+
+/**
+ * @brief 从内存中解析obj格式，加载网格对象
+ */
+std::vector<mesh_t> load_meshes_from_obj_mem(const std::string &str);
+
+/**
+ * @brief 从.obj中加载网格对象
+ */
+std::vector<mesh_t> load_meshes_from_obj(const std::string &filename);
 
 } // namespace agz::mesh

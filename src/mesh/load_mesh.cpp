@@ -8,8 +8,8 @@
 
 namespace agz::mesh
 {
-    
-static std::vector<triangle_t> load_obj(const std::string &_src)
+
+static std::vector<mesh_t> parse_meshes_from_obj(const std::string &_src)
 {
     std::string src = _src;
     stdstr::replace_(src, "\\\n", " ");
@@ -20,7 +20,7 @@ static std::vector<triangle_t> load_obj(const std::string &_src)
         throw std::runtime_error(reader.Error());
 
     auto &attrib = reader.GetAttrib();
-
+    
     auto get_pos = [&](size_t index)
     {
         if(3 * index + 2 >= attrib.vertices.size())
@@ -47,21 +47,32 @@ static std::vector<triangle_t> load_obj(const std::string &_src)
                            attrib.texcoords[2 * index + 1]);
     };
 
-    std::vector<triangle_t> build_triangles;
+    std::vector<mesh_t> meshes;
 
     for(auto &shape : reader.GetShapes())
     {
         for(auto face_vertex_count : shape.mesh.num_face_vertices)
         {
             if(face_vertex_count != 3)
-                throw std::runtime_error("invalid obj face vertex count: " + std::to_string(+face_vertex_count));
+            {
+                throw std::runtime_error(
+                    "invalid obj face vertex count: " + std::to_string(+face_vertex_count));
+            }
         }
 
         if(shape.mesh.indices.size() % 3 != 0)
-            throw std::runtime_error("invalid obj index count: " + std::to_string(shape.mesh.indices.size()));
+        {
+            throw std::runtime_error(
+                "invalid obj index count: " + std::to_string(shape.mesh.indices.size()));
+        }
 
-        build_triangles.reserve(build_triangles.size() + shape.mesh.indices.size() / 3);
         const size_t triangle_count = shape.mesh.indices.size() / 3;
+
+        meshes.emplace_back();
+        auto &mesh = meshes.back();
+
+        mesh.name = shape.name;
+        mesh.triangles.reserve(triangle_count);
 
         for(size_t i = 0, j = 0; i < triangle_count; ++i, j += 3)
         {
@@ -76,12 +87,16 @@ static std::vector<triangle_t> load_obj(const std::string &_src)
                 auto &idx = shape.mesh.indices[j + k];
 
                 if(idx.normal_index < 0)
-                    vtx[k].normal = cross(vtx[1].position - vtx[0].position, vtx[2].position - vtx[0].position).normalize();
+                    vtx[k].normal = cross(
+                        vtx[1].position - vtx[0].position,
+                        vtx[2].position - vtx[0].position).normalize();
                 else
                 {
                     vtx[k].normal = get_nor(idx.normal_index);
                     if(!vtx[k].normal)
-                        vtx[k].normal = cross(vtx[1].position - vtx[0].position, vtx[2].position - vtx[0].position).normalize();
+                        vtx[k].normal = cross(
+                            vtx[1].position - vtx[0].position,
+                            vtx[2].position - vtx[0].position).normalize();
                 }
 
                 if(idx.texcoord_index < 0)
@@ -90,14 +105,14 @@ static std::vector<triangle_t> load_obj(const std::string &_src)
                     vtx[k].tex_coord = get_uv(idx.texcoord_index);
             }
 
-            build_triangles.push_back(tri);
+            mesh.triangles.push_back(tri);
         }
     }
 
-    return build_triangles;
+    return meshes;
 }
 
-static std::vector<triangle_t> load_stl(const std::string &filename)
+static std::vector<triangle_t> load_triangles_from_stl(const std::string &filename)
 {
     std::vector<triangle_t> ret;
 
@@ -218,16 +233,41 @@ std::vector<face_t> load_from_obj(const std::string &filename)
 
 std::vector<triangle_t> load_from_obj_mem(const std::string &str)
 {
-    return load_obj(str);
+    auto meshes = parse_meshes_from_obj(str);
+
+    size_t total_triangle_count = 0;
+    for(auto &mesh : meshes)
+        total_triangle_count += mesh.triangles.size();
+
+    std::vector<triangle_t> ret;
+    ret.reserve(total_triangle_count);
+
+    for(auto &mesh : meshes)
+    {
+        for(auto &tri : mesh.triangles)
+            ret.push_back(tri);
+    }
+
+    return ret;
 }
 
 std::vector<triangle_t> load_from_file(const std::string &filename)
 {
     if(stdstr::ends_with(filename, ".obj"))
-        return load_obj(file::read_txt_file(filename));
+        return load_from_obj_mem(file::read_txt_file(filename));
     if(stdstr::ends_with(filename, ".stl"))
-        return load_stl(file::read_txt_file(filename));
+        return load_triangles_from_stl(file::read_txt_file(filename));
     throw std::runtime_error("unsupported mesh file: " + filename);
+}
+
+std::vector<mesh_t> load_meshes_from_obj_mem(const std::string &str)
+{
+    return parse_meshes_from_obj(str);
+}
+
+std::vector<mesh_t> load_meshes_from_obj(const std::string &filename)
+{
+    return load_meshes_from_obj_mem(file::read_txt_file(filename));
 }
 
 } // namespace agz::mesh
