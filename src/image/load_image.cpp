@@ -176,6 +176,33 @@ image_buffer<math::color4b> load_rgba_from_memory(const void *data, size_t byte_
     return img_impl::load_from_memory<math::color4b, 4, STBI_rgb_alpha>(data, byte_length);
 }
 
+math::tensor_t<math::color3f, 2> load_rgb_from_hdr_memory(const void *data_ptr, size_t byte_length)
+{
+    int w, h, channels;
+
+    float *data = stbi_loadf_from_memory(
+        static_cast<const stbi_uc *>(data_ptr),
+        static_cast<int>(byte_length),
+        &w, &h, &channels, STBI_rgb);
+    if(!data)
+        return image_buffer<math::color3f>();
+
+    AGZ_SCOPE_GUARD({ stbi_image_free(data); });
+
+    assert(w > 0 && h > 0);
+
+    int idx = 0;
+    return image_buffer<math::color3f>::from_linear_indexed_fn(
+        { h, w }, [&](int i)
+    {
+        math::color3f ret(UNINIT);
+        for(int j = 0; j < 3; ++j)
+            ret[j] = data[idx + j];
+        idx += 3;
+        return ret;
+    });
+}
+
 image_buffer<math::byte> load_gray_from_file(const std::string &filename)
 {
     auto content = file::read_raw_file(filename);
@@ -203,30 +230,7 @@ image_buffer<math::color4b> load_rgba_from_file(const std::string &filename)
 math::tensor_t<math::color3f, 2> load_rgb_from_hdr_file(const std::string &filename)
 {
     auto content = file::read_raw_file(filename);
-
-    int w, h, channels;
-
-    float *data = stbi_loadf_from_memory(
-        static_cast<const stbi_uc*>(content.data()),
-        static_cast<int>(content.size()),
-        &w, &h, &channels, STBI_rgb);
-    if(!data)
-        return image_buffer<math::color3f>();
-
-    AGZ_SCOPE_GUARD({ stbi_image_free(data); });
-
-    assert(w > 0 && h > 0);
-
-    int idx = 0;
-    return image_buffer<math::color3f>::from_linear_indexed_fn(
-        { h, w }, [&](int i)
-    {
-        math::color3f ret(UNINIT);
-        for(int j = 0; j < 3; ++j)
-            ret[j] = data[idx + j];
-        idx += 3;
-        return ret;
-    });
+    return load_rgb_from_hdr_memory(content.data(), content.size());
 }
 
 } // namespace agz::img
