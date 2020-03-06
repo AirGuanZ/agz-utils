@@ -15,6 +15,7 @@
 #include "decl/tensor.h"
 #include "decl/transform2.h"
 #include "decl/transform3.h"
+#include "decl/variance.h"
 #include "decl/vec.h"
 #include "decl/vec2.h"
 #include "decl/vec3.h"
