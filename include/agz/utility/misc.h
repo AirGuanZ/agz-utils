@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "misc/base64.h"
 #include "misc/bitcast.h"
 #include "misc/construct_from_tuple.h"
 #include "misc/endian.h"
