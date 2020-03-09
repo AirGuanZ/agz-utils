@@ -114,6 +114,7 @@ auto distance(const tvec3<T> &a, const tvec3<T> &b) noexcept
 {
     return (a - b).length();
 }
+
 template<typename T>
 auto distance(const tvec4<T> &a, const tvec4<T> &b) noexcept
 {
@@ -124,6 +125,30 @@ template<typename T, int D>
 auto distance(const tvec<T, D> &a, const tvec<T, D> &b) noexcept
 {
     return (a - b).length();
+}
+
+template<typename T>
+auto distance2(const tvec2<T> &a, const tvec2<T> &b) noexcept
+{
+    return (a - b).length_square();
+}
+
+template<typename T>
+auto distance2(const tvec3<T> &a, const tvec3<T> &b) noexcept
+{
+    return (a - b).length_square();
+}
+
+template<typename T>
+auto distance2(const tvec4<T> &a, const tvec4<T> &b) noexcept
+{
+    return (a - b).length_square();
+}
+
+template<typename T, int D>
+auto distance2(const tvec<T, D> &a, const tvec<T, D> &b) noexcept
+{
+    return (a - b).length_square();
 }
 
 template<typename T>
