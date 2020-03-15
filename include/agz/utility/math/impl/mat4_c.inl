@@ -3,7 +3,9 @@
 namespace agz::math {
 
 template<typename T>
-tmat4_c<T>::tmat4_c(const tvec4<T> &c0, const tvec4<T> &c1, const tvec4<T> &c2, const tvec4<T> &c3) noexcept
+tmat4_c<T>::tmat4_c(
+    const tvec4<T> &c0, const tvec4<T> &c1,
+    const tvec4<T> &c2, const tvec4<T> &c3) noexcept
     : data{ c0, c1, c2, c3 }
 {
 
@@ -97,7 +99,8 @@ const typename tmat4_c<T>::self_t& tmat4_c<T>::identity() noexcept
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::inv_from_adj(const self_t &adj) const noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::inv_from_adj(
+    const self_t &adj) const noexcept
 {
     return adj / dot(data[0], adj.get_row(0));
 }
@@ -314,12 +317,14 @@ tvec4<T> operator*(const tvec4<T> &lhs, const tmat4_c<T> &rhs) noexcept
 
 template<typename T> tmat4_c<T> operator*(const tmat4_c<T> &lhs, T rhs) noexcept
 {
-    return tmat4_c<T>::from_cols(lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs, lhs[3] * rhs);
+    return tmat4_c<T>::from_cols(
+        lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs, lhs[3] * rhs);
 }
 
 template<typename T> tmat4_c<T> operator/(const tmat4_c<T> &lhs, T rhs) noexcept
 {
-    return tmat4_c<T>::from_cols(lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs, lhs[3] / rhs);
+    return tmat4_c<T>::from_cols(
+        lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs, lhs[3] / rhs);
 }
 
 template<typename T> tmat4_c<T> operator*(T lhs, const tmat4_c<T> &rhs) noexcept
@@ -328,13 +333,15 @@ template<typename T> tmat4_c<T> operator*(T lhs, const tmat4_c<T> &rhs) noexcept
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(const tvec3<T> &offset) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(
+    const tvec3<T> &offset) noexcept
 {
     return left_transform::translate(offset.x, offset.y, offset.z);
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(T x, T y, T z) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(
+    T x, T y, T z) noexcept
 {
     return self_t(1, 0, 0, x,
         0, 1, 0, y,
@@ -343,7 +350,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(T x, T y, T z)
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate(const tvec3<T> &_axis, T rad) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate(
+    const tvec3<T> &_axis, T rad) noexcept
 {
     const auto axis = _axis.normalize();
     const T sinv = std::sin(rad), cosv = std::cos(rad);
@@ -404,13 +412,15 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_z(T rad) noexcept
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(const tvec3<T> &ratio) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(
+    const tvec3<T> &ratio) noexcept
 {
     return scale(ratio.x, ratio.y, ratio.z);
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(T x, T y, T z) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(
+    T x, T y, T z) noexcept
 {
     return self_t(x, 0, 0, 0,
         0, y, 0, 0,
@@ -419,7 +429,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(T x, T y, T z) noe
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::perspective(T fov_y_rad, T w_over_h, T near_plane, T far_plane) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::perspective(
+    T fov_y_rad, T w_over_h, T near_plane, T far_plane) noexcept
 {
     T inv_dis = T(1) / (far_plane - near_plane);
     auto y_rad = T(0.5) * fov_y_rad;
@@ -432,7 +443,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::perspective(T fov_y_rad,
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::look_at(
+    const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept
 {
     auto D = (dst - eye).normalize();
     auto R = cross(up, D).normalize();
@@ -444,13 +456,15 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::look_at(const tvec3<T> &
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(const tvec3<T> &offset) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(
+    const tvec3<T> &offset) noexcept
 {
     return right_transform::translate(offset.x, offset.y, offset.z);
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(T x, T y, T z) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(
+    T x, T y, T z) noexcept
 {
     return self_t(1, 0, 0, 0,
                   0, 1, 0, 0,
@@ -459,7 +473,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(T x, T y, T z
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate(const tvec3<T> &_axis, T rad) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate(
+    const tvec3<T> &_axis, T rad) noexcept
 {
     const auto axis = _axis.normalize();
     const T sinv = std::sin(rad), cosv = std::cos(rad);
@@ -520,7 +535,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_z(T rad) noexcep
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::scale(const tvec3<T> &ratio) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::scale(
+    const tvec3<T> &ratio) noexcept
 {
     return right_transform::scale(ratio.x, ratio.y, ratio.z);
 }
@@ -535,7 +551,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::scale(T x, T y, T z) no
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::perspective(T fov_y_rad, T w_over_h, T near_plane, T far_plane) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::perspective(
+    T fov_y_rad, T w_over_h, T near_plane, T far_plane) noexcept
 {
     T inv_dis = T(1) / (far_plane - near_plane);
     auto y_rad = T(0.5) * fov_y_rad;
@@ -548,7 +565,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::perspective(T fov_y_rad
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::orthographic(T left, T right, T top, T bottom, T near_z, T far_z) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::orthographic(
+    T left, T right, T top, T bottom, T near_z, T far_z) noexcept
 {
     T dx = 2 / (right - left);
     T dy = 2 / (top - bottom);
@@ -560,7 +578,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::orthographic(T left, T 
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::look_at(
+    const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept
 {
     auto D = (dst - eye).normalize();
     auto R = cross(up, D).normalize();
@@ -572,19 +591,9 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::look_at(const tvec3<T> 
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::from_quaternion(const tquaternion_t<T> &q) noexcept
+typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::from_quaternion(
+    const tquaternion_t<T> &q) noexcept
 {
-    /*float s = quaternion.length();
-    float r = quaternion.a;
-    float i = quaternion.b.x;
-    float j = quaternion.b.y;
-    float k = quaternion.b.z;
-    float i2 = i * i, j2 = j * j, k2 = k * k;
-    return self_t(1 - 2 * s * (j2 + k2),   2 * s * (i * j - k * r), 2 * s * (i * k + j * r), 0,
-                  2 * s * (i * j + k * r), 1 - 2 * s * (i2 + k2),   2 * s * (j * k - i * r), 0,
-                  2 * s * (i * k - j * r), 2 * s * (j * k + i * r), 1 - 2 * s * (i2 + j2),   0,
-                  0,                       0,                       0,                       1
-            ).transpose();*/
     T x = q.x, y = q.y, z = q.z, w = q.w;
     T r0c0 = 1 - 2 * (y * y + z * z);
     T r0c1 = 2 * (x * y - z * w);

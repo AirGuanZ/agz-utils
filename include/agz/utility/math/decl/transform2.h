@@ -53,7 +53,8 @@ public:
 };
 
 template<typename T, bool C>
-ttransform2<T, C> operator*(const ttransform2<T, C> &lhs, const ttransform2<T, C> &rhs) noexcept;
+ttransform2<T, C> operator*(
+    const ttransform2<T, C> &lhs, const ttransform2<T, C> &rhs) noexcept;
 
 using transform2f = ttransform2<float>;
 using transform2d = ttransform2<double>;

@@ -62,7 +62,8 @@ typename tcoord3<T>::self_t tcoord3<T>::from_z(axis_t new_z) noexcept
 }
 
 template<typename T>
-typename tcoord3<T>::vec_t tcoord3<T>::global_to_local(const vec_t &global_vector) const noexcept
+typename tcoord3<T>::vec_t tcoord3<T>::global_to_local(
+    const vec_t &global_vector) const noexcept
 {
     return vec_t(dot(x, global_vector),
                  dot(y, global_vector),
@@ -70,7 +71,8 @@ typename tcoord3<T>::vec_t tcoord3<T>::global_to_local(const vec_t &global_vecto
 }
 
 template<typename T>
-typename tcoord3<T>::vec_t tcoord3<T>::local_to_global(const vec_t &local_vector) const noexcept
+typename tcoord3<T>::vec_t tcoord3<T>::local_to_global(
+    const vec_t &local_vector) const noexcept
 {
     return x * local_vector.x
          + y * local_vector.y
@@ -78,7 +80,8 @@ typename tcoord3<T>::vec_t tcoord3<T>::local_to_global(const vec_t &local_vector
 }
 
 template<typename T>
-typename tcoord3<T>::self_t tcoord3<T>::rotate_to_new_x(const axis_t &new_x) const noexcept
+typename tcoord3<T>::self_t tcoord3<T>::rotate_to_new_x(
+    const axis_t &new_x) const noexcept
 {
     axis_t new_y = cross(z, new_x);
     axis_t new_z = cross(new_x, new_y);
@@ -86,7 +89,8 @@ typename tcoord3<T>::self_t tcoord3<T>::rotate_to_new_x(const axis_t &new_x) con
 }
 
 template<typename T>
-typename tcoord3<T>::self_t tcoord3<T>::rotate_to_new_y(const axis_t &new_y) const noexcept
+typename tcoord3<T>::self_t tcoord3<T>::rotate_to_new_y(
+    const axis_t &new_y) const noexcept
 {
     axis_t new_x = cross(new_y, z);
     axis_t new_z = cross(new_x, new_y);
@@ -94,7 +98,8 @@ typename tcoord3<T>::self_t tcoord3<T>::rotate_to_new_y(const axis_t &new_y) con
 }
 
 template<typename T>
-typename tcoord3<T>::self_t tcoord3<T>::rotate_to_new_z(const axis_t &new_z) const noexcept
+typename tcoord3<T>::self_t tcoord3<T>::rotate_to_new_z(
+    const axis_t &new_z) const noexcept
 {
     axis_t new_x = cross(y, new_z);
     axis_t new_y = cross(new_z, new_x);

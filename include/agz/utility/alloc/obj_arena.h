@@ -49,7 +49,8 @@ public:
      * @param mem_pool_chunk_size 每次预分配的字节数
      * @param direct_alloc_threshold alloc需要的空间超过此值时，将直接使用malloc
      */
-    explicit obj_arena_t(size_t mem_pool_chunk_size = 4096, size_t direct_alloc_threshold = 2048);
+    explicit obj_arena_t(
+        size_t mem_pool_chunk_size = 4096, size_t direct_alloc_threshold = 2048);
 
     ~obj_arena_t();
 
@@ -76,15 +77,18 @@ void obj_arena_t::add_destructor(T *obj)
     if constexpr(std::is_trivially_destructible_v<T>)
         return;
 
-    void *destructor_mem = mem_arena_.alloc(sizeof(obj_descructor_impl_t<T>), alignof(obj_descructor_impl_t<T>));
+    void *destructor_mem = mem_arena_.alloc(
+        sizeof(obj_descructor_impl_t<T>), alignof(obj_descructor_impl_t<T>));
     auto destructor = new(destructor_mem) obj_descructor_impl_t<T>(obj);
 
     destructor->next = destructor_entry_;
     destructor_entry_ = destructor;
 }
 
-inline obj_arena_t::obj_arena_t(size_t mem_pool_chunk_size, size_t direct_alloc_threshold)
-    : mem_arena_(mem_pool_chunk_size, direct_alloc_threshold), destructor_entry_(nullptr)
+inline obj_arena_t::obj_arena_t(
+    size_t mem_pool_chunk_size, size_t direct_alloc_threshold)
+    : mem_arena_(mem_pool_chunk_size, direct_alloc_threshold),
+      destructor_entry_(nullptr)
 {
     
 }

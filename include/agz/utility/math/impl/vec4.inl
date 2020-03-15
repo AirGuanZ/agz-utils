@@ -112,7 +112,11 @@ typename tvec4<T>::self_t tvec4<T>::clamp_high(T max_v) const noexcept
 template<typename T>
 typename tvec4<T>::self_t tvec4<T>::saturate() const noexcept
 {
-    return self_t(::agz::math::saturate(x), ::agz::math::saturate(y), ::agz::math::saturate(z), ::agz::math::saturate(w));
+    return self_t(
+        ::agz::math::saturate(x),
+        ::agz::math::saturate(y),
+        ::agz::math::saturate(z),
+        ::agz::math::saturate(w));
 }
 
 template<typename T>
@@ -338,7 +342,8 @@ auto cos(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 template<typename T>
 std::ostream &operator<<(std::ostream &out, const tvec4<T> &vec)
 {
-    return out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ")";
+    return out << "(" << vec.x << ", "
+               << vec.y << ", " << vec.z << ", " << vec.w << ")";
 }
 
 } // namespace agz::math

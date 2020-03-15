@@ -29,7 +29,8 @@ void atomic_add(std::atomic<T> &original, T add_val)
  * @brief 线性插值
  */
 template<typename T, typename F>
-auto mix(const T &left, const T &right, F factor) noexcept(noexcept((1 - factor) * left + factor * right))
+auto mix(const T &left, const T &right, F factor)
+    noexcept(noexcept((1 - factor) * left + factor * right))
 {
     return (1 - factor) * left + factor * right;
 }
@@ -38,7 +39,8 @@ auto mix(const T &left, const T &right, F factor) noexcept(noexcept((1 - factor)
  * @brief 线性插值，同mix
  */
 template<typename T, typename F>
-auto lerp(const T &left, const T &right, F factor) noexcept(noexcept((1 - factor) * left + factor * right))
+auto lerp(const T &left, const T &right, F factor)
+    noexcept(noexcept((1 - factor) * left + factor * right))
 {
     return ::agz::math::mix(left, right, factor);
 }
@@ -152,13 +154,15 @@ auto distance2(const tvec<T, D> &a, const tvec<T, D> &b) noexcept
 }
 
 template<typename T>
-const T &max3(const T &a, const T &b, const T &c) noexcept(noexcept((std::max)(a, b)))
+const T &max3(const T &a, const T &b, const T &c)
+    noexcept(noexcept((std::max)(a, b)))
 {
     return (std::max)(a, (std::max)(b, c));
 }
 
 template<typename T>
-const T &min3(const T &a, const T &b, const T &c) noexcept(noexcept((std::min)(a, b)))
+const T &min3(const T &a, const T &b, const T &c)
+    noexcept(noexcept((std::min)(a, b)))
 {
     return (std::min)(a, (std::min)(b, c));
 }

@@ -57,14 +57,16 @@ static std::vector<mesh_t> parse_meshes_from_obj(const std::string &_src)
             if(face_vertex_count != 3)
             {
                 throw std::runtime_error(
-                    "invalid obj face vertex count: " + std::to_string(+face_vertex_count));
+                    "invalid obj face vertex count: " +
+                    std::to_string(+face_vertex_count));
             }
         }
 
         if(shape.mesh.indices.size() % 3 != 0)
         {
             throw std::runtime_error(
-                "invalid obj index count: " + std::to_string(shape.mesh.indices.size()));
+                "invalid obj index count: " +
+                std::to_string(shape.mesh.indices.size()));
         }
 
         const size_t triangle_count = shape.mesh.indices.size() / 3;
@@ -113,7 +115,8 @@ static std::vector<mesh_t> parse_meshes_from_obj(const std::string &_src)
     return meshes;
 }
 
-static std::vector<triangle_t> load_triangles_from_stl(const std::string &filename)
+static std::vector<triangle_t> load_triangles_from_stl(
+    const std::string &filename)
 {
     std::vector<triangle_t> ret;
 
@@ -130,7 +133,9 @@ static std::vector<triangle_t> load_triangles_from_stl(const std::string &filena
             vtx[k].position[2] = c[2];
         }
         for(int k = 0; k < 3; ++k)
-            vtx[k].normal = cross(vtx[1].position - vtx[0].position, vtx[2].position - vtx[0].position).normalize();
+            vtx[k].normal = cross(
+                vtx[1].position - vtx[0].position,
+                vtx[2].position - vtx[0].position).normalize();
 
         ret.push_back(tri);
     }
@@ -187,7 +192,8 @@ std::vector<face_t> load_from_obj(const std::string &filename)
         for(auto face_vertex_count : shape.mesh.num_face_vertices)
         {
             if(face_vertex_count != 3 && face_vertex_count != 4)
-                throw std::runtime_error("invalid obj face vertex count: " + std::to_string(face_vertex_count));
+                throw std::runtime_error("invalid obj face vertex count: " +
+                            std::to_string(face_vertex_count));
 
             face_t face;
             face.is_quad = face_vertex_count == 4;
@@ -241,15 +247,22 @@ static std::vector<triangle_t> load_ply(std::vector<uint8_t> byte_buffer)
         size_t size;
     
         memory_buffer(char const * first_elem, size_t size)
-            : p_start(const_cast<char*>(first_elem)), p_end(p_start + size), size(size)
+            : p_start(const_cast<char*>(first_elem)),
+              p_end(p_start + size), size(size)
         {
             setg(p_start, p_start, p_end);
         }
     
-        pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which) override
+        pos_type seekoff(
+            off_type off, std::ios_base::seekdir dir,
+            std::ios_base::openmode which) override
         {
-            if (dir == std::ios_base::cur) gbump(static_cast<int>(off));
-            else setg(p_start, (dir == std::ios_base::beg ? p_start : p_end) + off, p_end);
+            if(dir == std::ios_base::cur)
+                gbump(static_cast<int>(off));
+            else
+                setg(
+                    p_start,
+                    (dir == std::ios_base::beg ? p_start : p_end) + off, p_end);
             return gptr() - p_start;
         }
     
@@ -262,10 +275,12 @@ static std::vector<triangle_t> load_ply(std::vector<uint8_t> byte_buffer)
     struct memory_stream : virtual memory_buffer, public std::istream
     {
         memory_stream(char const * first_elem, size_t size)
-            : memory_buffer(first_elem, size), std::istream(static_cast<std::streambuf*>(this)) {}
+            : memory_buffer(first_elem, size),
+              std::istream(static_cast<std::streambuf*>(this)) {}
     };
 
-    memory_stream file_stream(reinterpret_cast<char*>(byte_buffer.data()), byte_buffer.size());
+    memory_stream file_stream(
+        reinterpret_cast<char*>(byte_buffer.data()), byte_buffer.size());
     file_stream.seekg(0, std::ios::beg);
     
     tinyply::PlyFile file;
@@ -275,9 +290,12 @@ static std::vector<triangle_t> load_ply(std::vector<uint8_t> byte_buffer)
     
     vertices = file.request_properties_from_element("vertex", { "x", "y", "z" });
 
-    try { normals   = file.request_properties_from_element("vertex", { "nx", "ny", "nz" }); }  catch(...) { }
-    try { texcoords = file.request_properties_from_element("vertex", { "s", "t" }); }          catch(...) { }
-    try { faces     = file.request_properties_from_element("face", { "vertex_indices" }, 3); } catch(...) {}
+    try { normals   = file.request_properties_from_element(
+        "vertex", { "nx", "ny", "nz" }); }  catch(...) { }
+    try { texcoords = file.request_properties_from_element(
+        "vertex", { "s", "t" }); }          catch(...) { }
+    try { faces     = file.request_properties_from_element(
+        "face", { "vertex_indices" }, 3); } catch(...) {}
     
     file.read(file_stream);
     
@@ -285,15 +303,19 @@ static std::vector<triangle_t> load_ply(std::vector<uint8_t> byte_buffer)
         throw std::runtime_error("vertex data not found in ply");
     
     if(vertices->count <= 0)
-        throw std::runtime_error("invalid vertex count in ply: " + std::to_string(vertices->count));
+        throw std::runtime_error(
+            "invalid vertex count in ply: " +std::to_string(vertices->count));
 
     std::vector<vertex_t> all_vertices(vertices->count);
     
     if(vertices->t != tinyply::Type::FLOAT32)
         throw std::runtime_error("invalid vertex element type in ply: not float32");
     
-    std::vector<math::vec3f> position_data(vertices->buffer.size_bytes() / sizeof(math::vec3f));
-    std::memcpy(position_data.data(), vertices->buffer.get(), vertices->buffer.size_bytes());
+    std::vector<math::vec3f> position_data(
+        vertices->buffer.size_bytes() / sizeof(math::vec3f));
+    std::memcpy(
+        position_data.data(), vertices->buffer.get(),
+        vertices->buffer.size_bytes());
     for(size_t i = 0; i < position_data.size(); ++i)
         all_vertices[i].position = position_data[i];
     
@@ -303,7 +325,8 @@ static std::vector<triangle_t> load_ply(std::vector<uint8_t> byte_buffer)
             throw std::runtime_error("normals.count != vertices.count in ply");
         
         std::vector<math::vec3f> normal_data(normals->count);
-        std::memcpy(normal_data.data(), normals->buffer.get(), normals->buffer.size_bytes());
+        std::memcpy(
+            normal_data.data(), normals->buffer.get(), normals->buffer.size_bytes());
         for(size_t i = 0; i < normal_data.size(); ++i)
             all_vertices[i].normal = normal_data[i];
     }
@@ -314,7 +337,8 @@ static std::vector<triangle_t> load_ply(std::vector<uint8_t> byte_buffer)
             throw std::runtime_error("texcoords.count != vertices.count in ply");
         
         std::vector<math::vec2f> texcoord_data(texcoords->count);
-        std::memcpy(texcoord_data.data(), texcoords->buffer.get(), texcoords->buffer.size_bytes());
+        std::memcpy(
+            texcoord_data.data(), texcoords->buffer.get(), texcoords->buffer.size_bytes());
         for(size_t i = 0; i < texcoord_data.size(); ++i)
             all_vertices[i].tex_coord = texcoord_data[i];
     }
@@ -335,7 +359,9 @@ static std::vector<triangle_t> load_ply(std::vector<uint8_t> byte_buffer)
             tri.vertices[1] = all_vertices[f[1]];
             tri.vertices[2] = all_vertices[f[2]];
 
-            if(!tri.vertices[0].normal || !tri.vertices[1].normal || !tri.vertices[2].normal)
+            if(!tri.vertices[0].normal ||
+               !tri.vertices[1].normal ||
+               !tri.vertices[2].normal)
             {
                 math::vec3f nor = cross(
                     tri.vertices[1].position - tri.vertices[0].position,
@@ -360,7 +386,8 @@ static std::vector<triangle_t> load_ply(std::vector<uint8_t> byte_buffer)
             tri.vertices[1] = all_vertices[i + 1];
             tri.vertices[2] = all_vertices[i + 2];
 
-            if(!tri.vertices[0].normal || !tri.vertices[1].normal || !tri.vertices[2].normal)
+            if(!tri.vertices[0].normal || !tri.vertices[1].normal ||
+               !tri.vertices[2].normal)
             {
                 math::vec3f nor = cross(
                     tri.vertices[1].position - tri.vertices[0].position,

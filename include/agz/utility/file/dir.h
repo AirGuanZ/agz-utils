@@ -21,10 +21,13 @@ inline void create_directory_for_file(const std::filesystem::path &filename)
     if(exists(parent_path))
     {
         if(!is_directory(parent_path))
-            throw std::runtime_error("failed to create directory " + parent_path.string() + " (exists but is not a directory)");
+            throw std::runtime_error(
+                "failed to create directory " + parent_path.string() +
+                " (exists but is not a directory)");
     }
     else if(!create_directories(parent_path))
-        throw std::runtime_error("failed to create direcotry " + parent_path.string());
+        throw std::runtime_error(
+            "failed to create direcotry " + parent_path.string());
 }
 
 } // namespace agz::file

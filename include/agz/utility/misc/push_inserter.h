@@ -29,7 +29,8 @@ namespace misc_impl
             
         }
         
-        push_insert_iterator<Container> &operator=(typename Container::const_reference value)
+        push_insert_iterator<Container> &operator=(
+            typename Container::const_reference value)
         {
             container_->push(value);
             return *this;

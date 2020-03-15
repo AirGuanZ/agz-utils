@@ -159,7 +159,8 @@ std::string join(std::string_view joiner, TIt begin, TIt end)
 }
 
 template<typename TIt>
-size_t split(std::string_view src, char splitter, TIt out_iterator, bool rm_empty_result)
+size_t split(
+    std::string_view src, char splitter, TIt out_iterator, bool rm_empty_result)
 {
     size_t beg = 0, ret = 0;
     while(beg < src.size())
@@ -170,7 +171,8 @@ size_t split(std::string_view src, char splitter, TIt out_iterator, bool rm_empt
         if(end != beg || !rm_empty_result)
         {
             ++ret;
-            out_iterator = typename TIt::container_type::value_type(src.substr(beg, end - beg));
+            out_iterator = typename TIt::container_type::value_type(
+                src.substr(beg, end - beg));
             ++out_iterator;
         }
         beg = end + 1;
@@ -179,7 +181,9 @@ size_t split(std::string_view src, char splitter, TIt out_iterator, bool rm_empt
 }
 
 template<typename TIt>
-size_t split(std::string_view src, std::string_view splitter, TIt out_iterator, bool rm_empty_result)
+size_t split(
+    std::string_view src, std::string_view splitter, TIt out_iterator,
+    bool rm_empty_result)
 {
     size_t beg = 0, ret = 0;
     while(beg < src.size())
@@ -189,7 +193,8 @@ size_t split(std::string_view src, std::string_view splitter, TIt out_iterator, 
         if(end == std::string::npos)
         {
             ++ret;
-            out_iterator = typename TIt::container_type::value_type(src.substr(beg, src.size() - beg));
+            out_iterator = typename TIt::container_type::value_type(
+                src.substr(beg, src.size() - beg));
             ++out_iterator;
             break;
         }
@@ -197,7 +202,8 @@ size_t split(std::string_view src, std::string_view splitter, TIt out_iterator, 
         if(end != beg || !rm_empty_result)
         {
             ++ret;
-            out_iterator = typename TIt::container_type::value_type(src.substr(beg, end - beg));
+            out_iterator = typename TIt::container_type::value_type(
+                src.substr(beg, end - beg));
             ++out_iterator;
         }
 
@@ -206,21 +212,24 @@ size_t split(std::string_view src, std::string_view splitter, TIt out_iterator, 
     return ret;
 }
 
-inline std::vector<std::string> split(std::string_view src, char splitter, bool rm_empty_result)
+inline std::vector<std::string> split(
+    std::string_view src, char splitter, bool rm_empty_result)
 {
     std::vector<std::string> ret;
     split(src, splitter, std::back_inserter(ret), rm_empty_result);
     return ret;
 }
 
-inline std::vector<std::string> split(std::string_view src, std::string_view splitter, bool rm_empty_result)
+inline std::vector<std::string> split(
+    std::string_view src, std::string_view splitter, bool rm_empty_result)
 {
     std::vector<std::string> ret;
     split(src, splitter, std::back_inserter(ret), rm_empty_result);
     return ret;
 }
 
-inline size_t replace_(std::string &str, std::string_view old_seg, std::string_view new_seg)
+inline size_t replace_(
+    std::string &str, std::string_view old_seg, std::string_view new_seg)
 {
     if(old_seg.empty())
         return 0;
@@ -234,7 +243,8 @@ inline size_t replace_(std::string &str, std::string_view old_seg, std::string_v
     return ret;
 }
 
-inline std::string replace(std::string_view str, std::string_view old_seg, std::string_view new_seg)
+inline std::string replace(
+    std::string_view str, std::string_view old_seg, std::string_view new_seg)
 {
     std::string ret(str);
     replace_(ret, old_seg, new_seg);
@@ -276,7 +286,8 @@ T from_string(const std::string &str)
         long long, unsigned long long,
         float, double, long double
     >;
-    static_assert(supported_types::contains<T>, "unsupported dst type by agz::stdstr::from_string");
+    static_assert(supported_types::contains<T>,
+                  "unsupported dst type by agz::stdstr::from_string");
     return stdstr_impl::from_string_impl<T>(str);
 }
 
@@ -291,10 +302,12 @@ namespace stdstr_impl
     }
     
     template<typename Arg, typename Next, typename...Others>
-    std::string concat_impl(std::stringstream &sst, Arg &&arg, Next &&next, Others&&...others)
+    std::string concat_impl(
+        std::stringstream &sst, Arg &&arg, Next &&next, Others&&...others)
     {
         sst << std::forward<Arg>(arg);
-        return concat_impl(sst, std::forward<Next>(next), std::forward<Others>(others)...);
+        return concat_impl(
+            sst, std::forward<Next>(next), std::forward<Others>(others)...);
     }
 
 } // namespace stdstr_impl

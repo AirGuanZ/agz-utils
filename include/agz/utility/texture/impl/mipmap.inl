@@ -31,7 +31,8 @@ void mipmap_chain_t<T>::generate(const texture2d_t<T> &most_detailed)
     while(size > 1)
     {
         if(size & 1)
-            throw std::runtime_error("invalid input texture size: must be power of 2");
+            throw std::runtime_error(
+                "invalid input texture size: must be power of 2");
 
         const int next_size = (std::max)(1, size / 2);
         texture2d_t<T> next_elem(next_size, next_size);

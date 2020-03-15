@@ -83,7 +83,8 @@ namespace variant_impl
 } // namespace variant_impl
 
 /**
- * @brief 用一组可调用对象构造一个variant visitor，并用以匹配一个std::variant或misc::variant_t对象
+ * @brief 用一组可调用对象构造一个variant visitor
+ *  并用以匹配一个std::variant或misc::variant_t对象
  * @param e 被匹配的variant对象
  * @param vs 用于处理各variant分支的functor class实例。
  *			  它们的operator()返回值类型必须全部相同，且参数能覆盖所有的variant情形。
@@ -97,7 +98,8 @@ auto match_variant(E &&e, Vs...vs)
         explicit overloaded(Vs...vss) : Vs(vss)... { }
         using Vs::operator()...;
     };
-    return std::visit(overloaded(vs...), variant_impl::to_std_variant(std::forward<E>(e)));
+    return std::visit(
+        overloaded(vs...), variant_impl::to_std_variant(std::forward<E>(e)));
 }
 
 } // namespace agz::misc

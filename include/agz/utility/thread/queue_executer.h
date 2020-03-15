@@ -42,7 +42,8 @@ class queue_executer_t : public misc::uncopyable_t
     std::mutex task_mutex_;
     std::mutex exception_mutex_;
 
-    static void worker(std::function<void(const Task&)> f, queue_executer_t<Task> *p_this)
+    static void worker(
+        std::function<void(const Task&)> f, queue_executer_t<Task> *p_this)
     {
         for(;;)
         {
@@ -83,7 +84,8 @@ public:
     static int actual_worker_count(int worker_count_param) noexcept
     {
         if(worker_count_param < 1)
-            worker_count_param += static_cast<int>(std::thread::hardware_concurrency());
+            worker_count_param += static_cast<int>(
+                std::thread::hardware_concurrency());
         return (std::max)(worker_count_param, 1);
     }
 
@@ -98,7 +100,9 @@ public:
      * 
      * assert(!running());
      */
-    void run_async(int worker_count, std::queue<Task> &&tasks, std::function<void(const Task&)> f)
+    void run_async(
+        int worker_count, std::queue<Task> &&tasks,
+        std::function<void(const Task&)> f)
     {
         assert(!running());
 

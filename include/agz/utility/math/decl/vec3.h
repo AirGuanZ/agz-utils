@@ -65,10 +65,14 @@ public:
 
 template<typename T> tvec3<T> operator-(const tvec3<T> &vec) noexcept;
 
-template<typename T> tvec3<T> operator+(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
-template<typename T> tvec3<T> operator-(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
-template<typename T> tvec3<T> operator*(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
-template<typename T> tvec3<T> operator/(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> tvec3<T> operator+(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> tvec3<T> operator-(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> tvec3<T> operator*(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> tvec3<T> operator/(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 
 template<typename T> tvec3<T> operator+(const tvec3<T> &lhs, T rhs) noexcept;
 template<typename T> tvec3<T> operator-(const tvec3<T> &lhs, T rhs) noexcept;
@@ -78,16 +82,23 @@ template<typename T> tvec3<T> operator/(const tvec3<T> &lhs, T rhs) noexcept;
 template<typename T> tvec3<T> operator+(T lhs, const tvec3<T> &rhs) noexcept;
 template<typename T> tvec3<T> operator*(T lhs, const tvec3<T> &rhs) noexcept;
 
-template<typename T> bool operator==(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
-template<typename T> bool operator!=(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> bool operator==(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> bool operator!=(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 
-template<typename T> bool operator<(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> bool operator<(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 
-template<typename T> auto dot(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
-template<typename T> auto cross(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
-template<typename T> auto cos(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> auto dot(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> auto cross(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> auto cos(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 
-template<typename T> std::ostream &operator<<(std::ostream &out, const tvec3<T> &vec);
+template<typename T> std::ostream &operator<<(
+    std::ostream &out, const tvec3<T> &vec);
 
 using vec3f = tvec3<float>;
 using vec3d = tvec3<double>;

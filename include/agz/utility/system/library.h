@@ -19,7 +19,8 @@ struct shared_lib_handle_t;
  * 
  * err_msg用于输出错误消息，默认为nullptr
  */
-shared_lib_handle_t *load_lib(const std::string &filename, std::string *err_msg = nullptr);
+shared_lib_handle_t *load_lib(
+    const std::string &filename, std::string *err_msg = nullptr);
 
 /**
  * @brief 释放一个共享库
@@ -37,7 +38,9 @@ using void_func_ptr = void(*)();
  * 
  * err_msg用于输出错误消息，默认为nullptr
  */
-void_func_ptr get_lib_process(shared_lib_handle_t *handle, const char *proc_name, std::string *err_msg = nullptr);
+void_func_ptr get_lib_process(
+    shared_lib_handle_t *handle, const char *proc_name,
+    std::string *err_msg = nullptr);
 
 /**
  * @brief shared_lib_t相关异常
@@ -150,7 +153,8 @@ public:
     {
         assert(available());
         std::string err;
-        auto ret = reinterpret_cast<T>(get_lib_process(lib_, proc_name.c_str(), &err));
+        auto ret = reinterpret_cast<T>(
+            get_lib_process(lib_, proc_name.c_str(), &err));
         if(!ret)
             throw shared_lib_exception_t(err);
         return ret;

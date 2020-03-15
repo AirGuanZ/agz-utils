@@ -80,7 +80,8 @@ public:
     void attach(GLenum attachment, renderbuffer_t &buffer)
     {
         assert(handle_);
-        glNamedFramebufferRenderbuffer(handle_, attachment, GL_RENDERBUFFER, buffer.handle());
+        glNamedFramebufferRenderbuffer(
+            handle_, attachment, GL_RENDERBUFFER, buffer.handle());
     }
 
     /**

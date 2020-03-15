@@ -52,7 +52,8 @@ std::vector<mesh_t> load_meshes_from_obj(const std::string &filename);
 /**
  * @brief 从内存中解析ply格式，加载网格对象
  */
-std::vector<triangle_t> load_from_ply_mem(const std::vector<uint8_t> &byte_buffer);
+std::vector<triangle_t> load_from_ply_mem(
+    const std::vector<uint8_t> &byte_buffer);
 
 /**
  * @brief 从ply文件中加载网格

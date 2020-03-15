@@ -71,7 +71,8 @@ public:
      * @brief 设置指定attrib变量对应的vertex buffer binding point
      */
     template<typename Var>
-    void set_attrib_binding_point(attrib_variable_t<Var> var, GLuint binding_point) noexcept
+    void set_attrib_binding_point(
+        attrib_variable_t<Var> var, GLuint binding_point) noexcept
     {
         assert(handle_);
         glVertexArrayAttribBinding(handle_, var.location(), binding_point);
@@ -85,22 +86,29 @@ public:
      * @param normalized 是否在读取该属性时将其normalize
      */
     template<typename Var>
-    void set_attrib_format(attrib_variable_t<Var> var, GLuint byte_relative_offset, bool normalized) noexcept
+    void set_attrib_format(
+        attrib_variable_t<Var> var, GLuint byte_relative_offset,
+        bool normalized) noexcept
     {
         assert(handle_);
         glVertexArrayAttribFormat(
-            handle_, var.location(), var_to_gl_type<Var>::usize, var_to_gl_type<Var>::utype, normalized, byte_relative_offset);
+            handle_, var.location(),
+            var_to_gl_type<Var>::usize, var_to_gl_type<Var>::utype,
+            normalized, byte_relative_offset);
     }
 
     /**
      * @brief 将vertex buffer绑定到指定的vertex buffer binding point
      */
     template<typename Vertex>
-    void set_vertex_buffer_binding_point(const vertex_buffer_t<Vertex> &buf, GLuint binding_point, size_t vertex_offset = 0) noexcept
+    void set_vertex_buffer_binding_point(
+        const vertex_buffer_t<Vertex> &buf, GLuint binding_point,
+        size_t vertex_offset = 0) noexcept
     {
         assert(handle_);
         glVertexArrayVertexBuffer(
-            handle_, binding_point, buf.handle(), GLintptr(vertex_offset * sizeof(Vertex)), GLsizei(sizeof(Vertex)));
+            handle_, binding_point, buf.handle(),
+            GLintptr(vertex_offset * sizeof(Vertex)), GLsizei(sizeof(Vertex)));
     }
 
     /**

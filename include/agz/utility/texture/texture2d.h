@@ -33,9 +33,9 @@ public:
 
     ~texture2d_t() = default;
 
-    void initialize(int h, int w,            uninitialized_t);
-    void initialize(int h, int w,            const texel_t *data);
-    void initialize(int h, int w,            const texel_t &init_texel = texel_t());
+    void initialize(int h, int w, uninitialized_t);
+    void initialize(int h, int w, const texel_t *data);
+    void initialize(int h, int w, const texel_t &init_texel = texel_t());
     
     void swap(self_t &swap_with) noexcept;
 
@@ -87,7 +87,8 @@ protected:
     data_t data_;
 };
 
-template<typename T, typename S, typename = std::enable_if_t<std::is_arithmetic_v<S>>>
+template<typename T, typename S,
+         typename = std::enable_if_t<std::is_arithmetic_v<S>>>
 auto operator*(S lhs, const texture2d_t<T> &rhs);
 
 } // namespace agz::texture

@@ -124,13 +124,15 @@ math::vec2i texture2d_t<T>::size() const noexcept
 }
 
 template<typename T>
-typename texture2d_t<T>::texel_t& texture2d_t<T>::operator()(int y, int x) noexcept
+typename texture2d_t<T>::texel_t& texture2d_t<T>::operator()(
+    int y, int x) noexcept
 {
     return data_(y, x);
 }
 
 template<typename T>
-const typename texture2d_t<T>::texel_t& texture2d_t<T>::operator()(int y, int x) const noexcept
+const typename texture2d_t<T>::texel_t& texture2d_t<T>::operator()(
+    int y, int x) const noexcept
 {
     return data_(y, x);
 }
@@ -142,7 +144,8 @@ typename texture2d_t<T>::texel_t& texture2d_t<T>::at(int y, int x) noexcept
 }
 
 template<typename T>
-const typename texture2d_t<T>::texel_t& texture2d_t<T>::at(int y, int x) const noexcept
+const typename texture2d_t<T>::texel_t& texture2d_t<T>::at(
+    int y, int x) const noexcept
 {
     return data_(y, x);
 }
@@ -189,7 +192,8 @@ void texture2d_t<T>::clear(const T &value)
 }
 
 template<typename T>
-typename texture2d_t<T>::self_t texture2d_t<T>::subtex(int y_beg, int y_end, int x_beg, int x_end) const
+typename texture2d_t<T>::self_t texture2d_t<T>::subtex(
+    int y_beg, int y_end, int x_beg, int x_end) const
 {
     assert(is_available());
     assert(0 <= y_beg && y_beg < y_end && y_end < height());

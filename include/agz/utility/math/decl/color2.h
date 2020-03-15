@@ -48,21 +48,33 @@ public:
 
 template<typename T> tcolor2<T> operator-(const tcolor2<T> &color) noexcept;
 
-template<typename T> tcolor2<T> operator+(const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
-template<typename T> tcolor2<T> operator-(const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
-template<typename T> tcolor2<T> operator*(const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
-template<typename T> tcolor2<T> operator/(const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
+template<typename T> tcolor2<T> operator+(
+    const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
+template<typename T> tcolor2<T> operator-(
+    const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
+template<typename T> tcolor2<T> operator*(
+    const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
+template<typename T> tcolor2<T> operator/(
+    const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
 
-template<typename T> tcolor2<T> operator+(const tcolor2<T> &lhs, T rhs) noexcept;
-template<typename T> tcolor2<T> operator-(const tcolor2<T> &lhs, T rhs) noexcept;
-template<typename T> tcolor2<T> operator*(const tcolor2<T> &lhs, T rhs) noexcept;
-template<typename T> tcolor2<T> operator/(const tcolor2<T> &lhs, T rhs) noexcept;
+template<typename T> tcolor2<T> operator+(
+    const tcolor2<T> &lhs, T rhs) noexcept;
+template<typename T> tcolor2<T> operator-(
+    const tcolor2<T> &lhs, T rhs) noexcept;
+template<typename T> tcolor2<T> operator*(
+    const tcolor2<T> &lhs, T rhs) noexcept;
+template<typename T> tcolor2<T> operator/(
+    const tcolor2<T> &lhs, T rhs) noexcept;
 
-template<typename T> tcolor2<T> operator+(T lhs, const tcolor2<T> &rhs) noexcept;
-template<typename T> tcolor2<T> operator*(T lhs, const tcolor2<T> &rhs) noexcept;
+template<typename T> tcolor2<T> operator+(
+    T lhs, const tcolor2<T> &rhs) noexcept;
+template<typename T> tcolor2<T> operator*(
+    T lhs, const tcolor2<T> &rhs) noexcept;
 
-template<typename T> bool operator==(const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
-template<typename T> bool operator!=(const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
+template<typename T> bool operator==(
+    const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
+template<typename T> bool operator!=(
+    const tcolor2<T> &lhs, const tcolor2<T> &rhs) noexcept;
 
 using color2f = tcolor2<float>;
 using color2d = tcolor2<double>;

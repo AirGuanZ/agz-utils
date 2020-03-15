@@ -75,7 +75,9 @@ typename tvec2<T>::self_t tvec2<T>::normalize() const noexcept
 template<typename T>
 typename tvec2<T>::self_t tvec2<T>::clamp(T min_v, T max_v) const noexcept
 {
-    return self_t(::agz::math::clamp(x, min_v, max_v), ::agz::math::clamp(y, min_v, max_v));
+    return self_t(
+        ::agz::math::clamp(x, min_v, max_v),
+        ::agz::math::clamp(y, min_v, max_v));
 }
 
 template<typename T>

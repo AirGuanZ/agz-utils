@@ -32,6 +32,7 @@ public:
 };
 
 template<typename T>
-tquaternion_t<T> slerp(const tquaternion_t<T> &lhs, const tquaternion_t<T> &rhs, T interp_factor);
+tquaternion_t<T> slerp(
+    const tquaternion_t<T> &lhs, const tquaternion_t<T> &rhs, T interp_factor);
 
 } // namespace agz::math

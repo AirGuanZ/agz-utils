@@ -3,7 +3,8 @@
 
 #include <agz/utility/file/file_raw.h>
 
-std::vector<unsigned char> agz::file::read_raw_file(const std::string &filename)
+std::vector<unsigned char> agz::file::read_raw_file(
+    const std::string &filename)
 {
     std::ifstream fin(filename, std::ios::in | std::ios::binary);
     if(!fin)
@@ -19,7 +20,8 @@ std::vector<unsigned char> agz::file::read_raw_file(const std::string &filename)
     return ret;
 }
 
-void agz::file::write_raw_file(const std::string &filename, const void *data, size_t byte_size)
+void agz::file::write_raw_file(
+    const std::string &filename, const void *data, size_t byte_size)
 {
     std::ofstream fout(filename, std::ios::binary | std::ios::trunc);
     if(!fout)

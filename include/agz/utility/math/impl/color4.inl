@@ -75,7 +75,10 @@ typename tcolor4<T>::self_t tcolor4<T>::clamp_high(T max_v) const noexcept
 template<typename T>
 typename tcolor4<T>::self_t tcolor4<T>::saturate() const noexcept
 {
-    return self_t(::agz::math::saturate(r), ::agz::math::saturate(g), ::agz::math::saturate(b), ::agz::math::saturate(a));
+    return self_t(::agz::math::saturate(r),
+                  ::agz::math::saturate(g),
+                  ::agz::math::saturate(b),
+                  ::agz::math::saturate(a));
 }
 
 template<typename T>
@@ -93,7 +96,8 @@ auto tcolor4<T>::relative_luminance() const noexcept
 template<typename T>
 bool tcolor4<T>::is_finite() const noexcept
 {
-    return math::is_finite(r) && math::is_finite(g) && math::is_finite(b) && math::is_finite(a);
+    return math::is_finite(r) && math::is_finite(g) &&
+           math::is_finite(b) && math::is_finite(a);
 }
 
 template<typename T>
@@ -301,7 +305,8 @@ bool operator!=(const tcolor4<T> &lhs, const tcolor4<T> &rhs) noexcept
 template<typename T, typename>
 color4b to_color4b(const tcolor4<T> &c) noexcept
 {
-    return c.clamp(0, 1).map([](T s) { return static_cast<unsigned char>(s * 255); });
+    return c.clamp(0, 1).map(
+        [](T s) { return static_cast<unsigned char>(s * 255); });
 }
 
 template<typename T, typename>

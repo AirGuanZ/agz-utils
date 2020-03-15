@@ -78,7 +78,8 @@ public:
      * @param byte_size 初始化数据的字节数
      * @param usage GL_{STREAM|STATIC|DYNAMIC}_{DRAW|READ|COPY}
      */
-    void reinitialize_data(const void *data, size_t byte_size, GLenum usage) noexcept
+    void reinitialize_data(
+        const void *data, size_t byte_size, GLenum usage) noexcept
     {
         assert(handle_);
         glNamedBufferData(handle_, GLsizeiptr(byte_size), data, usage);
@@ -91,10 +92,12 @@ public:
      * @param byte_offset 要写入的数据距buffer首字节的距离
      * @param byte_size 要写入的数据长度
      */
-    void set_data(const void *subdata, size_t byte_offset, size_t byte_size) noexcept
+    void set_data(
+        const void *subdata, size_t byte_offset, size_t byte_size) noexcept
     {
         assert(handle_);
-        glNamedBufferSubData(handle_, GLintptr(byte_offset), GLsizeiptr(byte_size), subdata);
+        glNamedBufferSubData(
+            handle_, GLintptr(byte_offset), GLsizeiptr(byte_size), subdata);
     }
 };
 
@@ -141,7 +144,8 @@ public:
 
     vertex_buffer_t<Var> &operator=(vertex_buffer_t<Var> &&move_from) noexcept
     {
-        static_cast<buffer_t&>(*this) = std::move(static_cast<buffer_t&>(move_from));
+        static_cast<buffer_t&>(*this) =
+            std::move(static_cast<buffer_t&>(move_from));
         vertex_count_ = move_from.vertex_count_;
         move_from.vertex_count_ = 0;
         return *this;
@@ -240,15 +244,18 @@ public:
         reinitialize_data(data, usage);
     }
 
-    std140_uniform_block_buffer_t(std140_uniform_block_buffer_t<Block> &&move_from) noexcept
+    std140_uniform_block_buffer_t(
+        std140_uniform_block_buffer_t<Block> &&move_from) noexcept
         : buffer_t(std::move(static_cast<buffer_t&>(move_from)))
     {
         
     }
 
-    std140_uniform_block_buffer_t<Block> &operator=(std140_uniform_block_buffer_t<Block> &&move_from) noexcept
+    std140_uniform_block_buffer_t<Block> &operator=(
+        std140_uniform_block_buffer_t<Block> &&move_from) noexcept
     {
-        static_cast<buffer_t&>(*this) = std::move(static_cast<buffer_t&>(move_from));
+        static_cast<buffer_t&>(*this) =
+            std::move(static_cast<buffer_t&>(move_from));
         return *this;
     }
 
@@ -292,7 +299,8 @@ public:
      * @param byte_offset 要设置的内容距buffer首元素有多少个字节
      * @param byte_size 要写入多少个字节数据
      */
-    void set_data(const void *subdata, size_t byte_offset, size_t byte_size) noexcept
+    void set_data(
+        const void *subdata, size_t byte_offset, size_t byte_size) noexcept
     {
         buffer_t::set_data(subdata, byte_offset, byte_size);
     }

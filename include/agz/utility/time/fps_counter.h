@@ -26,8 +26,10 @@ public:
         duration fps_interval,
         duration expected_update_interval,
         duration timeout_interval) noexcept
-        : fps_counter_(0), fps_(0), last_update_interval_(expected_update_interval),
-          fps_interval_(fps_interval), expected_update_interval_(expected_update_interval),
+        : fps_counter_(0), fps_(0),
+          last_update_interval_(expected_update_interval),
+          fps_interval_(fps_interval),
+          expected_update_interval_(expected_update_interval),
           update_timeout_interval_(timeout_interval)
     {
         const time_point now = clock::now();

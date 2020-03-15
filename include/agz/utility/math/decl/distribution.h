@@ -9,7 +9,9 @@ namespace agz::math::distribution
 /**
  * @brief 将[0, 1]间的浮点数u转换为[beg, end)中的整数
  */
-template<typename T, typename F, typename = std::enable_if_t<std::is_integral_v<T> && std::is_floating_point_v<F>>>
+template<typename T, typename F,
+         typename = std::enable_if_t<
+            std::is_integral_v<T> && std::is_floating_point_v<F>>>
 T uniform_integer(T beg, T end, F u);
 
 /**
@@ -136,7 +138,8 @@ template<typename F>
 constexpr F uniform_on_hemisphere_pdf = 1 / (2 * PI<F>);
 
 /**
- * @brief 把[0, 1]^2上的均匀分布转换为以maxCosTheta为顶角的单位球面上的锥体内的方向上的均匀分布（w.r.t. solid angle）
+ * @brief 把[0, 1]^2上的均匀分布转换为以maxCosTheta为顶角的单位球面上的锥体内的方向上
+ *  的均匀分布（w.r.t. solid angle）
  * 
  * @param max_cos_theta 以+z为锥体中心，theta是方向向量与+z的夹角
  */
@@ -144,7 +147,8 @@ template<typename F>
 std::pair<tvec3<F>, F> uniform_on_cone(F max_cos_theta, F u1, F u2) noexcept;
 
 /**
- * @brief 把[0, 1]^2上的均匀分布转换为以maxCosTheta为顶角的单位球面上的锥体内的方向上的均匀分布对应的pdf（w.r.t. solid angle）
+ * @brief 把[0, 1]^2上的均匀分布转换为以maxCosTheta为顶角的单位球面上的锥体内的方向上
+ *  的均匀分布对应的pdf（w.r.t. solid angle）
  */
 template<typename F>
 F uniform_on_cone_pdf(F max_cos_theta) noexcept;
@@ -182,7 +186,8 @@ template<typename F>
 constexpr F uniform_on_unit_disk_pdf = 1;
 
 /**
- * @brief 将[0, 1]上的均匀分布转换为{ begin, begin + 1, ..., end - 1 } \times [0, 1]上的均匀分布
+ * @brief 将[0, 1]上的均匀分布转换为
+ *  { begin, begin + 1, ..., end - 1 } \times [0, 1]上的均匀分布
  */
 template<typename F, typename I>
 std::pair<I, F> extract_uniform_int(F u, I begin, I end);
@@ -190,7 +195,8 @@ std::pair<I, F> extract_uniform_int(F u, I begin, I end);
 /**
  * @brief 将[0, 1]上的均匀分布转换为服从inv_cdf描述的cdf的分布
  * 
- * 记inverse CDF表格为A，大小为N，则A[0]对应CDF^{-1}(0)，A[N-1]对应CDF^{-1}(1)，中间的值用最近的表项作线性插值得到
+ * 记inverse CDF表格为A，大小为N，则A[0]对应CDF^{-1}(0)，A[N-1]对应
+ *  CDF^{-1}(1)，中间的值用最近的表项作线性插值得到
  */
 template<typename F>
 F sample_inv_cdf_table(F u, const F *inv_cdf, size_t tab_size) noexcept;

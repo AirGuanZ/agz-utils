@@ -16,7 +16,8 @@ std::vector<unsigned char> read_raw_file(const std::string &filename);
  * 
  * 若存在原文件，覆盖之
  */
-void write_raw_file(const std::string &filename, const void *data, size_t byte_size);
+void write_raw_file(
+    const std::string &filename, const void *data, size_t byte_size);
 
 /**
  * @brief 读取一个文本文件的全部内容

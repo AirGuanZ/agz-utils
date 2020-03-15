@@ -73,7 +73,8 @@ std::string join(std::string_view joiner, TIt begin, TIt end);
  * 
  * @return 分割得到的所有字符串构成的vector
  */
-inline std::vector<std::string> split(std::string_view src, char splitter, bool rm_empty_result = true);
+inline std::vector<std::string> split(
+    std::string_view src, char splitter, bool rm_empty_result = true);
 
 /**
  * @brief 以一个字符串为分隔符分割一个字符串
@@ -84,7 +85,8 @@ inline std::vector<std::string> split(std::string_view src, char splitter, bool 
  *
  * @return 分割得到的所有字符串构成的vector
  */
-inline std::vector<std::string> split(std::string_view src, std::string_view splitter, bool rm_empty_result = true);
+inline std::vector<std::string> split(
+    std::string_view src, std::string_view splitter, bool rm_empty_result = true);
 
 /***
  * @brief 以一个字符为分隔符分割一个字符串
@@ -97,7 +99,9 @@ inline std::vector<std::string> split(std::string_view src, std::string_view spl
  * @return 共输出了多少个分割结果
  */
 template<typename TIt>
-size_t split(std::string_view src, char splitter, TIt out_iterator, bool rm_empty_result = true);
+size_t split(
+    std::string_view src, char splitter, TIt out_iterator,
+    bool rm_empty_result = true);
 
 /***
  * @brief 以一个字符串为分隔符分割一个字符串
@@ -110,21 +114,25 @@ size_t split(std::string_view src, char splitter, TIt out_iterator, bool rm_empt
  * @return 共输出了多少个分割结果
  */
 template<typename TIt>
-size_t split(std::string_view src, std::string_view splitter, TIt out_iterator, bool rm_empty_result = true);
+size_t split(
+    std::string_view src, std::string_view splitter, TIt out_iterator,
+    bool rm_empty_result = true);
 
 /***
  * @brief 原地在字符串中进行子串替换
  * 
  * 替换不会递归进行
  */
-inline size_t replace_(std::string &str, std::string_view old_seg, std::string_view new_seg);
+inline size_t replace_(
+    std::string &str, std::string_view old_seg, std::string_view new_seg);
 
 /***
  * @brief 返回在字符串中进行子串替换得到的新串
  * 
  * 替换不会递归进行
  */
-inline std::string replace(std::string_view str, std::string_view old_seg, std::string_view new_seg);
+inline std::string replace(
+    std::string_view str, std::string_view old_seg, std::string_view new_seg);
 
 /**
  * @brief 把一个字符串转为指定的数值类型
@@ -143,12 +151,14 @@ std::string cat(Args&&...args);
 /**
  * @brief 用给定字符填充str的左侧，使其长度不小于width，返回填充得到的新串
  */
-inline std::string align_left (std::string_view str, size_t width, char padder = ' ');
+inline std::string align_left(
+    std::string_view str, size_t width, char padder = ' ');
 
 /**
  * @brief 用给定字符填充str的右侧，使其长度不小于width，返回填充得到的新串
  */
-inline std::string align_right(std::string_view str, size_t width, char padder = ' ');
+inline std::string align_right(
+    std::string_view str, size_t width, char padder = ' ');
 
 /**
  * @brief 将以std::string存储的utf-8字符串转为本平台上的宽字符串

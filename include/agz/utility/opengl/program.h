@@ -109,13 +109,15 @@ public:
         GLuint index;
         glGetUniformIndices(handle_, 1, &name, &index);
         if(index == GL_INVALID_INDEX)
-            throw opengl_exception_t("invalid uniform variable name: " + std::string(name));
+            throw opengl_exception_t(
+                "invalid uniform variable name: " + std::string(name));
 
         GLint size;
         GLenum type;
         glGetActiveUniform(handle_, index, 0, nullptr, &size, &type, nullptr);
         if(type != var_to_gl_type<Var>::type)
-            throw opengl_exception_t("invalid uniform variable type of " + std::string(name));
+            throw opengl_exception_t(
+                "invalid uniform variable type of " + std::string(name));
 
         auto loc = glGetUniformLocation(handle_, name);
         return uniform_variable_t<Var>(loc);
@@ -133,12 +135,15 @@ public:
 
         GLuint index = glGetUniformBlockIndex(handle_, name);
         if(index == GL_INVALID_INDEX)
-            throw opengl_exception_t("invalid std140 uniform block name: " + std::string(name));
+            throw opengl_exception_t(
+                "invalid std140 uniform block name: " + std::string(name));
 
         GLint size;
-        glGetActiveUniformBlockiv(handle_, index, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+        glGetActiveUniformBlockiv(
+            handle_, index, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
         if(sizeof(Block) != size)
-            throw opengl_exception_t("unmatched std140 uniform block size of " + std::string(name));
+            throw opengl_exception_t(
+                "unmatched std140 uniform block size of " + std::string(name));
 
         return std140_uniform_block_t<Block>(handle_, index);
     }
@@ -155,12 +160,14 @@ public:
 
         GLint loc = glGetAttribLocation(handle_, name);
         if(loc < 0)
-            throw opengl_exception_t("invalid attrib variable name: " + std::string(name));
+            throw opengl_exception_t(
+                "invalid attrib variable name: " + std::string(name));
 
         GLint size; GLenum type;
         glGetActiveAttrib(handle_, loc, 0, nullptr, &size, &type, nullptr);
         if(type != var_to_gl_type<Var>::type)
-            throw opengl_exception_t("unmatched attrib variable type of " + std::string(name));
+            throw opengl_exception_t(
+                "unmatched attrib variable type of " + std::string(name));
 
         return attrib_variable_t<Var>(loc);
     }
@@ -210,7 +217,9 @@ namespace impl
                 {
                     std::vector<GLuint> attached_shaders(shader_handles_.size());
                     GLsizei count;
-                    glGetAttachedShaders(handle, GLsizei(attached_shaders.size()), &count, attached_shaders.data());
+                    glGetAttachedShaders(
+                        handle, GLsizei(attached_shaders.size()),
+                        &count, attached_shaders.data());
                     for(GLsizei i = 0; i < count; ++i)
                         glDetachShader(handle, attached_shaders[i]);
                     glDeleteProgram(handle);
@@ -229,7 +238,8 @@ namespace impl
                 GLint log_len;
                 glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_len);
                 std::vector<char> log_buf(log_len + 1);
-                glGetProgramInfoLog(handle, GLsizei(log_buf.size()), nullptr, log_buf.data());
+                glGetProgramInfoLog(
+                    handle, GLsizei(log_buf.size()), nullptr, log_buf.data());
                 throw opengl_exception_t(log_buf.data());
             }
 

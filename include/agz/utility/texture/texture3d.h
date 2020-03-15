@@ -30,9 +30,9 @@ public:
 
     ~texture3d_t() = default;
     
-    void initialize(int d, int h, int w,     uninitialized_t);
-    void initialize(int d, int h, int w,     const texel_t *data);
-    void initialize(int d, int h, int w,     const texel_t &init_texel = texel_t());
+    void initialize(int d, int h, int w, uninitialized_t);
+    void initialize(int d, int h, int w, const texel_t *data);
+    void initialize(int d, int h, int w, const texel_t &init_texel = texel_t());
     
     void swap(self_t &swap_with) noexcept;
 
@@ -62,7 +62,8 @@ public:
 
     void clear(const T &value);
     
-    self_t subtex(int z_beg, int z_end, int y_beg, int y_end, int x_beg, int x_end) const;
+    self_t subtex(
+        int z_beg, int z_end, int y_beg, int y_end, int x_beg, int x_end) const;
 
 protected:
 

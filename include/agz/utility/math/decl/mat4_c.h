@@ -13,7 +13,9 @@ namespace agz::math
 template<typename T>
 class tmat4_c
 {
-    tmat4_c(const tvec4<T> &c0, const tvec4<T> &c1, const tvec4<T> &c2, const tvec4<T> &c3) noexcept;
+    tmat4_c(
+        const tvec4<T> &c0, const tvec4<T> &c1,
+        const tvec4<T> &c2, const tvec4<T> &c3) noexcept;
 
 public:
 
@@ -96,8 +98,12 @@ public:
         static self_t scale(const tvec3<T> &ratio) noexcept;
         static self_t scale(T x, T y, T z)         noexcept;
 
-        static self_t perspective(T fov_y_rad, T w_over_h, T near_plane, T far_plane)       noexcept;
-        static self_t look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept;
+        static self_t perspective(
+            T fov_y_rad, T w_over_h, T near_plane, T far_plane) noexcept;
+
+        static self_t look_at(
+            const tvec3<T> &eye, const tvec3<T> &dst,
+            const tvec3<T> &up) noexcept;
     };
 
     struct right_transform
@@ -113,24 +119,38 @@ public:
         static self_t scale(const tvec3<T> &ratio) noexcept;
         static self_t scale(T x, T y, T z)         noexcept;
 
-        static self_t perspective(T fov_y_rad, T w_over_h, T near_plane, T far_plane)       noexcept;
-        static self_t orthographic(T left, T right, T top, T bottom, T near_z, T far_z)     noexcept;
-        static self_t look_at(const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept;
+        static self_t perspective(
+            T fov_y_rad, T w_over_h, T near_plane, T far_plane) noexcept;
+
+        static self_t orthographic(
+            T left, T right, T top, T bottom, T near_z, T far_z) noexcept;
+
+        static self_t look_at(
+            const tvec3<T> &eye, const tvec3<T> &dst,
+            const tvec3<T> &up) noexcept;
 
         static self_t from_quaternion(const tquaternion_t<T> &quaternion) noexcept;
     };
 };
 
-template<typename T> tmat4_c<T> operator+(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept;
-template<typename T> tmat4_c<T> operator-(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept;
+template<typename T> tmat4_c<T> operator+(
+    const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept;
+template<typename T> tmat4_c<T> operator-(
+    const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept;
 
-template<typename T> tmat4_c<T> operator*(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept;
-template<typename T> tvec4<T>   operator*(const tmat4_c<T> &lhs, const tvec4<T>   &rhs) noexcept;
-template<typename T> tvec4<T>   operator*(const tvec4<T>   &lhs, const tmat4_c<T> &rhs) noexcept;
+template<typename T> tmat4_c<T> operator*(
+    const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept;
+template<typename T> tvec4<T>   operator*(
+    const tmat4_c<T> &lhs, const tvec4<T>   &rhs) noexcept;
+template<typename T> tvec4<T>   operator*(
+    const tvec4<T>   &lhs, const tmat4_c<T> &rhs) noexcept;
 
-template<typename T> tmat4_c<T> operator*(const tmat4_c<T> &lhs, T rhs) noexcept;
-template<typename T> tmat4_c<T> operator/(const tmat4_c<T> &lhs, T rhs) noexcept;
-template<typename T> tmat4_c<T> operator*(T lhs, const tmat4_c<T> &rhs) noexcept;
+template<typename T> tmat4_c<T> operator*(
+    const tmat4_c<T> &lhs, T rhs) noexcept;
+template<typename T> tmat4_c<T> operator/(
+    const tmat4_c<T> &lhs, T rhs) noexcept;
+template<typename T> tmat4_c<T> operator*(
+    T lhs, const tmat4_c<T> &rhs) noexcept;
 
 using mat4f_c = tmat4_c<float>;
 using mat4d_c = tmat4_c<double>;

@@ -70,7 +70,8 @@ public:
         if(it == map_.end())
             return std::nullopt;
 
-        auto ret = std::make_optional(std::move(it->second.list_iterator->value));
+        auto ret = std::make_optional(
+            std::move(it->second.list_iterator->value));
         list_.erase(it->second.list_iterator);
         map_.erase(it);
         return ret;
@@ -144,7 +145,8 @@ public:
         list_node_t list_node;
         list_node.value = std::move(value);
         list_.push_front(std::move(list_node));
-        auto it_result = map_.insert(std::make_pair(key, map_node_t{ list_.begin() }));
+        auto it_result = map_.insert(
+            std::make_pair(key, map_node_t{ list_.begin() }));
         list_.front().map_iterator = it_result.first;
     }
 

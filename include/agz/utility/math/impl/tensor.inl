@@ -12,7 +12,8 @@ namespace tensor_impl
 {
 
     template<int D>
-    tvec<int, D> next_index(const tvec<int, D> &shape, const tvec<int, D> &index)
+    tvec<int, D> next_index(
+        const tvec<int, D> &shape, const tvec<int, D> &index)
     {
         auto ret = index;
         for(int i = D - 1; i >= 1; --i)
@@ -28,7 +29,8 @@ namespace tensor_impl
     template<int D>
     struct to_linear_index_aux
     {
-        static int eval(const tvec<int, D> &shape, const tvec<int, D> &index) noexcept
+        static int eval(
+            const tvec<int, D> &shape, const tvec<int, D> &index) noexcept
         {
             int ret = 0, base = 1;
             for(int i = D - 1; i >= 0; --i)
@@ -43,7 +45,8 @@ namespace tensor_impl
     template<>
     struct to_linear_index_aux<1>
     {
-        static int eval(const tvec<int, 1> &, const tvec<int, 1> &index) noexcept
+        static int eval(
+            const tvec<int, 1> &, const tvec<int, 1> &index) noexcept
         {
             return index[0];
         }
@@ -52,7 +55,8 @@ namespace tensor_impl
     template<>
     struct to_linear_index_aux<2>
     {
-        static int eval(const tvec<int, 2> &shape, const tvec<int, 2> &index) noexcept
+        static int eval(
+            const tvec<int, 2> &shape, const tvec<int, 2> &index) noexcept
         {
             return index[0] * shape[1] + index[1];
         }
@@ -61,7 +65,8 @@ namespace tensor_impl
     template<>
     struct to_linear_index_aux<3>
     {
-        static int eval(const tvec<int, 3> &shape, const tvec<int, 3> &index) noexcept
+        static int eval(
+            const tvec<int, 3> &shape, const tvec<int, 3> &index) noexcept
         {
             const int s2 = shape[2], s1 = shape[1] * shape[2];
             return index[0] * s1 + index[1] * s2 + index[2];
@@ -99,7 +104,8 @@ tensor_t<P, D>::tensor_t(from_indexed_func_t, const vec<int, D> &shape, F &&func
 
 template<typename P, int D>
 template<typename F>
-tensor_t<P, D>::tensor_t(from_linear_indexed_func_t, const vec<int, D> &shape, F &&func)
+tensor_t<P, D>::tensor_t(
+    from_linear_indexed_func_t, const vec<int, D> &shape, F &&func)
     : data_(nullptr), shape_(shape), elem_count_(shape.product())
 {
     assert(elem_count_ > 0);
@@ -150,20 +156,23 @@ tensor_t<P, D>::tensor_t(const index_t &shape, const P &init_value)
 
 template<typename P, int D>
 template<typename F>
-typename tensor_t<P, D>::self_t tensor_t<P, D>::from_indexed_fn(const index_t &shape, F &&func)
+typename tensor_t<P, D>::self_t tensor_t<P, D>::from_indexed_fn(
+    const index_t &shape, F &&func)
 {
     return self_t(from_indexed_func_t{ }, shape, std::forward<F>(func));
 }
 
 template<typename P, int D>
 template<typename F>
-typename tensor_t<P, D>::self_t tensor_t<P, D>::from_linear_indexed_fn(const index_t &shape, F &&func)
+typename tensor_t<P, D>::self_t tensor_t<P, D>::from_linear_indexed_fn(
+    const index_t &shape, F &&func)
 {
     return self_t(from_linear_indexed_func_t{ }, shape, std::forward<F>(func));
 }
 
 template<typename P, int D>
-typename tensor_t<P, D>::self_t tensor_t<P, D>::from_array(const index_t &shape, const P *data)
+typename tensor_t<P, D>::self_t tensor_t<P, D>::from_array(
+    const index_t &shape, const P *data)
 {
     return from_linear_indexed_fn(shape, [&](int i)
     {
@@ -192,15 +201,24 @@ tensor_t<P, D>::tensor_t(self_t &&move_from) noexcept
 template<typename P, int D>
 tensor_t<P, D> &tensor_t<P, D>::operator=(const self_t &copy_from)
 {
-    self_t t(copy_from);
-    this->swap(t);
+    if(shape() != copy_from.shape())
+    {
+        self_t t(copy_from);
+        this->swap(t);
+        return *this;
+    }
+
+    auto *raw = copy_from.raw_data();
+    for(int i = 0; i < elem_count_; ++i)
+        data_[i] = raw[i];
+
     return *this;
 }
 
 template<typename P, int D>
 tensor_t<P, D> &tensor_t<P, D>::operator=(self_t &&move_from) noexcept
 {
-    swap(move_from);
+    this->swap(move_from);
     return *this;
 }
 
@@ -254,7 +272,8 @@ template<typename P, int D>
 P &tensor_t<P, D>::at(const index_t &index) noexcept
 {
     assert(is_available());
-    const int linear_index = tensor_impl::to_linear_index_aux<D>::eval(shape_, index);
+    const int linear_index = tensor_impl::
+            to_linear_index_aux<D>::eval(shape_, index);
     assert(linear_index < elem_count_);
     return data_[linear_index];
 }
@@ -263,7 +282,8 @@ template<typename P, int D>
 const P &tensor_t<P, D>::at(const index_t &index) const noexcept
 {
     assert(is_available());
-    const int linear_index = tensor_impl::to_linear_index_aux<D>::eval(shape_, index);
+    const int linear_index = tensor_impl::
+            to_linear_index_aux<D>::eval(shape_, index);
     assert(linear_index < elem_count_);
     return data_[linear_index];
 }
@@ -345,7 +365,8 @@ auto elemwise_unary(const tensor_t<P, D> &opd, F &&opr)
 }
 
 template<typename P, int D, typename F>
-auto elemwise_binary(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs, F &&opr)
+auto elemwise_binary(
+    const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs, F &&opr)
 {
     if(lhs.shape() != rhs.shape() || !lhs.is_available())
     {
@@ -353,7 +374,8 @@ auto elemwise_binary(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs, F &&o
             "invalid/unmatched tensor size in elementwise binary operation");
     }
 
-    using ret_pixel_t = rm_rcv_t<decltype(opr(std::declval<const P&>(), std::declval<const P&>()))>;
+    using ret_pixel_t = rm_rcv_t<decltype(
+        opr(std::declval<const P&>(), std::declval<const P&>()))>;
     return tensor_t<ret_pixel_t, D>::from_linear_indexed_fn(lhs.shape(),
         [&](int i)
     {

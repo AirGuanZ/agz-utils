@@ -69,8 +69,11 @@ public:
     }
 };
 
-#define AGZ_SCOPE_ASSIGN(ADDR, TARGET)             AGZ_SCOPE_ASSIGN_IMPL0((ADDR), (TARGET), __LINE__)
-#define AGZ_SCOPE_ASSIGN_IMPL0(ADDR, TARGET, LINE) AGZ_SCOPE_ASSIGN_IMPL1(ADDR, TARGET, LINE)
-#define AGZ_SCOPE_ASSIGN_IMPL1(ADDR, TARGET, LINE) ::agz::misc::scope_assignment_t _auto_scope_assignment##LINE(ADDR, TARGET)
+#define AGZ_SCOPE_ASSIGN(ADDR, TARGET) \
+    AGZ_SCOPE_ASSIGN_IMPL0((ADDR), (TARGET), __LINE__)
+#define AGZ_SCOPE_ASSIGN_IMPL0(ADDR, TARGET, LINE) \
+    AGZ_SCOPE_ASSIGN_IMPL1(ADDR, TARGET, LINE)
+#define AGZ_SCOPE_ASSIGN_IMPL1(ADDR, TARGET, LINE) \
+    ::agz::misc::scope_assignment_t _auto_scope_assignment##LINE(ADDR, TARGET)
 
 } // namespace agz::misc

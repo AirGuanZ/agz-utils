@@ -59,7 +59,8 @@ public:
     using sublist = type_list_t<at<Is>...>; // 用下标序列取子列表
 
     template<typename T>
-    static constexpr bool contains = type_list_impl::find_in<T, Ts...>(); // 列表中是否包含指定类型
+    static constexpr bool contains = // 列表中是否包含指定类型
+        type_list_impl::find_in<T, Ts...>();
 };
 
 } // namespace misc

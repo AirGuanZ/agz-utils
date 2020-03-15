@@ -91,7 +91,8 @@ public:
      */
     template<typename DataTexel>
     void initialize_format_and_data(
-        GLsizei levels, GLenum internal_format, GLsizei width, GLsizei height, const DataTexel *data)
+        GLsizei levels, GLenum internal_format,
+        GLsizei width, GLsizei height, const DataTexel *data)
     {
         assert(handle_);
         initialize_format(levels, internal_format, width, height);
@@ -105,9 +106,13 @@ public:
      */
     template<typename DataTexel>
     void initialize_format_and_data(
-        GLsizei levels, GLenum internal_format, const texture::texture2d_t<DataTexel> &data)
+        GLsizei levels, GLenum internal_format,
+        const texture::texture2d_t<DataTexel> &data)
     {
-        initialize_format_and_data(levels, internal_format, GLsizei(data.width()), GLsizei(data.height()), data.get_data().raw_data());
+        initialize_format_and_data(
+            levels, internal_format,
+            GLsizei(data.width()), GLsizei(data.height()),
+            data.get_data().raw_data());
     }
 
     /**
@@ -117,9 +122,13 @@ public:
      */
     template<typename DataTexel>
     void initialize_format_and_data(
-        GLsizei levels, GLenum internal_format, const math::tensor_t<DataTexel, 2> &data)
+        GLsizei levels, GLenum internal_format,
+        const math::tensor_t<DataTexel, 2> &data)
     {
-        initialize_format_and_data(levels, internal_format, GLsizei(data.shape()[1]), GLsizei(data.shape()[0]), data.raw_data());
+        initialize_format_and_data(
+            levels, internal_format,
+            GLsizei(data.shape()[1]), GLsizei(data.shape()[0]),
+            data.raw_data());
     }
 
     /**
@@ -127,7 +136,8 @@ public:
      *
      * internal_format取值参见glTextureStorage2D
      */
-    void initialize_format(GLsizei levels, GLenum internal_format, GLsizei width, GLsizei height)
+    void initialize_format(
+        GLsizei levels, GLenum internal_format, GLsizei width, GLsizei height)
     {
         assert(handle_);
         glTextureStorage2D(handle_, levels, internal_format, width, height);
@@ -142,10 +152,13 @@ public:
         assert(handle_);
         GLint old_align;
         glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_align);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, impl::data_type_to_texel_type<DataTexel>::row_align);
+        glPixelStorei(
+            GL_UNPACK_ALIGNMENT,
+            impl::data_type_to_texel_type<DataTexel>::row_align);
         glTextureSubImage2D(
             handle_, 0, 0, 0, width, height,
-            impl::data_type_to_texel_type<DataTexel>::format, impl::data_type_to_texel_type<DataTexel>::type, data);
+            impl::data_type_to_texel_type<DataTexel>::format,
+            impl::data_type_to_texel_type<DataTexel>::type, data);
         glPixelStorei(GL_UNPACK_ALIGNMENT, old_align);
         glGenerateTextureMipmap(handle_);
     }

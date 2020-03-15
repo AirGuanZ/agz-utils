@@ -115,7 +115,8 @@ class uniform_variable_assignment_t
         uniform_variable_t<Var> var;
         Var value;
 
-        uniform_var_record_t(uniform_variable_t<Var> var, const Var &value) noexcept
+        uniform_var_record_t(
+            uniform_variable_t<Var> var, const Var &value) noexcept
             : var(var), value(value)
         {
 
@@ -175,7 +176,9 @@ class uniform_variable_assignment_t
 
         void set(const void *value) noexcept override
         {
-            auto tvalue = static_cast<const std140_uniform_block_record_value_t<Block>*>(value);
+            auto tvalue =
+                static_cast<const std140_uniform_block_record_value_t<Block>*>(
+                    value);
             buffer = tvalue->buffer;
             bindingPoint = tvalue->bindingPoint;
         }
@@ -207,18 +210,23 @@ public:
      * @brief 设置uniform block所绑定的buffer
      */
     template<typename Block>
-    void set(std140_uniform_block_t<Block> block, const std140_uniform_block_buffer_t<Block> *buffer, GLuint binding_point)
+    void set(
+        std140_uniform_block_t<Block> block,
+        const std140_uniform_block_buffer_t<Block> *buffer,
+        GLuint binding_point)
     {
         GLint key = static_cast<GLint>(block.index()) | 0xF00000;
         assert(static_cast<GLuint>(key) != block.index());
         auto it = assignments_.find(key);
         if(it != assignments_.end())
         {
-            std140_uniform_block_record_value_t<Block> val = { buffer, binding_point };
+            std140_uniform_block_record_value_t<Block> val =
+                { buffer, binding_point };
             it->second->set(&val);
             return;
         }
-        auto rc = std::make_unique<std140_uniform_block_record_t<Block>>(block, buffer, binding_point);
+        auto rc = std::make_unique<std140_uniform_block_record_t<Block>>(
+            block, buffer, binding_point);
         assignments_[key] = std::move(rc);
     }
 

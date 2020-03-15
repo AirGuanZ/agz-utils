@@ -44,17 +44,20 @@ inline void clock_t::restart() noexcept
 
 inline uint64_t clock_t::s() const noexcept
 {
-    return std::chrono::duration_cast<std::chrono::seconds>(c::now() - start_).count();
+    return std::chrono::duration_cast<std::chrono::seconds>(
+        c::now() - start_).count();
 }
 
 inline uint64_t clock_t::ms() const noexcept
 {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(c::now() - start_).count();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        c::now() - start_).count();
 }
 
 inline uint64_t clock_t::us() const noexcept
 {
-    return std::chrono::duration_cast<std::chrono::microseconds>(c::now() - start_).count();
+    return std::chrono::duration_cast<std::chrono::microseconds>(
+        c::now() - start_).count();
 }
 
 } // namespace agz::time

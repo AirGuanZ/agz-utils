@@ -51,14 +51,16 @@ public:
     explicit uint_ptr_variant_t(TPtrDest *owner_ptr);
 
     /**
-     * @brief 由于指针独占所有权，可能调用存储对象的clone()方法获得新的std::unique_ptr<TPtrDest>
+     * @brief 由于指针独占所有权，可能调用存储对象的clone()方法
+     *  获得新的std::unique_ptr<TPtrDest>
      */
     uint_ptr_variant_t(const self_t &copy_from);
 
     uint_ptr_variant_t(self_t &&move_from) noexcept;
 
     /**
-     * @brief 由于指针独占所有权，可能调用存储对象的clone()方法获得新的std::unique_ptr<TPtrDest>
+     * @brief 由于指针独占所有权，可能调用存储对象的clone()方法
+     *  获得新的std::unique_ptr<TPtrDest>
      */
     uint_ptr_variant_t &operator=(const self_t &copy_from);
 
@@ -143,7 +145,8 @@ public:
 };
 
 template<typename TUInt, typename TPtrDest>
-size_t uint_ptr_variant_t<TUInt, TPtrDest>::uint_to_data(TUInt uint_value) noexcept
+size_t uint_ptr_variant_t<TUInt, TPtrDest>::uint_to_data(
+    TUInt uint_value) noexcept
 {
     return (uint_value << 8) | 0x01;
 }
@@ -156,7 +159,8 @@ uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t() noexcept
 }
 
 template<typename TUInt, typename TPtrDest>
-uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(uint_t uint_value) noexcept
+uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(
+    uint_t uint_value) noexcept
     : data_(uint_to_data(uint_value))
 {
     
@@ -170,14 +174,16 @@ uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(TPtrDest *owner_ptr)
 }
 
 template<typename TUInt, typename TPtrDest>
-uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(std::unique_ptr<TPtrDest> owner_ptr)
+uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(
+    std::unique_ptr<TPtrDest> owner_ptr)
     : uint_ptr_variant_t(owner_ptr.get())
 {
     owner_ptr.release();
 }
 
 template<typename TUInt, typename TPtrDest>
-uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(const self_t &copy_from)
+uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(
+    const self_t &copy_from)
 {
     if(copy_from.is_ptr())
     {
@@ -191,13 +197,15 @@ uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(const self_t &copy_from)
 }
 
 template<typename TUInt, typename TPtrDest>
-uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(self_t &&move_from) noexcept
+uint_ptr_variant_t<TUInt, TPtrDest>::uint_ptr_variant_t(
+    self_t &&move_from) noexcept
 {
     this->swap(move_from);
 }
 
 template<typename TUInt, typename TPtrDest>
-uint_ptr_variant_t<TUInt, TPtrDest> &uint_ptr_variant_t<TUInt, TPtrDest>::operator=(const self_t &copy_from)
+uint_ptr_variant_t<TUInt, TPtrDest> &
+    uint_ptr_variant_t<TUInt, TPtrDest>::operator=(const self_t &copy_from)
 {
     if(is_ptr())
         delete get_ptr_unchecked();
@@ -216,7 +224,8 @@ uint_ptr_variant_t<TUInt, TPtrDest> &uint_ptr_variant_t<TUInt, TPtrDest>::operat
 }
 
 template<typename TUInt, typename TPtrDest>
-uint_ptr_variant_t<TUInt, TPtrDest> &uint_ptr_variant_t<TUInt, TPtrDest>::operator=(self_t &&move_from) noexcept
+uint_ptr_variant_t<TUInt, TPtrDest> &
+    uint_ptr_variant_t<TUInt, TPtrDest>::operator=(self_t &&move_from) noexcept
 {
     this->swap(move_from);
     return *this;
@@ -256,7 +265,8 @@ std::optional<TPtrDest *> uint_ptr_variant_t<TUInt, TPtrDest>::get_ptr()
 }
 
 template<typename TUInt, typename TPtrDest>
-std::optional<const TPtrDest *> uint_ptr_variant_t<TUInt, TPtrDest>::get_ptr() const
+std::optional<const TPtrDest *>
+    uint_ptr_variant_t<TUInt, TPtrDest>::get_ptr() const
 {
     if(is_ptr())
         return reinterpret_cast<TPtrDest *>(data_);
@@ -264,7 +274,8 @@ std::optional<const TPtrDest *> uint_ptr_variant_t<TUInt, TPtrDest>::get_ptr() c
 }
 
 template<typename TUInt, typename TPtrDest>
-std::optional<typename uint_ptr_variant_t<TUInt, TPtrDest>::uint_t> uint_ptr_variant_t<TUInt, TPtrDest>::get_uint() const
+std::optional<typename uint_ptr_variant_t<TUInt, TPtrDest>::uint_t>
+        uint_ptr_variant_t<TUInt, TPtrDest>::get_uint() const
 {
     if(is_uint())
         return get_uint_unchecked();
@@ -284,13 +295,15 @@ const TPtrDest *uint_ptr_variant_t<TUInt, TPtrDest>::get_ptr_unchecked() const n
 }
 
 template<typename TUInt, typename TPtrDest>
-typename uint_ptr_variant_t<TUInt, TPtrDest>::uint_t uint_ptr_variant_t<TUInt, TPtrDest>::get_uint_unchecked() const noexcept
+typename uint_ptr_variant_t<TUInt, TPtrDest>::uint_t
+        uint_ptr_variant_t<TUInt, TPtrDest>::get_uint_unchecked() const noexcept
 {
     return uint_t(data_ >> 8);
 }
 
 template<typename TUInt, typename TPtrDest>
-void uint_ptr_variant_t<TUInt, TPtrDest>::set(std::unique_ptr<TPtrDest> owner_ptr)
+void uint_ptr_variant_t<TUInt, TPtrDest>::set(
+    std::unique_ptr<TPtrDest> owner_ptr)
 {
     this->set(owner_ptr.get());
     owner_ptr.release();

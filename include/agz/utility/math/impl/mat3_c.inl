@@ -3,7 +3,8 @@
 namespace agz::math {
 
 template<typename T>
-tmat3_c<T>::tmat3_c(const tvec3<T> &c0, const tvec3<T> &c1, const tvec3<T> &c2) noexcept
+tmat3_c<T>::tmat3_c(
+    const tvec3<T> &c0, const tvec3<T> &c1, const tvec3<T> &c2) noexcept
     : data{ c0, c1, c2 }
 {
     
@@ -90,7 +91,8 @@ const typename tmat3_c<T>::self_t& tmat3_c<T>::identity() noexcept
 }
 
 template<typename T>
-typename tmat3_c<T>::self_t tmat3_c<T>::translate(const tvec2<T> &offset) noexcept
+typename tmat3_c<T>::self_t tmat3_c<T>::translate(
+    const tvec2<T> &offset) noexcept
 {
     return translate(offset.x, offset.y);
 }
@@ -104,7 +106,8 @@ typename tmat3_c<T>::self_t tmat3_c<T>::translate(T x, T y) noexcept
 }
 
 template<typename T>
-typename tmat3_c<T>::self_t tmat3_c<T>::rotate(const tvec3<T> &_axis, T rad) noexcept
+typename tmat3_c<T>::self_t tmat3_c<T>::rotate(
+    const tvec3<T> &_axis, T rad) noexcept
 {
     const tvec3<T> axis = _axis.normalize();
     const T sinv = std::sin(rad), cosv = std::cos(rad);
@@ -168,7 +171,8 @@ typename tmat3_c<T>::self_t tmat3_c<T>::scale(T x, T y) noexcept
 }
 
 template<typename T>
-typename tmat3_c<T>::self_t tmat3_c<T>::inv_from_adj(const self_t &adj) const noexcept
+typename tmat3_c<T>::self_t tmat3_c<T>::inv_from_adj(
+    const self_t &adj) const noexcept
 {
     return adj / dot(data[0], adj.get_row(0));
 }
@@ -180,7 +184,8 @@ typename tmat3_c<T>::col_t& tmat3_c<T>::operator[](size_t idx) noexcept
 }
 
 template<typename T>
-const typename tmat3_c<T>::col_t& tmat3_c<T>::operator[](size_t idx) const noexcept
+const typename tmat3_c<T>::col_t& tmat3_c<T>::operator[](
+    size_t idx) const noexcept
 {
     return data[idx];
 }

@@ -1,8 +1,10 @@
-﻿#include <climits>
+﻿#include <cassert>
+#include <climits>
 #include <cstring>
 
 #include <agz/utility/file/file_raw.h>
 #include <agz/utility/image/load_image.h>
+#include <agz/utility/misc.h>
 
 //=============================== begin stb SIMD includes ===============================
 
@@ -161,22 +163,29 @@ namespace img_impl
 
 } // namespace img_impl
 
-image_buffer<math::color2b> load_gray_alpha_from_memory(const void *data, size_t byte_length)
+image_buffer<math::color2b> load_gray_alpha_from_memory(
+    const void *data, size_t byte_length)
 {
-    return img_impl::load_from_memory<math::color2b, 2, STBI_grey_alpha>(data, byte_length);
+    return img_impl::load_from_memory<math::color2b, 2, STBI_grey_alpha>(
+        data, byte_length);
 }
 
-image_buffer<math::color3b> load_rgb_from_memory(const void *data, size_t byte_length)
+image_buffer<math::color3b> load_rgb_from_memory(
+    const void *data, size_t byte_length)
 {
-    return img_impl::load_from_memory<math::color3b, 3, STBI_rgb>(data, byte_length);
+    return img_impl::load_from_memory<math::color3b, 3, STBI_rgb>(
+        data, byte_length);
 }
 
-image_buffer<math::color4b> load_rgba_from_memory(const void *data, size_t byte_length)
+image_buffer<math::color4b> load_rgba_from_memory(
+    const void *data, size_t byte_length)
 {
-    return img_impl::load_from_memory<math::color4b, 4, STBI_rgb_alpha>(data, byte_length);
+    return img_impl::load_from_memory<math::color4b, 4, STBI_rgb_alpha>(
+        data, byte_length);
 }
 
-math::tensor_t<math::color3f, 2> load_rgb_from_hdr_memory(const void *data_ptr, size_t byte_length)
+math::tensor_t<math::color3f, 2> load_rgb_from_hdr_memory(
+    const void *data_ptr, size_t byte_length)
 {
     int w, h, channels;
 
@@ -209,7 +218,8 @@ image_buffer<math::byte> load_gray_from_file(const std::string &filename)
     return load_gray_from_memory(content.data(), content.size());
 }
 
-image_buffer<math::color2b> load_gray_alpha_from_file(const std::string &filename)
+image_buffer<math::color2b> load_gray_alpha_from_file(
+    const std::string &filename)
 {
     auto content = file::read_raw_file(filename);
     return load_gray_alpha_from_memory(content.data(), content.size());
@@ -227,7 +237,8 @@ image_buffer<math::color4b> load_rgba_from_file(const std::string &filename)
     return load_rgba_from_memory(content.data(), content.size());
 }
 
-math::tensor_t<math::color3f, 2> load_rgb_from_hdr_file(const std::string &filename)
+math::tensor_t<math::color3f, 2> load_rgb_from_hdr_file(
+    const std::string &filename)
 {
     auto content = file::read_raw_file(filename);
     return load_rgb_from_hdr_memory(content.data(), content.size());

@@ -54,7 +54,8 @@ T bsearch_sampler_t<F, T>::sample(F u) const noexcept
     assert(available());
     assert(0 <= u && u <= 1);
 
-    const auto upper = std::upper_bound(partial_sum_.begin(), partial_sum_.end(), u);
+    const auto upper = std::upper_bound(
+        partial_sum_.begin(), partial_sum_.end(), u);
     if(upper == partial_sum_.end())
         return static_cast<T>(partial_sum_.size() - 1);
     return static_cast<T>(upper - partial_sum_.begin());
@@ -272,7 +273,8 @@ F sample_inv_cdf_table(F u, const F *inv_cdf, size_t tab_size) noexcept
 {
     assert(tab_size >= 2);
     const F global = u * (tab_size - 1);
-    const size_t low = (std::min<size_t>)(static_cast<size_t>(global), tab_size - 2);
+    const size_t low = (std::min<size_t>)(
+        static_cast<size_t>(global), tab_size - 2);
     const F local = global - low;
     return inv_cdf[low] * (1 - local) + inv_cdf[low + 1] * local;
 }

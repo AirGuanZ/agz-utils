@@ -120,25 +120,29 @@ math::vec3i texture3d_t<T>::size() const noexcept
 }
 
 template<typename T>
-typename texture3d_t<T>::texel_t &texture3d_t<T>::operator()(int z, int y, int x) noexcept
+typename texture3d_t<T>::texel_t &texture3d_t<T>::operator()(
+    int z, int y, int x) noexcept
 {
     return data_(z, y, x);
 }
 
 template<typename T>
-const typename texture3d_t<T>::texel_t &texture3d_t<T>::operator()(int z, int y, int x) const noexcept
+const typename texture3d_t<T>::texel_t &texture3d_t<T>::operator()(
+    int z, int y, int x) const noexcept
 {
     return data_(z, y, x);
 }
 
 template<typename T>
-typename texture3d_t<T>::texel_t &texture3d_t<T>::at(int z, int y, int x) noexcept
+typename texture3d_t<T>::texel_t &texture3d_t<T>::at(
+    int z, int y, int x) noexcept
 {
     return data_(z, y, x);
 }
 
 template<typename T>
-const typename texture3d_t<T>::texel_t &texture3d_t<T>::at(int z, int y, int x) const noexcept
+const typename texture3d_t<T>::texel_t &texture3d_t<T>::at(
+    int z, int y, int x) const noexcept
 {
     return data_(z, y, x);
 }
@@ -193,7 +197,9 @@ typename texture3d_t<T>::self_t texture3d_t<T>::subtex(
     assert(0 <= y_beg && y_beg < y_end && y_end < height());
     assert(0 <= x_beg && x_beg < x_end && x_end < width());
 
-    const int x_size = x_end - x_beg, y_size = y_end - y_beg, z_size = z_end - z_beg;
+    const int x_size = x_end - x_beg;
+    const int y_size = y_end - y_beg;
+    const int z_size = z_end - z_beg;
     self_t ret(z_size, y_size, x_size);
     for(int lz = 0, z = z_beg; lz < z_size; ++lz, ++z)
     {

@@ -71,10 +71,14 @@ public:
 
     const P &at(int index) const noexcept;
 
-    template<typename...Args, typename = std::enable_if_t<misc::type_list_t<Args...>::length == D>>
+    template<typename...Args,
+             typename = std::enable_if_t<
+                misc::type_list_t<Args...>::length == D>>
     P &operator()(Args...indices) noexcept;
 
-    template<typename...Args, typename = std::enable_if_t<misc::type_list_t<Args...>::length == D>>
+    template<typename...Args,
+             typename = std::enable_if_t<
+                misc::type_list_t<Args...>::length == D>>
     const P &operator()(Args...indices) const noexcept;
 
     void swap(self_t &swap_with) noexcept;
@@ -92,7 +96,8 @@ template<typename P, int D, typename F>
 auto elemwise_unary(const tensor_t<P, D> &opd, F &&opr);
 
 template<typename P, int D, typename F>
-auto elemwise_binary(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs, F &&opr);
+auto elemwise_binary(
+    const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs, F &&opr);
 
 template<typename P, int D>
 bool operator==(const tensor_t<P, D> &lhs, const tensor_t<P, D> &rhs);

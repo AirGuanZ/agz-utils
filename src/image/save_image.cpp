@@ -98,173 +98,205 @@ namespace
     }
 }
 
-std::vector<unsigned char> save_gray_to_png_in_memory(const math::byte *data, int w, int h)
+std::vector<unsigned char> save_gray_to_png_in_memory(
+    const math::byte *data, int w, int h)
 {
     return save_to_png_in_memory<1>(data, w, h);
 }
 
-std::vector<unsigned char> save_gray_alpha_to_png_in_memory(const math::color2b *data, int w, int h)
+std::vector<unsigned char> save_gray_alpha_to_png_in_memory(
+    const math::color2b *data, int w, int h)
 {
     return save_to_png_in_memory<2>(data, w, h);
 }
 
-std::vector<unsigned char> save_rgb_to_png_in_memory(const math::color3b *data, int w, int h)
+std::vector<unsigned char> save_rgb_to_png_in_memory(
+    const math::color3b *data, int w, int h)
 {
     return save_to_png_in_memory<3>(data, w, h);
 }
 
-std::vector<unsigned char> save_rgba_to_png_in_memory(const math::color4b *data, int w, int h)
+std::vector<unsigned char> save_rgba_to_png_in_memory(
+    const math::color4b *data, int w, int h)
 {
     return save_to_png_in_memory<4>(data, w, h);
 }
 
-void save_gray_to_png_file(const std::string &filename, const math::byte *data, int w, int h)
+void save_gray_to_png_file(
+    const std::string &filename, const math::byte *data, int w, int h)
 {
     auto content = save_gray_to_png_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_gray_to_png_file(const std::string &filename, const image_buffer<math::byte> &data)
+void save_gray_to_png_file(
+    const std::string &filename, const image_buffer<math::byte> &data)
 {
     save_gray_to_png_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
 }
 
-void save_gray_alpha_to_png_file(const std::string &filename, const math::color2b *data, int w, int h)
+void save_gray_alpha_to_png_file(
+    const std::string &filename, const math::color2b *data, int w, int h)
 {
     auto content = save_gray_alpha_to_png_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_gray_alpha_to_png_file(const std::string &filename, const image_buffer<math::color2b> &data)
+void save_gray_alpha_to_png_file(
+    const std::string &filename, const image_buffer<math::color2b> &data)
 {
     save_gray_alpha_to_png_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
 }
 
-void save_rgb_to_png_file(const std::string &filename, const math::color3b *data, int w, int h)
+void save_rgb_to_png_file(
+    const std::string &filename, const math::color3b *data, int w, int h)
 {
     auto content = save_rgb_to_png_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_rgb_to_png_file(const std::string &filename, const image_buffer<math::color3b> &data)
+void save_rgb_to_png_file(
+    const std::string &filename, const image_buffer<math::color3b> &data)
 {
     save_rgb_to_png_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
 }
 
-void save_rgba_to_png_file(const std::string &filename, const math::color4b *data, int w, int h)
+void save_rgba_to_png_file(
+    const std::string &filename, const math::color4b *data, int w, int h)
 {
     auto content = save_rgba_to_png_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_rgba_to_png_file(const std::string &filename, const image_buffer<math::color4b> &data)
+void save_rgba_to_png_file(
+    const std::string &filename, const image_buffer<math::color4b> &data)
 {
     save_rgba_to_png_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
 }
 
-std::vector<unsigned char> save_gray_to_jpg_in_memory(const math::byte *data, int w, int h)
+std::vector<unsigned char> save_gray_to_jpg_in_memory(
+    const math::byte *data, int w, int h)
 {
     return save_to_jpg_in_memory<1>(data, w, h);
 }
 
-std::vector<unsigned char> save_gray_alpha_to_jpg_in_memory(const math::color2b *data, int w, int h)
+std::vector<unsigned char> save_gray_alpha_to_jpg_in_memory(
+    const math::color2b *data, int w, int h)
 {
     return save_to_jpg_in_memory<2>(data, w, h);
 }
 
-std::vector<unsigned char> save_rgb_to_jpg_in_memory(const math::color3b *data, int w, int h)
+std::vector<unsigned char> save_rgb_to_jpg_in_memory(
+    const math::color3b *data, int w, int h)
 {
     return save_to_jpg_in_memory<3>(data, w, h);
 }
 
-std::vector<unsigned char> save_rgba_to_jpg_in_memory(const math::color4b *data, int w, int h)
+std::vector<unsigned char> save_rgba_to_jpg_in_memory(
+    const math::color4b *data, int w, int h)
 {
     return save_to_jpg_in_memory<4>(data, w, h);
 }
 
-void save_gray_to_jpg_file(const std::string &filename, const math::byte *data, int w, int h)
+void save_gray_to_jpg_file(
+    const std::string &filename, const math::byte *data, int w, int h)
 {
     auto content = save_gray_to_jpg_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_gray_to_jpg_file(const std::string &filename, const image_buffer<math::byte> &data)
+void save_gray_to_jpg_file(
+    const std::string &filename, const image_buffer<math::byte> &data)
 {
     save_gray_to_jpg_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
 }
 
-void save_gray_alpha_to_jpg_file(const std::string &filename, const math::color2b *data, int w, int h)
+void save_gray_alpha_to_jpg_file(
+    const std::string &filename, const math::color2b *data, int w, int h)
 {
     auto content = save_gray_alpha_to_jpg_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_gray_alpha_to_jpg_file(const std::string &filename, const image_buffer<math::color2b> &data)
+void save_gray_alpha_to_jpg_file(
+    const std::string &filename, const image_buffer<math::color2b> &data)
 {
     save_gray_alpha_to_jpg_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
 }
 
-void save_rgb_to_jpg_file(const std::string &filename, const math::color3b *data, int w, int h)
+void save_rgb_to_jpg_file(
+    const std::string &filename, const math::color3b *data, int w, int h)
 {
     auto content = save_rgb_to_jpg_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_rgb_to_jpg_file(const std::string &filename, const image_buffer<math::color3b> &data)
+void save_rgb_to_jpg_file(
+    const std::string &filename, const image_buffer<math::color3b> &data)
 {
     save_rgb_to_jpg_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
 }
 
-void save_rgba_to_jpg_file(const std::string &filename, const math::color4b *data, int w, int h)
+void save_rgba_to_jpg_file(
+    const std::string &filename, const math::color4b *data, int w, int h)
 {
     auto content = save_rgba_to_jpg_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_rgba_to_jpg_file(const std::string &filename, const image_buffer<math::color4b> &data)
+void save_rgba_to_jpg_file(
+    const std::string &filename, const image_buffer<math::color4b> &data)
 {
     save_rgba_to_jpg_file(filename, data.raw_data(), data.shape()[1], data.shape()[0]);
 }
 
-std::vector<unsigned char> save_rgb_to_hdr_in_memory(const float *data, int w, int h)
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(
+    const float *data, int w, int h)
 {
     return construct_hdr(data, w, h);
 }
 
-std::vector<unsigned char> save_rgb_to_hdr_in_memory(const math::color3f *data, int w, int h)
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(
+    const math::color3f *data, int w, int h)
 {
     return construct_hdr(&data->r, w, h);
 }
 
-std::vector<unsigned char> save_rgb_to_hdr_in_memory(const math::vec3f *data, int w, int h)
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(
+    const math::vec3f *data, int w, int h)
 {
     return construct_hdr(&data->x, w, h);
 }
 
-std::vector<unsigned char> save_rgb_to_hdr_in_memory(const math::tensor_t<math::color3f, 2> &data)
+std::vector<unsigned char> save_rgb_to_hdr_in_memory(
+    const math::tensor_t<math::color3f, 2> &data)
 {
     return save_rgb_to_hdr_in_memory(data.raw_data(), data.shape()[1], data.shape()[0]);
 }
 
-void save_rgb_to_hdr_file(const std::string &filename, const float *data, int w, int h)
+void save_rgb_to_hdr_file(
+    const std::string &filename, const float *data, int w, int h)
 {
     const auto content = save_rgb_to_hdr_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_rgb_to_hdr_file(const std::string &filename, const math::color3f *data, int w, int h)
+void save_rgb_to_hdr_file(
+    const std::string &filename, const math::color3f *data, int w, int h)
 {
     const auto content = save_rgb_to_hdr_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_rgb_to_hdr_file(const std::string &filename, const math::vec3f *data, int w, int h)
+void save_rgb_to_hdr_file(
+    const std::string &filename, const math::vec3f *data, int w, int h)
 {
     const auto content = save_rgb_to_hdr_in_memory(data, w, h);
     file::write_raw_file(filename, content.data(), content.size());
 }
 
-void save_rgb_to_hdr_file(const std::string &filename, const math::tensor_t<math::color3f, 2> &data)
+void save_rgb_to_hdr_file(
+    const std::string &filename, const math::tensor_t<math::color3f, 2> &data)
 {
     const auto content = save_rgb_to_hdr_in_memory(data);
     file::write_raw_file(filename, content.data(), content.size());

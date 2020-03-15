@@ -48,7 +48,8 @@ T convert_endian(T value) noexcept
 
     T result;
     unsigned char *to_ptr   = reinterpret_cast<unsigned char*>(&result);
-    unsigned char *from_ptr = reinterpret_cast<unsigned char*>(&value) + sizeof(value) - 1;
+    unsigned char *from_ptr = reinterpret_cast<unsigned char*>(&value)
+                            + sizeof(value) - 1;
 
     if constexpr(sizeof(T) == 2)
     {

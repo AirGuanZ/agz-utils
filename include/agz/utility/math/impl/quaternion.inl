@@ -62,7 +62,8 @@ tvec3<T> tquaternion_t<T>::apply_to_vector(const tvec3<T> &rhs) const noexcept
 }
 
 template<typename T>
-typename tquaternion_t<T>::self_t tquaternion_t<T>::operator*(const self_t &rhs) const noexcept
+typename tquaternion_t<T>::self_t tquaternion_t<T>::operator*(
+    const self_t &rhs) const noexcept
 {
     return self_t(w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z,
                   w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
@@ -71,7 +72,8 @@ typename tquaternion_t<T>::self_t tquaternion_t<T>::operator*(const self_t &rhs)
 }
 
 template<typename T>
-tquaternion_t<T> slerp(const tquaternion_t<T> &lhs, const tquaternion_t<T> &rhs, T interp_factor)
+tquaternion_t<T> slerp(
+    const tquaternion_t<T> &lhs, const tquaternion_t<T> &rhs, T interp_factor)
 {
     T cos_theta = lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
     tquaternion_t<T> real_rhs = rhs;

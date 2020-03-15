@@ -71,7 +71,9 @@ typename tcolor3<T>::self_t tcolor3<T>::clamp_high(T max_v) const noexcept
 template<typename T>
 typename tcolor3<T>::self_t tcolor3<T>::saturate() const noexcept
 {
-    return self_t(::agz::math::saturate(r), ::agz::math::saturate(g), ::agz::math::saturate(b));
+    return self_t(::agz::math::saturate(r),
+                  ::agz::math::saturate(g),
+                  ::agz::math::saturate(b));
 }
 
 template<typename T>
@@ -297,7 +299,8 @@ bool operator!=(const tcolor3<T> &lhs, const tcolor3<T> &rhs) noexcept
 template<typename T, typename>
 color3b to_color3b(const tcolor3<T> &c) noexcept
 {
-    return c.clamp(0, 1).map([](T s) { return static_cast<unsigned char>(s * 255); });
+    return c.clamp(0, 1).map(
+        [](T s) { return static_cast<unsigned char>(s * 255); });
 }
 
 template<typename T, typename>

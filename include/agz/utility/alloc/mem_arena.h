@@ -40,7 +40,8 @@ public:
      * @param chunk_byte_size 每次预分配的字节数
      * @param direct_alloc_threshold alloc需要的空间超过此值时，将直接使用malloc
      */
-    explicit mem_arena_t(size_t chunk_byte_size = 4096, size_t direct_alloc_threshold = 2048);
+    explicit mem_arena_t(
+        size_t chunk_byte_size = 4096, size_t direct_alloc_threshold = 2048);
 
     ~mem_arena_t();
 
@@ -103,15 +104,19 @@ inline void *mem_arena_t::alloc_direct_chunk(size_t bytes, size_t align)
     total_chunk_bytes_ += total_bytes;
 
     char *new_chunk_data_top = new_chunk_datazone + sizeof(chunk_t);
-    const size_t align_rest_bytes = reinterpret_cast<size_t>(new_chunk_data_top) % align;
-    const size_t align_pad_bytes = align_rest_bytes ? align - align_rest_bytes : 0;
+    const size_t align_rest_bytes =
+        reinterpret_cast<size_t>(new_chunk_data_top) % align;
+    const size_t align_pad_bytes = align_rest_bytes ?
+                                   align - align_rest_bytes : 0;
     assert(sizeof(chunk_t) + align_pad_bytes + bytes <= total_bytes);
 
     return new_chunk_data_top + align_pad_bytes;
 }
 
-inline mem_arena_t::mem_arena_t(size_t chunk_byte_size, size_t direct_alloc_threshold)
-    : chunk_byte_size_(chunk_byte_size), direct_alloc_threshold_(direct_alloc_threshold)
+inline mem_arena_t::mem_arena_t(
+    size_t chunk_byte_size, size_t direct_alloc_threshold)
+    : chunk_byte_size_(chunk_byte_size),
+      direct_alloc_threshold_(direct_alloc_threshold)
 {
     chunk_entry_  = nullptr;
     data_top_     = nullptr;
@@ -127,8 +132,10 @@ inline mem_arena_t::~mem_arena_t()
 
 inline void *mem_arena_t::alloc(size_t bytes, size_t align)
 {
-    const size_t align_rest_bytes = reinterpret_cast<size_t>(data_top_) % align;
-    const size_t align_pad_bytes = align_rest_bytes ? align - align_rest_bytes : 0;
+    const size_t align_rest_bytes =
+        reinterpret_cast<size_t>(data_top_) % align;
+    const size_t align_pad_bytes = align_rest_bytes ?
+                                   align - align_rest_bytes : 0;
     const size_t total_bytes = bytes + align_pad_bytes;
     if(total_bytes > direct_alloc_threshold_)
         return alloc_direct_chunk(bytes, align);

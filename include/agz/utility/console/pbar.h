@@ -23,12 +23,15 @@ class progress_bar_t
     char complete_;
     char incomplete_;
 
-    std::chrono::steady_clock::time_point start_ = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point start_ =
+        std::chrono::steady_clock::now();
 
 public:
 
-    progress_bar_t(int total, int width, char complete = '#', char incomplete = ' ')
-        : finished_(0), total_(total), width_(width), complete_(complete), incomplete_(incomplete)
+    progress_bar_t(
+        int total, int width, char complete = '#', char incomplete = ' ')
+        : finished_(0), total_(total), width_(width),
+          complete_(complete), incomplete_(incomplete)
     {
 
     }
@@ -49,8 +52,10 @@ public:
         const float progress = float(finished_) / total_;
         const int pos = int(width_ * progress);
 
-        const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        const auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
+        const std::chrono::steady_clock::time_point now =
+            std::chrono::steady_clock::now();
+        const auto time_elapsed = std::chrono::duration_cast<
+            std::chrono::milliseconds>(now - start_).count();
 
         std::cout << "[";
 
@@ -90,12 +95,15 @@ class progress_bar_f_t
     char complete_;
     char incomplete_;
 
-    std::chrono::steady_clock::time_point start_ = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point start_ =
+        std::chrono::steady_clock::now();
 
 public:
 
-    explicit progress_bar_f_t(int width, char complete = '#', char incomplete = ' ')
-        : percent_(0), width_(width), complete_(complete), incomplete_(incomplete)
+    explicit progress_bar_f_t(
+        int width, char complete = '#', char incomplete = ' ')
+        : percent_(0), width_(width),
+          complete_(complete), incomplete_(incomplete)
     {
 
     }
@@ -114,8 +122,10 @@ public:
     {
         const int pos = int(width_ * percent_ / 100);
 
-        const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-        const auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
+        const std::chrono::steady_clock::time_point now =
+            std::chrono::steady_clock::now();
+        const auto time_elapsed = std::chrono::duration_cast<
+            std::chrono::milliseconds>(now - start_).count();
 
         std::cout << "[";
 

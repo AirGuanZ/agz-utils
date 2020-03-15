@@ -39,8 +39,10 @@ bool taabb2<T>::contains(const tvec2<T> &p) const noexcept
 template<typename T>
 typename taabb2<T>::self_t taabb2<T>::operator|(const tvec2<T> &rhs) const noexcept
 {
-    return self_t(tvec2<T>((std::min)(low.x, rhs.x), (std::min)(low.y, rhs.y)),
-                  tvec2<T>((std::max)(high.x, rhs.x), (std::max)(high.y, rhs.y)));
+    return self_t(tvec2<T>((std::min)(low.x, rhs.x),
+                           (std::min)(low.y, rhs.y)),
+                  tvec2<T>((std::max)(high.x, rhs.x),
+                           (std::max)(high.y, rhs.y)));
 }
 
 template<typename T>
@@ -52,8 +54,10 @@ typename taabb2<T>::self_t &taabb2<T>::operator|=(const tvec2<T> &rhs) noexcept
 template<typename T>
 typename taabb2<T>::self_t taabb2<T>::operator|(const self_t &rhs) const noexcept
 {
-    return self_t(tvec2<T>((std::min)(low.x, rhs.low.x), (std::min)(low.y, rhs.low.y)),
-                  tvec2<T>((std::max)(high.x, rhs.high.x), (std::max)(high.y, rhs.high.y)));
+    return self_t(tvec2<T>((std::min)(low.x, rhs.low.x),
+                           (std::min)(low.y, rhs.low.y)),
+                  tvec2<T>((std::max)(high.x, rhs.high.x),
+                           (std::max)(high.y, rhs.high.y)));
 }
 
 template<typename T>

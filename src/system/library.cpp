@@ -33,7 +33,8 @@ shared_lib_handle_t *load_lib(const std::string &filename, std::string *err_msg)
     if(!ret->handle)
     {
         if(err_msg)
-            *err_msg = "failed to load lib from " + filename + ". err code = " + std::to_string(GetLastError());
+            *err_msg = "failed to load lib from " + filename +
+                ". err code = " + std::to_string(GetLastError());
         return nullptr;
     }
 
@@ -43,7 +44,8 @@ shared_lib_handle_t *load_lib(const std::string &filename, std::string *err_msg)
     if(!ret->handle)
     {
         if(err_msg)
-            *err_msg = "failed to load lib from " + filename + ". err msg = " + dlerror();
+            *err_msg = "failed to load lib from " + filename +
+                ". err msg = " + dlerror();
         return nullptr;
     }
 
@@ -70,17 +72,20 @@ void destroy_lib(shared_lib_handle_t *handle)
 #endif
 }
 
-void_func_ptr get_lib_process(shared_lib_handle_t *handle, const char *proc_name, std::string *err_msg)
+void_func_ptr get_lib_process(
+    shared_lib_handle_t *handle, const char *proc_name, std::string *err_msg)
 {
     assert(handle && handle->handle);
 
 #ifdef AGZ_OS_WIN32
 
-    auto ret = reinterpret_cast<void_func_ptr>(GetProcAddress(handle->handle, proc_name));
+    auto ret = reinterpret_cast<void_func_ptr>(
+        GetProcAddress(handle->handle, proc_name));
     if(!ret)
     {
         if(err_msg)
-            *err_msg = std::string("failed to get proc ") + proc_name + ". err code = " + std::to_string(GetLastError());
+            *err_msg = std::string("failed to get proc ") + proc_name +
+                ". err code = " + std::to_string(GetLastError());
         return nullptr;
     }
 
@@ -90,7 +95,8 @@ void_func_ptr get_lib_process(shared_lib_handle_t *handle, const char *proc_name
     if(!ret)
     {
         if(err_msg)
-            *err_msg = std::string("failed to get proc ") + proc_name + ". err code = " + dlerror();
+            *err_msg = std::string("failed to get proc ") + proc_name +
+                ". err code = " + dlerror();
         return nullptr;
     }
 
