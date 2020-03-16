@@ -70,6 +70,15 @@ public:
     }
 
     /**
+     * @brief 重启线程队列
+     */
+    void restart()
+    {
+        stop_ = false;
+        cond_.notify_all();
+    }
+
+    /**
      * @brief 阻塞地取出一个数据，或得知不会再有数据到来
      */
     std::optional<data_t> pop_or_stop()
