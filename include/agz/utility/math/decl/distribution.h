@@ -15,9 +15,7 @@ template<typename T, typename F,
 T uniform_integer(T beg, T end, F u);
 
 /**
- * @brief 基于二分搜索在常数时间内按离散分布律进行采样
- *
- * 参见 https://en.wikipedia.org/wiki/Alias_methods
+ * @brief 基于二分搜索按离散分布律进行采样
  */
 template<typename F, typename T = int>
 class bsearch_sampler_t
