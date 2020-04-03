@@ -14,6 +14,15 @@ namespace agz::math
 {
 
 /**
+ * @brief 将a以b为单位向上取整
+ */
+template<typename I, typename = std::enable_if_t<std::is_integral_v<I>>>
+I round_up(I a, I b) noexcept
+{
+    return (a + b - 1) / b * b;
+}
+
+/**
  * @brief 浮点数原子加法
  */
 template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>

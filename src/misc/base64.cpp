@@ -1,3 +1,5 @@
+#include <cctype>
+
 #include <agz/utility/misc/base64.h>
 
 // ref: http://www.adp-gmbh.ch/cpp/common/base64.html (restyled)
