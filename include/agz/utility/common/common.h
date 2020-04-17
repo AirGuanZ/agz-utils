@@ -16,7 +16,7 @@ using rm_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;
 
 /** @brief static array size */
 template<typename T, size_t N>
-size_t array_size(const T (&)[N]) noexcept
+constexpr size_t array_size(const T (&)[N]) noexcept
 {
     return N;
 }
