@@ -1,4 +1,30 @@
-﻿#pragma once
+﻿/*
+MIT License
+
+Copyright (c) 2019-2020 Zhuang Guan
+
+https://github.com/AirGuanZ
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#pragma once
 
 #include <array>
 #include <cstring>
@@ -6,6 +32,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 #ifndef IMGUI_VERSION
 #   error "include imgui.h before this header"
@@ -37,6 +64,10 @@ namespace ImGui
 
         FileBrowser &operator=(const FileBrowser &copyFrom);
 
+        // set the window size (in pixels)
+        // default is (700, 450)
+        void SetWindowSize(int width, int height) noexcept;
+
         // set the window title text
         void SetTitle(std::string title);
 
@@ -56,7 +87,8 @@ namespace ImGui
         bool HasSelected() const noexcept;
 
         // set current browsing directory
-        bool SetPwd(const std::filesystem::path &pwd = std::filesystem::current_path());
+        bool SetPwd(const std::filesystem::path &pwd =
+                                    std::filesystem::current_path());
 
         // returns selected filename. make sense only when HasSelected returns true
         std::filesystem::path GetSelected() const;
@@ -86,6 +118,8 @@ namespace ImGui
         static std::uint32_t GetDrivesBitMask();
 #endif
 
+        int width_;
+        int height_;
         ImGuiFileBrowserFlags flags_;
 
         std::string title_;
@@ -102,18 +136,18 @@ namespace ImGui
         int typeFilterIndex_;
 
         std::filesystem::path pwd_;
-        std::string selectedFilename_;
+        std::filesystem::path selectedFilename_;
 
         struct FileRecord
         {
             bool isDir = false;
-            std::string name;
+            std::filesystem::path name;
             std::string showName;
-            std::string extension;
+            std::filesystem::path extension;
         };
         std::vector<FileRecord> fileRecords_;
 
-        // IMPROVE: overflow when selectedFilename_.length() > inputNameBuf_.size() - 1
+        // IMPROVE: truncate when selectedFilename_.length() > inputNameBuf_.size() - 1
         static constexpr size_t INPUT_NAME_BUF_SIZE = 512;
         std::unique_ptr<std::array<char, INPUT_NAME_BUF_SIZE>> inputNameBuf_;
 
@@ -127,12 +161,13 @@ namespace ImGui
 } // namespace ImGui
 
 inline ImGui::FileBrowser::FileBrowser(ImGuiFileBrowserFlags flags)
-    : flags_(flags),
+    : width_(700), height_(450), flags_(flags),
       openFlag_(false), closeFlag_(false), isOpened_(false), ok_(false),
       inputNameBuf_(std::make_unique<std::array<char, INPUT_NAME_BUF_SIZE>>())
 {
     if(flags_ & ImGuiFileBrowserFlags_CreateNewDir)
-        newDirNameBuf_ = std::make_unique<std::array<char, INPUT_NAME_BUF_SIZE>>();
+        newDirNameBuf_ = std::make_unique<
+                                std::array<char, INPUT_NAME_BUF_SIZE>>();
 
     inputNameBuf_->at(0) = '\0';
     SetTitle("file browser");
@@ -152,7 +187,8 @@ inline ImGui::FileBrowser::FileBrowser(const FileBrowser &copyFrom)
     *this = copyFrom;
 }
 
-inline ImGui::FileBrowser &ImGui::FileBrowser::operator=(const FileBrowser &copyFrom)
+inline ImGui::FileBrowser &ImGui::FileBrowser::operator=(
+    const FileBrowser &copyFrom)
 {
     flags_ = copyFrom.flags_;
     SetTitle(copyFrom.title_);
@@ -172,18 +208,28 @@ inline ImGui::FileBrowser &ImGui::FileBrowser::operator=(const FileBrowser &copy
 
     if(flags_ & ImGuiFileBrowserFlags_CreateNewDir)
     {
-        newDirNameBuf_ = std::make_unique<std::array<char, INPUT_NAME_BUF_SIZE>>();
+        newDirNameBuf_ = std::make_unique<
+                                std::array<char, INPUT_NAME_BUF_SIZE>>();
         *newDirNameBuf_ = *copyFrom.newDirNameBuf_;
     }
 
     return *this;
 }
 
+inline void ImGui::FileBrowser::SetWindowSize(int width, int height) noexcept
+{
+    assert(width > 0 && height > 0);
+    width_  = width;
+    height_ = height;
+}
+
 inline void ImGui::FileBrowser::SetTitle(std::string title)
 {
     title_ = std::move(title);
-    openLabel_ = title_ + "##filebrowser_" + std::to_string(reinterpret_cast<size_t>(this));
-    openNewDirLabel_ = "new dir##new_dir_" + std::to_string(reinterpret_cast<size_t>(this));
+    openLabel_ = title_ + "##filebrowser_" +
+                 std::to_string(reinterpret_cast<size_t>(this));
+    openNewDirLabel_ = "new dir##new_dir_" +
+                       std::to_string(reinterpret_cast<size_t>(this));
 }
 
 inline void ImGui::FileBrowser::Open()
@@ -210,7 +256,12 @@ inline bool ImGui::FileBrowser::IsOpened() const noexcept
 inline void ImGui::FileBrowser::Display()
 {
     PushID(this);
-    ScopeGuard exitThis([this] { openFlag_ = false; closeFlag_ = false; PopID(); });
+    ScopeGuard exitThis([this]
+    {
+        openFlag_ = false;
+        closeFlag_ = false;
+        PopID();
+    });
 
     if(openFlag_)
         OpenPopup(openLabel_.c_str());
@@ -219,16 +270,24 @@ inline void ImGui::FileBrowser::Display()
     // open the popup window
 
     if(openFlag_ && (flags_ & ImGuiFileBrowserFlags_NoModal))
-        SetNextWindowSize(ImVec2(700, 450));
+    {
+        SetNextWindowSize(
+            ImVec2(static_cast<float>(width_), static_cast<float>(height_)));
+    }
     else
-        SetNextWindowSize(ImVec2(700, 450), ImGuiCond_FirstUseEver);
+    {
+        SetNextWindowSize(
+            ImVec2(static_cast<float>(width_), static_cast<float>(height_)),
+            ImGuiCond_FirstUseEver);
+    }
     if(flags_ & ImGuiFileBrowserFlags_NoModal)
     {
         if(!BeginPopup(openLabel_.c_str()))
             return;
     }
     else if(!BeginPopupModal(openLabel_.c_str(), nullptr,
-        flags_ & ImGuiFileBrowserFlags_NoTitleBar ? ImGuiWindowFlags_NoTitleBar : 0))
+                             flags_ & ImGuiFileBrowserFlags_NoTitleBar ?
+                                ImGuiWindowFlags_NoTitleBar : 0))
     {
         return;
     }
@@ -318,45 +377,53 @@ inline void ImGui::FileBrowser::Display()
         {
             ScopeGuard endNewDirPopup([] { EndPopup(); });
 
-            InputText("name", newDirNameBuf_->data(), newDirNameBuf_->size()); SameLine();
+            InputText("name", newDirNameBuf_->data(), newDirNameBuf_->size());
+            SameLine();
+
             if(Button("ok") && (*newDirNameBuf_)[0] != '\0')
             {
                 ScopeGuard closeNewDirPopup([] { CloseCurrentPopup(); });
                 if(create_directory(pwd_ / newDirNameBuf_->data()))
                     SetPwd(pwd_);
                 else
-                    statusStr_ = "failed to create " + std::string(newDirNameBuf_->data());
+                {
+                    statusStr_ = "failed to create " +
+                                 std::string(newDirNameBuf_->data());
+                }
             }
         }
     }
 
     // browse files in a child window
 
-    float reserveHeight = GetItemsLineHeightWithSpacing();
+    float reserveHeight = GetFrameHeightWithSpacing();
     std::filesystem::path newPwd; bool setNewPwd = false;
-    if(!(flags_ & ImGuiFileBrowserFlags_SelectDirectory) && (flags_ & ImGuiFileBrowserFlags_EnterNewFilename))
-        reserveHeight += GetItemsLineHeightWithSpacing();
+    if(!(flags_ & ImGuiFileBrowserFlags_SelectDirectory) &&
+       (flags_ & ImGuiFileBrowserFlags_EnterNewFilename))
+        reserveHeight += GetFrameHeightWithSpacing();
     {
         BeginChild("ch", ImVec2(0, -reserveHeight), true,
-            (flags_ & ImGuiFileBrowserFlags_NoModal) ? ImGuiWindowFlags_AlwaysHorizontalScrollbar : 0);
+            (flags_ & ImGuiFileBrowserFlags_NoModal) ?
+                ImGuiWindowFlags_AlwaysHorizontalScrollbar : 0);
         ScopeGuard endChild([] { EndChild(); });
 
         for(auto &rsc : fileRecords_)
         {
             if (!rsc.isDir && typeFilters_.size() > 0 &&
-                typeFilterIndex_ < typeFilters_.size() &&
+                static_cast<size_t>(typeFilterIndex_) < typeFilters_.size() &&
                 !(rsc.extension == typeFilters_[typeFilterIndex_]))
                 continue;
 
-            if(!rsc.name.empty() && rsc.name[0] == '$')
+            if(!rsc.name.empty() && rsc.name.c_str()[0] == '$')
                 continue;
 
             const bool selected = selectedFilename_ == rsc.name;
-            if(Selectable(rsc.showName.c_str(), selected, ImGuiSelectableFlags_DontClosePopups))
+            if(Selectable(rsc.showName.c_str(), selected,
+                          ImGuiSelectableFlags_DontClosePopups))
             {
                 if(selected)
                 {
-                    selectedFilename_ = std::string();
+                    selectedFilename_ = std::filesystem::path();
                     (*inputNameBuf_)[0] = '\0';
                 }
                 else if(rsc.name != "..")
@@ -366,7 +433,15 @@ inline void ImGui::FileBrowser::Display()
                     {
                         selectedFilename_ = rsc.name;
                         if(!(flags_ & ImGuiFileBrowserFlags_SelectDirectory))
-                            std::strcpy(inputNameBuf_->data(), selectedFilename_.c_str());
+                        {
+#ifdef _MSC_VER
+                            strcpy_s(inputNameBuf_->data(), inputNameBuf_->size(),
+                                     selectedFilename_.u8string().c_str());
+#else
+                            std::strncpy(inputNameBuf_->data(), selectedFilename_.u8string().c_str(),
+                                         inputNameBuf_->size());
+#endif
+                        }
                     }
                 }
             }
@@ -374,7 +449,8 @@ inline void ImGui::FileBrowser::Display()
             if(IsItemClicked(0) && IsMouseDoubleClicked(0) && rsc.isDir)
             {
                 setNewPwd = true;
-                newPwd = (rsc.name != "..") ? (pwd_ / rsc.name) : pwd_.parent_path();
+                newPwd = (rsc.name != "..") ? (pwd_ / rsc.name) :
+                                               pwd_.parent_path();
             }
         }
     }
@@ -382,7 +458,8 @@ inline void ImGui::FileBrowser::Display()
     if(setNewPwd)
         SetPwd(newPwd);
 
-    if(!(flags_ & ImGuiFileBrowserFlags_SelectDirectory) && (flags_ & ImGuiFileBrowserFlags_EnterNewFilename))
+    if(!(flags_ & ImGuiFileBrowserFlags_SelectDirectory) &&
+       (flags_ & ImGuiFileBrowserFlags_EnterNewFilename))
     {
         PushID(this);
         ScopeGuard popTextID([] { PopID(); });
@@ -419,7 +496,9 @@ inline void ImGui::FileBrowser::Display()
 
     int escIdx = GetIO().KeyMap[ImGuiKey_Escape];
     if(Button("cancel") || closeFlag_ ||
-        ((flags_ & ImGuiFileBrowserFlags_CloseOnEsc) && IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && escIdx >= 0 && IsKeyPressed(escIdx)))
+        ((flags_ & ImGuiFileBrowserFlags_CloseOnEsc) &&
+         IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+         escIdx >= 0 && IsKeyPressed(escIdx)))
         CloseCurrentPopup();
 
     if(!statusStr_.empty() && !(flags_ & ImGuiFileBrowserFlags_NoStatusBar))
@@ -432,7 +511,8 @@ inline void ImGui::FileBrowser::Display()
     {
         SameLine();
         PushItemWidth(8 * GetFontSize());
-        Combo("##type_filters", &typeFilterIndex_, typeFilters_.data(), int(typeFilters_.size()));
+        Combo("##type_filters", &typeFilterIndex_,
+              typeFilters_.data(), int(typeFilters_.size()));
         PopItemWidth();
     }
 }
@@ -474,7 +554,8 @@ inline void ImGui::FileBrowser::ClearSelected()
     ok_ = false;
 }
 
-inline void ImGui::FileBrowser::SetTypeFilters(const std::vector<const char*> &typeFilters)
+inline void ImGui::FileBrowser::SetTypeFilters(
+    const std::vector<const char*> &typeFilters)
 {
     typeFilters_ = typeFilters;
     typeFilterIndex_ = 0;
@@ -482,7 +563,7 @@ inline void ImGui::FileBrowser::SetTypeFilters(const std::vector<const char*> &t
 
 inline void ImGui::FileBrowser::SetPwdUncatched(const std::filesystem::path &pwd)
 {
-    fileRecords_ = { FileRecord{ true, "..", "[D] .." } };
+    fileRecords_ = { FileRecord{ true, "..", "[D] ..", "" } };
 
     for(auto &p : std::filesystem::directory_iterator(pwd))
     {
@@ -495,13 +576,14 @@ inline void ImGui::FileBrowser::SetPwdUncatched(const std::filesystem::path &pwd
         else
             continue;
 
-        rcd.name = p.path().filename().string();
+        rcd.name = p.path().filename();
         if(rcd.name.empty())
             continue;
 
-        rcd.extension = p.path().filename().extension().string();
+        rcd.extension = p.path().filename().extension();
 
-        rcd.showName = (rcd.isDir ? "[D] " : "[F] ") + p.path().filename().u8string();
+        rcd.showName = (rcd.isDir ? "[D] " : "[F] ") +
+                        p.path().filename().u8string();
         fileRecords_.push_back(rcd);
     }
 
@@ -518,7 +600,23 @@ inline void ImGui::FileBrowser::SetPwdUncatched(const std::filesystem::path &pwd
 
 #ifdef _WIN32
 
+#ifndef _INC_WINDOWS
+
+#ifndef WIN32_LEAN_AND_MEAN
+
+#define IMGUI_FILEBROWSER_UNDEF_WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+
+#endif // #ifndef WIN32_LEAN_AND_MEAN
+
 #include <Windows.h>
+
+#ifdef IMGUI_FILEBROWSER_UNDEF_WIN32_LEAN_AND_MEAN
+#undef IMGUI_FILEBROWSER_UNDEF_WIN32_LEAN_AND_MEAN
+#undef WIN32_LEAN_AND_MEAN
+#endif // #ifdef IMGUI_FILEBROWSER_UNDEF_WIN32_LEAN_AND_MEAN
+
+#endif // #ifdef _INC_WINDOWS
 
 inline std::uint32_t ImGui::FileBrowser::GetDrivesBitMask()
 {
