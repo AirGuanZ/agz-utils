@@ -173,7 +173,9 @@ void Window::Initialize(const WindowDesc &windowDesc)
     int clientHeight = windowDesc.fullscreen ? screenHeight : windowDesc.clientHeight;
 
     DWORD dwStyle = 0;
-    dwStyle |= WS_POPUPWINDOW | WS_CAPTION | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+    dwStyle |= WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+    if(windowDesc.resizable)
+        dwStyle |= WS_SIZEBOX;
 
     RECT winRect = { 0, 0, clientWidth, clientHeight };
     if(!AdjustWindowRect(&winRect, dwStyle, FALSE))
