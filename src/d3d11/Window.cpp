@@ -83,10 +83,24 @@ namespace Impl
         }
     };
 
+    Vec2i ClientSizeToWindowSize(DWORD style, const Vec2i &clientSize)
+    {
+        RECT winRect = { 0, 0, clientSize.x, clientSize.y };
+        if(!AdjustWindowRect(&winRect, style, FALSE))
+        {
+            throw VRPGBaseException("failed to adjust window size");
+        }
+        int realWinWidth  = winRect.right - winRect.left;
+        int realWinHeight = winRect.bottom - winRect.top;
+        return { realWinWidth, realWinHeight };
+    }
+
 } // namespace Impl
 
 struct WindowImplData
 {
+    DWORD dwStyle = 0;
+
     HWND hWindow        = nullptr;
     HINSTANCE hInstance = nullptr;
 
@@ -96,8 +110,8 @@ struct WindowImplData
     bool shouldClose = false;
     bool hasFocus    = true;
 
-    int clientLeft   = 0;
-    int clientTop    = 0;
+    //int clientLeft   = 0;
+    //int clientTop    = 0;
     int clientWidth  = 0;
     int clientHeight = 0;
 
@@ -123,6 +137,15 @@ struct WindowImplData
 
     Impl::ImGuiInputDispatcher inputDispatcher;
 };
+
+DWORD WindowDesc::GetWindowStyle() const noexcept
+{
+    DWORD dwStyle = 0;
+    dwStyle |= WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+    if(resizable)
+        dwStyle |= WS_SIZEBOX;
+    return dwStyle;
+}
 
 Window::~Window()
 {
@@ -164,29 +187,41 @@ void Window::Initialize(const WindowDesc &windowDesc)
         throw VRPGBaseException("failed to register window class");
     }
 
-    // style, rect size and title
+    // screen info
 
-    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+    const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    int clientWidth = windowDesc.fullscreen ? screenWidth : windowDesc.clientWidth;
-    int clientHeight = windowDesc.fullscreen ? screenHeight : windowDesc.clientHeight;
+    RECT workAreaRect;
+    SystemParametersInfo(SPI_GETWORKAREA, 0, &workAreaRect, 0);
 
-    DWORD dwStyle = 0;
-    dwStyle |= WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
-    if(windowDesc.resizable)
-        dwStyle |= WS_SIZEBOX;
+    const int workAreaWidth  = workAreaRect.right - workAreaRect.left;
+    const int workAreaHeight = workAreaRect.bottom - workAreaRect.top;
 
-    RECT winRect = { 0, 0, clientWidth, clientHeight };
-    if(!AdjustWindowRect(&winRect, dwStyle, FALSE))
+    // window style & size
+
+    const int clientWidth =
+        windowDesc.fullscreen ? screenWidth  : windowDesc.clientWidth;
+    const int clientHeight =
+        windowDesc.fullscreen ? screenHeight : windowDesc.clientHeight;
+
+    data_->dwStyle = windowDesc.GetWindowStyle();
+    const auto [realWinWidth, realWinHeight] = Impl::ClientSizeToWindowSize(
+        data_->dwStyle, { clientWidth, clientHeight });
+
+    // window pos
+
+    int realWinLeft, realWinTop;
+    if(windowDesc.fullscreen)
     {
-        throw VRPGBaseException("failed to adjust window size");
+        realWinLeft   = (screenWidth - realWinWidth) / 2;
+        realWinTop    = (screenHeight - realWinHeight) / 2;
     }
-
-    int realWinWidth  = winRect.right - winRect.left;
-    int realWinHeight = winRect.bottom - winRect.top;
-    int realWinLeft   = (screenWidth - realWinWidth) / 2;
-    int realWinTop    = (screenHeight - realWinHeight) / 2;
+    else
+    {
+        realWinLeft = workAreaRect.left + (workAreaWidth  - realWinWidth) / 2;
+        realWinTop  = workAreaRect.top  + (workAreaHeight - realWinHeight) / 2;
+    }
 
     data_->windowTitle = windowDesc.windowTitle;
 
@@ -194,7 +229,7 @@ void Window::Initialize(const WindowDesc &windowDesc)
 
     data_->hWindow = CreateWindowW(
         data_->windowClassName.c_str(), data_->windowTitle.c_str(),
-        dwStyle, realWinLeft, realWinTop, realWinWidth, realWinHeight,
+        data_->dwStyle, realWinLeft, realWinTop, realWinWidth, realWinHeight,
         nullptr, nullptr, data_->hInstance, nullptr);
     if(!data_->hWindow)
     {
@@ -214,8 +249,6 @@ void Window::Initialize(const WindowDesc &windowDesc)
     ClientToScreen(data_->hWindow, &LT);
     ClientToScreen(data_->hWindow, &RB);
 
-    data_->clientLeft   = LT.x;
-    data_->clientTop    = LT.y;
     data_->clientWidth  = RB.x - LT.x;
     data_->clientHeight = RB.y - LT.y;
 
@@ -367,6 +400,20 @@ int Window::GetClientSizeY() const noexcept
 {
     assert(IsAvailable());
     return data_->clientHeight;
+}
+
+void Window::SetClientSize(int width, int height)
+{
+    assert(IsAvailable());
+
+    RECT windowRect;
+    GetWindowRect(data_->hWindow, &windowRect);
+
+    const auto [w, h] = Impl::ClientSizeToWindowSize(
+        data_->dwStyle, { width, height });
+
+    MoveWindow(
+        data_->hWindow, windowRect.left, windowRect.top, w, h, TRUE);
 }
 
 float Window::GetClientAspectRatio() const noexcept
@@ -545,17 +592,17 @@ void Window::_resize()
 
     RECT clientRect;
     GetClientRect(data_->hWindow, &clientRect);
-    POINT LT = { clientRect.left, clientRect.top }, RB = { clientRect.right, clientRect.bottom };
+    POINT LT = { clientRect.left, clientRect.top };
+    POINT RB = { clientRect.right, clientRect.bottom };
     ClientToScreen(data_->hWindow, &LT);
     ClientToScreen(data_->hWindow, &RB);
 
-    data_->clientLeft   = LT.x;
-    data_->clientTop    = LT.y;
     data_->clientWidth  = RB.x - LT.x;
     data_->clientHeight = RB.y - LT.y;
 
     data_->deviceContext->ClearState();
-    ReleaseCOMObjects(data_->renderTargetView, data_->depthStencilBuffer, data_->depthStencilView);
+    ReleaseCOMObjects(
+        data_->renderTargetView, data_->depthStencilBuffer, data_->depthStencilView);
 
     HRESULT hr = data_->swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
     if(FAILED(hr))
@@ -564,27 +611,34 @@ void Window::_resize()
         std::exit(1);
     }
 
-    data_->renderTargetView = CreateD3D11RenderTargetView(data_->swapChain, data_->device);
+    data_->renderTargetView = CreateD3D11RenderTargetView(
+        data_->swapChain, data_->device);
     if(!data_->renderTargetView)
     {
-        std::cerr << "failed to create new render target view after resizing swap chain buffers" << std::endl;
+        std::cerr << "failed to create new render target view "
+                     "after resizing swap chain buffers" << std::endl;
         std::exit(1);
     }
 
     auto [depthStencilBuffer, depthStencilView] = CreateD3D11DepthStencilBuffer(
         data_->device, data_->clientWidth, data_->clientHeight,
-        data_->depthStencilFormat, data_->screenbufferSampleCount, data_->screenbufferSampleQuality);
+        data_->depthStencilFormat,
+        data_->screenbufferSampleCount,
+        data_->screenbufferSampleQuality);
     if(!depthStencilBuffer)
     {
-        std::cerr << "failed to create new depth stencil buffer/view after resizing swap chain buffers" << std::endl;
+        std::cerr << "failed to create new depth stencil buffer/view "
+                     "after resizing swap chain buffers" << std::endl;
         std::exit(1);
     }
     data_->depthStencilBuffer = depthStencilBuffer;
     data_->depthStencilView = depthStencilView;
-    data_->deviceContext->OMSetRenderTargets(1, &data_->renderTargetView, data_->depthStencilView);
+    data_->deviceContext->OMSetRenderTargets(
+        1, &data_->renderTargetView, data_->depthStencilView);
 
     UseDefaultViewport();
-    eventMgr_.InvokeAllHandlers(WindowResizeEvent{ data_->clientWidth, data_->clientHeight});
+    eventMgr_.InvokeAllHandlers(
+        WindowResizeEvent{ data_->clientWidth, data_->clientHeight});
 }
 
 void Window::_close()

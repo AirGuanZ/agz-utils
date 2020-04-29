@@ -29,6 +29,8 @@ struct WindowDesc
     DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
     bool resizable = true;
+
+    DWORD GetWindowStyle() const noexcept;
 };
 
 struct WindowResizeEvent
@@ -82,6 +84,8 @@ public:
     int GetClientSizeX() const noexcept;
 
     int GetClientSizeY() const noexcept;
+
+    void SetClientSize(int width, int height);
 
     float GetClientAspectRatio() const noexcept;
 

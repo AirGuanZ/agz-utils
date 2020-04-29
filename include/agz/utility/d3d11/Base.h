@@ -5,7 +5,6 @@
 #include <agz/utility/d3d11/D3D/Buffer/VertexBuffer.h>
 #include <agz/utility/d3d11/D3D/Immediate/Immediate2D.h>
 #include <agz/utility/d3d11/D3D/Immediate/Immediate3D.h>
-#include <agz/utility/d3d11/D3D/Misc/ShadowMap.h>
 #include <agz/utility/d3d11/D3D/State/BlendState.h>
 #include <agz/utility/d3d11/D3D/State/DepthStencilState.h>
 #include <agz/utility/d3d11/D3D/State/RasterizerState.h>
