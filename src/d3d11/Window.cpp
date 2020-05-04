@@ -434,6 +434,12 @@ bool Window::GetVSync() const noexcept
     return data_->vsync;
 }
 
+void Window::setViewport(const D3D11_VIEWPORT &vp)
+{
+    assert(IsAvailable());
+    data_->deviceContext->RSSetViewports(1, &vp);
+}
+
 void Window::UseDefaultViewport()
 {
     assert(IsAvailable());

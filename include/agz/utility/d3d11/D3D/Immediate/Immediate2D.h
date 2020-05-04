@@ -91,6 +91,15 @@ public:
     /**
      * @brief 在屏幕上绘制矩形纹理
      *
+     * framebuffer左上角为原点，+x向右+y向上，单位为像素
+     */
+    void DrawTextureP2(
+        const Vec2i &leftTop, const Vec2i &rightBottom, ID3D11ShaderResourceView *srv,
+        float alphaTestThreshold = 0, SamplerType samplerType = Point) const;
+
+    /**
+     * @brief 在屏幕上绘制矩形纹理
+     *
      * framebuffer中心为原点，+x向右+y向上，坐标取值范围为[-1, 1]^2
      */
     void DrawTexture(
@@ -213,6 +222,16 @@ inline void Immediate2D::DrawTextureP(
         2.0f * (rightTop.y + 1) / framebufferSize_.y - 1
     };
     DrawTexture(LB, RT, srv, alphaTestThreshold, samplerType);
+}
+
+inline void Immediate2D::DrawTextureP2(
+    const Vec2i &leftTop, const Vec2i &rightBottom, ID3D11ShaderResourceView *srv,
+    float alphaTestThreshold, SamplerType samplerType) const
+{
+    DrawTextureP(
+        { leftTop.x,     framebufferSize_.y - rightBottom.y },
+        { rightBottom.x, framebufferSize_.y - leftTop.y     },
+        srv, alphaTestThreshold, samplerType);
 }
 
 inline void Immediate2D::DrawTexture(

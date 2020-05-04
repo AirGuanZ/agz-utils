@@ -93,6 +93,8 @@ public:
 
     bool GetVSync() const noexcept;
 
+    void setViewport(const D3D11_VIEWPORT &vp);
+
     void UseDefaultViewport();
 
     void UseDefaultRenderTargetAndDepthStencil();

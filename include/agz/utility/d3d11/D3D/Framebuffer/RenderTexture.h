@@ -22,6 +22,8 @@ public:
 
     int GetHeight() const noexcept;
 
+    ComPtr<ID3D11Texture2D> GetRenderTarget();
+
     ComPtr<ID3D11RenderTargetView> GetRenderTargetView();
 
     ComPtr<ID3D11ShaderResourceView> GetShaderResourceView();
@@ -30,6 +32,7 @@ private:
 
     int width_ = 0, height_ = 0;
 
+    ComPtr<ID3D11Texture2D>          tex_;
     ComPtr<ID3D11RenderTargetView>   rtv_;
     ComPtr<ID3D11ShaderResourceView> srv_;
 };
@@ -59,8 +62,7 @@ inline void RenderTexture::Initialize(int width, int height, DXGI_FORMAT texForm
     rtDesc.CPUAccessFlags     = 0;
     rtDesc.MiscFlags          = 0;
 
-    ComPtr<ID3D11Texture2D> renderTarget;
-    if(FAILED(gDevice->CreateTexture2D(&rtDesc, nullptr, renderTarget.GetAddressOf())))
+    if(FAILED(gDevice->CreateTexture2D(&rtDesc, nullptr, tex_.GetAddressOf())))
     {
         throw VRPGBaseException("failed to create render target");
     }
@@ -69,7 +71,7 @@ inline void RenderTexture::Initialize(int width, int height, DXGI_FORMAT texForm
     rtvDesc.Format             = rtFormat;
     rtvDesc.ViewDimension      = D3D11_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Texture2D.MipSlice = 0;
-    if(FAILED(gDevice->CreateRenderTargetView(renderTarget.Get(), &rtvDesc, rtv_.GetAddressOf())))
+    if(FAILED(gDevice->CreateRenderTargetView(tex_.Get(), &rtvDesc, rtv_.GetAddressOf())))
     {
         throw VRPGBaseException("failed to create render target view");
     }
@@ -79,7 +81,7 @@ inline void RenderTexture::Initialize(int width, int height, DXGI_FORMAT texForm
     srvDesc.ViewDimension             = D3D11_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels       = 1;
     srvDesc.Texture2D.MostDetailedMip = 0;
-    if(FAILED(gDevice->CreateShaderResourceView(renderTarget.Get(), &srvDesc, srv_.GetAddressOf())))
+    if(FAILED(gDevice->CreateShaderResourceView(tex_.Get(), &srvDesc, srv_.GetAddressOf())))
     {
         throw VRPGBaseException("failed to create shader resource view");
     }
@@ -110,6 +112,11 @@ inline int RenderTexture::GetWidth() const noexcept
 inline int RenderTexture::GetHeight() const noexcept
 {
     return height_;
+}
+
+inline ComPtr<ID3D11Texture2D> RenderTexture::GetRenderTarget()
+{
+    return tex_;
 }
 
 inline ComPtr<ID3D11RenderTargetView> RenderTexture::GetRenderTargetView()
