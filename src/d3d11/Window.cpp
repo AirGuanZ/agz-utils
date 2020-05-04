@@ -141,9 +141,9 @@ struct WindowImplData
 DWORD WindowDesc::GetWindowStyle() const noexcept
 {
     DWORD dwStyle = 0;
-    dwStyle |= WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+    dwStyle |= WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX;
     if(resizable)
-        dwStyle |= WS_SIZEBOX;
+        dwStyle |= WS_SIZEBOX | WS_MAXIMIZEBOX;
     return dwStyle;
 }
 
@@ -189,7 +189,7 @@ void Window::Initialize(const WindowDesc &windowDesc)
 
     // screen info
 
-    const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    const int screenWidth  = GetSystemMetrics(SM_CXSCREEN);
     const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
     RECT workAreaRect;
@@ -447,6 +447,13 @@ void Window::UseDefaultViewport()
     data_->deviceContext->RSSetViewports(1, &vp);
 }
 
+void Window::UseDefaultRenderTargetAndDepthStencil()
+{
+    assert(IsAvailable());
+    data_->deviceContext->OMSetRenderTargets(
+        1, &data_->renderTargetView, data_->depthStencilView);
+}
+
 void Window::ClearDefaultRenderTarget(float r, float g, float b, float a)
 {
     const float CLEAR_COLOR[] = { r, g, b, a };
@@ -554,6 +561,12 @@ ID3D11DeviceContext *Window::DeviceContext() const noexcept
 {
     assert(IsAvailable());
     return data_->deviceContext;
+}
+
+IDXGISwapChain *Window::SwapChain() const noexcept
+{
+    assert(IsAvailable());
+    return data_->swapChain;
 }
 
 HWND Window::GetNativeWindowHandle() const noexcept

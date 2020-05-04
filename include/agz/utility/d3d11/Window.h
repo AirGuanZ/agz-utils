@@ -95,6 +95,8 @@ public:
 
     void UseDefaultViewport();
 
+    void UseDefaultRenderTargetAndDepthStencil();
+
     void ClearDefaultRenderTarget(float r = 0, float g = 0, float b = 0, float a = 0);
 
     void ClearDefaultRenderTarget(const float backgroundColor[4]);
@@ -122,6 +124,8 @@ public:
     ID3D11Device *Device() const noexcept;
 
     ID3D11DeviceContext *DeviceContext() const noexcept;
+
+    IDXGISwapChain *SwapChain() const noexcept;
 
     HWND GetNativeWindowHandle() const noexcept;
 
