@@ -87,6 +87,8 @@ public:
 
     void SetClientSize(int width, int height);
 
+    void Maximize();
+
     float GetClientAspectRatio() const noexcept;
 
     void SetVSync(bool vsync) noexcept;

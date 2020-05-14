@@ -416,6 +416,12 @@ void Window::SetClientSize(int width, int height)
         data_->hWindow, windowRect.left, windowRect.top, w, h, TRUE);
 }
 
+void Window::Maximize()
+{
+    assert(IsAvailable());
+    ShowWindow(data_->hWindow, SW_MAXIMIZE);
+}
+
 float Window::GetClientAspectRatio() const noexcept
 {
     assert(IsAvailable());
