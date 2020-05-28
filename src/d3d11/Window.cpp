@@ -170,7 +170,7 @@ void Window::Initialize(const WindowDesc &windowDesc)
     // register window class
 
     WNDCLASSEXW wc;
-    wc.cbSize        = sizeof(WNDCLASSEXA);
+    wc.cbSize        = sizeof(WNDCLASSEXW);
     wc.style         = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc   = Impl::WindowProc;
     wc.cbClsExtra    = 0;

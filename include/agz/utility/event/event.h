@@ -61,12 +61,10 @@ class sender_t : public misc::uncopyable_t
 {
     std::tuple<receiver_set_t<Events>...> sets_;
 
-protected:
+public:
 
     template<typename Event>
     void send(const Event &e) const;
-
-public:
 
     template<typename Event>
     void attach(receiver_t<Event> *handler);
@@ -92,6 +90,8 @@ class functional_receiver_t : public receiver_t<Event>
 public:
 
     using function_t = std::function<void(const Event &)>;
+
+    explicit functional_receiver_t(std::function<void()> f);
 
     explicit functional_receiver_t(function_t f = function_t());
 
@@ -252,6 +252,13 @@ void sender_t<Events...>::detach_all_types()
     std::apply(
         [](auto &&...s) { ((s.detach_all()), ...); },
         sets_);
+}
+
+template<typename Event>
+functional_receiver_t<Event>::functional_receiver_t(std::function<void()> f)
+{
+    if(f)
+        f_ = [nf = std::move(f)](const Event &) { nf(); };
 }
 
 template<typename Event>
