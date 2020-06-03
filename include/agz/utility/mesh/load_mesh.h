@@ -30,6 +30,13 @@ struct face_t
 };
 
 /**
+ * @brief 计算一组顶点的包围盒
+ */
+math::aabb3f compute_bounding_box(const vertex_t *vertices, size_t verte_count);
+
+std::vector<vertex_t> triangle_to_vertex(const std::vector<triangle_t> &triangles);
+
+/**
  * @brief 从.obj文件中加载网格
  */
 std::vector<face_t> load_from_obj(const std::string &filename);

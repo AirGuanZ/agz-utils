@@ -9,7 +9,7 @@ namespace agz::event::keycode
 
 using keycode_t = int32_t;
 
-namespace keycode_values
+namespace keycode_constants
 {
 
     constexpr keycode_t KEY_UNKNOWN = -1;

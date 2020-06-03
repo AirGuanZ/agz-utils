@@ -15,7 +15,7 @@ namespace
 
         keycode_table_t()
         {
-            using namespace keycode_values;
+            using namespace keycode_constants;
 
             for(auto &kc : table)
             {

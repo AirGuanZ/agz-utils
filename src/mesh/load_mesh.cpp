@@ -143,6 +143,25 @@ static std::vector<triangle_t> load_triangles_from_stl(
     return ret;
 }
 
+math::aabb3f compute_bounding_box(const vertex_t *vertices, size_t verte_count)
+{
+    return std::accumulate(
+        vertices, vertices + verte_count, math::aabb3f{},
+        [](const auto &a, const auto &b) { return a | b.position; });
+}
+
+std::vector<vertex_t> triangle_to_vertex(const std::vector<triangle_t> &triangles)
+{
+    std::vector<vertex_t> ret;
+    for(auto &t : triangles)
+    {
+        ret.push_back(t.vertices[0]);
+        ret.push_back(t.vertices[1]);
+        ret.push_back(t.vertices[2]);
+    }
+    return ret;
+}
+
 std::vector<face_t> load_from_obj(const std::string &filename)
 {
     std::string src = file::read_txt_file(filename);

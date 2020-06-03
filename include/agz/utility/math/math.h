@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "decl/aabb2.h"
+#include "decl/aabb3.h"
 #include "decl/collision.h"
 #include "decl/color2.h"
 #include "decl/color3.h"
@@ -22,6 +23,7 @@
 #include "decl/vec4.h"
 
 #include "impl/aabb2.inl"
+#include "impl/aabb3.inl"
 #include "impl/collision.inl"
 #include "impl/color2.inl"
 #include "impl/color3.inl"
