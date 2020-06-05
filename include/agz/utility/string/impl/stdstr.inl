@@ -264,7 +264,7 @@ namespace stdstr_impl
     template<> inline unsigned int from_string_impl<unsigned int>(const std::string &str)
     {
         unsigned long ul = std::stoul(str);
-        if(ul > std::numeric_limits<unsigned int>::max())
+        if(ul > (std::numeric_limits<unsigned int>::max)())
             throw std::out_of_range(str);
         return static_cast<unsigned int>(ul);
     }
