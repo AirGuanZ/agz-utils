@@ -95,6 +95,8 @@ public:
 
     explicit functional_receiver_t(function_t f = function_t());
 
+    void set_function(std::function<void()> f);
+
     void set_function(function_t f);
 
     void handle(const Event &e) override;
@@ -266,6 +268,15 @@ functional_receiver_t<Event>::functional_receiver_t(function_t f)
     : f_(std::move(f))
 {
     
+}
+
+template<typename Event>
+void functional_receiver_t<Event>::set_function(std::function<void()> f)
+{
+    if(f)
+        f_ = [nf = std::move(f)](const Event &) { nf(); };
+    else
+        f_ = function_t();
 }
 
 template<typename Event>
