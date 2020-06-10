@@ -34,6 +34,13 @@ ptrdiff_t byte_offset(M(C::*memPtr)) noexcept
 template<typename T>
 using identity_t = T;
 
+/** @brief 取得一个临时变量指针，注意返回值的失效时间 */
+template<typename T>
+const T *get_temp_ptr(const T &val) noexcept
+{
+    return &val;
+}
+
 /**
  * 用于消除一些代码检查工具的警告
  *
