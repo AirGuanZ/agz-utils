@@ -25,12 +25,6 @@ inline _simd_float3_t::_simd_float3_t(const __m128 &m128) noexcept
     
 }
 
-inline _simd_float3_t &_simd_float3_t::operator=(const __m128 &m128) noexcept
-{
-    this->m128 = m128;
-    return *this;
-}
-
 inline _simd_float3_t::_simd_float3_t(float v) noexcept
     : _simd_float3_t(_mm_set_ps1(v))
 {
@@ -148,12 +142,22 @@ _simd_float3_t _simd_float3_t::swizzle() const noexcept
 
 inline float dot(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
 {
-    return _mm_cvtss_f32(_mm_dp_ps(lhs, rhs, 0xff));
+    return (lhs * rhs).sum();
 }
 
 inline float cos(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
 {
     return dot(lhs, rhs) / (lhs.length() * rhs.length());
+}
+
+inline float distance(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
+{
+    return (lhs - rhs).length();
+}
+
+inline float distance2(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
+{
+    return (lhs - rhs).length_square();
 }
 
 inline _simd_float3_t cross(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
@@ -227,21 +231,6 @@ inline bool operator==(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noe
 inline bool operator!=(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
 {
     return !(lhs == rhs);
-}
-
-inline auto distance(const _simd_float3_t &a, const _simd_float3_t &b) noexcept
-{
-    return (a - b).length();
-}
-
-inline auto distance2(const _simd_float3_t &a, const _simd_float3_t &b) noexcept
-{
-    return (a - b).length_square();
-}
-
-inline _simd_float3_t exp(const _simd_float3_t &v) noexcept
-{
-    return _simd_float3_t(_mm_exp_ps(v));
 }
 
 } // namespace agz::math

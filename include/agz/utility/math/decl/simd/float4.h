@@ -65,7 +65,14 @@ public:
 
     template<int I0, int I1, int I2, int I3>
     _simd_float4_t swizzle() const noexcept;
+
+    // conv with normal float4
+
+    _simd_float4_t(const vec4f &v) noexcept : _simd_float4_t(v.x, v.y, v.z, v.w) { }
+    operator vec4f () const noexcept { return { x, y, z, w }; }
 };
+
+using float4 = _simd_float4_t;
 
 float dot(const _simd_float4_t &lhs, const _simd_float4_t &rhs) noexcept;
 float cos(const _simd_float4_t &lhs, const _simd_float4_t &rhs) noexcept;

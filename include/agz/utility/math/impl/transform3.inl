@@ -115,7 +115,7 @@ template<typename T, bool COLUMN_MAJOR>
 tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_normal(
     const tvec3<T> &normal) const noexcept
 {
-    const auto v4 = (inv_.t() * tvec4<T>(normal.x, normal.y, normal.z, 0)).normalize();
+    const auto v4 = inv_.t() * tvec4<T>(normal.x, normal.y, normal.z, 0);
     return tvec3<T>(v4.x, v4.y, v4.z).normalize();
 }
 

@@ -395,6 +395,130 @@ inline _simd_float4x4_c_t _simd_float4x4_c_t::transpose() const noexcept
 	return t();
 }
 
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::translate(
+	const float3 &offset) noexcept
+{
+	return translate(offset.x, offset.y, offset.z);
+}
+
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::translate(
+	float x, float y, float z) noexcept
+{
+	return self_t(
+		1, 0, 0, x,
+		0, 1, 0, y,
+		0, 0, 1, z,
+		0, 0, 0, 1);
+}
+
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::rotate(
+	const float3 &_axis, float rad) noexcept
+{
+	const auto axis = _axis.normalize();
+	const float sinv = std::sin(rad), cosv = std::cos(rad);
+
+	self_t ret(UNINIT);
+
+	ret[0][0] = axis.x * axis.x + (1 - axis.x * axis.x) * cosv;
+	ret[0][1] = axis.x * axis.y * (1 - cosv) - axis.z * sinv;
+	ret[0][2] = axis.x * axis.z * (1 - cosv) + axis.y * sinv;
+	ret[0][3] = 0;
+
+	ret[1][0] = axis.x * axis.y * (1 - cosv) + axis.z * sinv;
+	ret[1][1] = axis.y * axis.y + (1 - axis.y * axis.y) * cosv;
+	ret[1][2] = axis.y * axis.z * (1 - cosv) - axis.x * sinv;
+	ret[1][3] = 0;
+
+	ret[2][0] = axis.x * axis.z * (1 - cosv) - axis.y * sinv;
+	ret[2][1] = axis.y * axis.z * (1 - cosv) + axis.x * sinv;
+	ret[2][2] = axis.z * axis.z + (1 - axis.z * axis.z) * cosv;
+	ret[2][3] = 0;
+
+	ret[3][0] = 0;
+	ret[3][1] = 0;
+	ret[3][2] = 0;
+	ret[3][3] = 1;
+
+	return ret;
+}
+
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::rotate_x(
+	float rad) noexcept
+{
+	const auto S = std::sin(rad), C = std::cos(rad);
+	return self_t(
+		1, 0, 0, 0,
+		0, C, -S, 0,
+		0, S, C, 0,
+		0, 0, 0, 1);
+}
+
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::rotate_y(
+	float rad) noexcept
+{
+	const auto S = std::sin(rad), C = std::cos(rad);
+	return self_t(
+		C, 0, S, 0,
+		0, 1, 0, 0,
+		-S, 0, C, 0,
+		0, 0, 0, 1);
+}
+
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::rotate_z(
+	float rad) noexcept
+{
+	const auto S = std::sin(rad), C = std::cos(rad);
+	return self_t(
+		C, -S, 0, 0,
+		S, C, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
+}
+
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::scale(
+	const float3 &ratio) noexcept
+{
+	return scale(ratio.x, ratio.y, ratio.z);
+}
+
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::scale(
+	float x, float y, float z) noexcept
+{
+	return self_t(
+		x, 0, 0, 0,
+		0, y, 0, 0,
+		0, 0, z, 0,
+		0, 0, 0, 1);
+}
+
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::perspective(
+	float fov_y_rad, float w_over_h,
+	float near_plane, float far_plane) noexcept
+{
+	const float inv_dis = 1 / (far_plane - near_plane);
+	auto y_rad = 0.5f * fov_y_rad;
+	auto cot = std::cos(y_rad) / std::sin(y_rad);
+
+	return self_t(
+		cot / w_over_h, 0, 0, 0,
+		0, cot, 0, 0,
+		0, 0, far_plane * inv_dis, -far_plane * near_plane * inv_dis,
+		0, 0, 1, 0);
+}
+
+inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::look_at(
+	const float3 &eye, const float3 &dst, const float3 &up) noexcept
+{
+	auto D = (dst - eye).normalize();
+	auto R = cross(up, D).normalize();
+	auto U = cross(D, R);
+	return self_t(
+		R.x, U.x, D.x, eye.x,
+		R.y, U.y, D.y, eye.y,
+		R.z, U.z, D.z, eye.z,
+		0, 0, 0, 1).inverse();
+}
+
 inline _simd_float4x4_c_t operator+(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept
 {
 	_simd_float4x4_c_t ret(UNINIT);
@@ -558,6 +682,41 @@ inline _simd_float4x4_c_t operator/(const _simd_float4x4_c_t &lhs, float rhs) no
 {
 	const float invRHS = 1 / rhs;
 	return lhs * invRHS;
+}
+
+inline _simd_float4x4_c_t &operator+=(
+	_simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept
+{
+	lhs = lhs + rhs;
+	return lhs;
+}
+
+inline _simd_float4x4_c_t &operator-=(
+	_simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept
+{
+	lhs = lhs - rhs;
+	return lhs;
+}
+
+inline _simd_float4x4_c_t &operator*=(
+	_simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept
+{
+	lhs = lhs * rhs;
+	return lhs;
+}
+
+inline _simd_float4x4_c_t &operator*=(
+	_simd_float4x4_c_t &lhs, float rhs) noexcept
+{
+	lhs = lhs * rhs;
+	return lhs;
+}
+
+inline _simd_float4x4_c_t &operator/=(
+	_simd_float4x4_c_t &lhs, float rhs) noexcept
+{
+	lhs = lhs / rhs;
+	return lhs;
 }
 
 } // namespace agz::math

@@ -2,6 +2,7 @@
 
 #ifdef AGZ_UTILS_SSE
 
+#include "./float3.h"
 #include "./float4.h"
 
 namespace agz::math
@@ -72,7 +73,48 @@ public:
 
 	_simd_float4x4_c_t t()         const noexcept;
 	_simd_float4x4_c_t transpose() const noexcept;
+
+    // conv with mat4
+
+    _simd_float4x4_c_t(const tmat4_c<float> &m) noexcept
+        : _simd_float4x4_c_t(UNINIT)
+    {
+        data[0] = m[0];
+        data[1] = m[1];
+        data[2] = m[2];
+        data[3] = m[3];
+    }
+
+    operator tmat4_c<float>() const noexcept
+    {
+        return tmat4_c<float>::from_cols(
+            data[0], data[1], data[2], data[3]);
+    }
+    
+    struct left_transform
+    {
+        static self_t translate(const float3 &offset)      noexcept;
+        static self_t translate(float x, float y, float z) noexcept;
+
+        static self_t rotate(const float3 &_axis, float rad) noexcept;
+        static self_t rotate_x(float rad)                    noexcept;
+        static self_t rotate_y(float rad)                    noexcept;
+        static self_t rotate_z(float rad)                    noexcept;
+
+        static self_t scale(const float3 &ratio)       noexcept;
+        static self_t scale(float x, float y, float z) noexcept;
+
+        static self_t perspective(
+            float fov_y_rad, float w_over_h,
+            float near_plane, float far_plane) noexcept;
+
+        static self_t look_at(
+            const float3 &eye, const float3 &dst,
+            const float3 &up) noexcept;
+    };
 };
+
+using float4x4 = _simd_float4x4_c_t;
 
 _simd_float4x4_c_t operator+(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
 _simd_float4x4_c_t operator-(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
@@ -85,6 +127,21 @@ _simd_float4x4_c_t operator/(const _simd_float4x4_c_t &lhs, float rhs) noexcept;
 
 _simd_float4_t operator*(const _simd_float4x4_c_t &lhs, const _simd_float4_t &rhs) noexcept;
 _simd_float4_t operator*(const _simd_float4_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
+
+_simd_float4x4_c_t &operator+=(
+    _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
+
+_simd_float4x4_c_t &operator-=(
+    _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
+
+_simd_float4x4_c_t &operator*=(
+    _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
+
+_simd_float4x4_c_t &operator*=(
+    _simd_float4x4_c_t &lhs, float rhs) noexcept;
+
+_simd_float4x4_c_t &operator/=(
+    _simd_float4x4_c_t &lhs, float rhs) noexcept;
 
 } // namespace agz::math
 

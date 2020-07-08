@@ -29,7 +29,6 @@ public:
     _simd_float3_t(float x, float y, float z) noexcept;
 
     explicit _simd_float3_t(const __m128 &m128) noexcept;
-    _simd_float3_t &operator=(const __m128 &m128) noexcept;
 
     explicit _simd_float3_t(float v)         noexcept;
     explicit _simd_float3_t(uninitialized_t) noexcept;
@@ -67,11 +66,19 @@ public:
     template<int I0, int I1, int I2>
     _simd_float3_t swizzle() const noexcept;
 
-    size_t stdhash() const noexcept { return misc::hash(x, y, z); }
+    // conv with normal float3
+
+    _simd_float3_t(const vec3f &v) noexcept : _simd_float3_t(v.x, v.y, v.z) { }
+    operator vec3f () const noexcept { return { x, y, z }; }
 };
+
+using float3 = _simd_float3_t;
 
 float dot(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 float cos(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
+
+float distance(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
+float distance2(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 
 _simd_float3_t cross(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 
@@ -103,11 +110,6 @@ inline _simd_float3_t &operator/=(_simd_float3_t &lhs, float rhs) noexcept { lhs
 bool operator==(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 bool operator!=(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 
-auto distance(const _simd_float3_t &a, const _simd_float3_t &b) noexcept;
-auto distance2(const _simd_float3_t &a, const _simd_float3_t &b) noexcept;
-
-_simd_float3_t exp(const _simd_float3_t &v) noexcept;
-
 } // namespace agz::math
 
 namespace std
@@ -117,7 +119,7 @@ namespace std
     {
         size_t operator()(const agz::math::_simd_float3_t &vec) const noexcept
         {
-            return vec.stdhash();
+            return agz::misc::hash(vec.x, vec.y, vec.z);
         }
     };
 

@@ -22,6 +22,12 @@
 #include "decl/vec3.h"
 #include "decl/vec4.h"
 
+#include "decl/simd/float3.h"
+#include "decl/simd/float4.h"
+#include "decl/simd/float4x4.h"
+#include "decl/simd/coord_float3.h"
+#include "decl/simd/transform_float3.h"
+
 #include "impl/aabb2.inl"
 #include "impl/aabb3.inl"
 #include "impl/collision.inl"
@@ -41,3 +47,9 @@
 #include "impl/vec2.inl"
 #include "impl/vec3.inl"
 #include "impl/vec4.inl"
+
+#include "impl/simd/float3.inl"
+#include "impl/simd/float4.inl"
+#include "impl/simd/float4x4.inl"
+#include "impl/simd/coord_float3.inl"
+#include "impl/simd/transform_float3.inl"

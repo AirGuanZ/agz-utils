@@ -343,7 +343,8 @@ template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(
     T x, T y, T z) noexcept
 {
-    return self_t(1, 0, 0, x,
+    return self_t(
+        1, 0, 0, x,
         0, 1, 0, y,
         0, 0, 1, z,
         0, 0, 0, 1);
@@ -385,7 +386,8 @@ template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_x(T rad) noexcept
 {
     const auto S = std::sin(rad), C = std::cos(rad);
-    return self_t(1, 0, 0, 0,
+    return self_t(
+        1, 0, 0, 0,
         0, C, -S, 0,
         0, S, C, 0,
         0, 0, 0, 1);
@@ -395,7 +397,8 @@ template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_y(T rad) noexcept
 {
     const auto S = std::sin(rad), C = std::cos(rad);
-    return self_t(C, 0, S, 0,
+    return self_t(
+        C, 0, S, 0,
         0, 1, 0, 0,
         -S, 0, C, 0,
         0, 0, 0, 1);
@@ -405,7 +408,8 @@ template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_z(T rad) noexcept
 {
     const auto S = std::sin(rad), C = std::cos(rad);
-    return self_t(C, -S, 0, 0,
+    return self_t(
+        C, -S, 0, 0,
         S, C, 0, 0,
         0, 0, 1, 0,
         0, 0, 0, 1);
@@ -422,7 +426,8 @@ template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(
     T x, T y, T z) noexcept
 {
-    return self_t(x, 0, 0, 0,
+    return self_t(
+        x, 0, 0, 0,
         0, y, 0, 0,
         0, 0, z, 0,
         0, 0, 0, 1);
@@ -432,7 +437,7 @@ template<typename T>
 typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::perspective(
     T fov_y_rad, T w_over_h, T near_plane, T far_plane) noexcept
 {
-    T inv_dis = T(1) / (far_plane - near_plane);
+    const T inv_dis = T(1) / (far_plane - near_plane);
     auto y_rad = T(0.5) * fov_y_rad;
     auto cot = std::cos(y_rad) / std::sin(y_rad);
 
