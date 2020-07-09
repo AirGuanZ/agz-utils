@@ -37,6 +37,7 @@ public:
     _simd_float3_t &operator=(const _simd_float3_t &other) noexcept;
 
     bool is_zero() const noexcept;
+    bool is_black() const noexcept;
     
     float length()        const noexcept;
     float length_square() const noexcept;
@@ -54,6 +55,10 @@ public:
 
     float max_elem() const noexcept;
     float min_elem() const noexcept;
+
+    float lum() const noexcept;
+
+    bool is_finite() const noexcept;
     
     bool operator!() const noexcept;
 
@@ -70,6 +75,11 @@ public:
 
     _simd_float3_t(const vec3f &v) noexcept : _simd_float3_t(v.x, v.y, v.z) { }
     operator vec3f () const noexcept { return { x, y, z }; }
+
+    // conv with color3f
+
+    _simd_float3_t(const color3f &c) noexcept : _simd_float3_t(c.r, c.g, c.b) { }
+    operator color3f() const noexcept { return { r, g, b }; }
 };
 
 using float3 = _simd_float3_t;
@@ -79,6 +89,9 @@ float cos(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 
 float distance(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 float distance2(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
+
+_simd_float3_t exp(const _simd_float3_t &v) noexcept;
+_simd_float3_t sqrt(const _simd_float3_t &v) noexcept;
 
 _simd_float3_t cross(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 

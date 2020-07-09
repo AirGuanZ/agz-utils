@@ -53,6 +53,11 @@ inline bool _simd_float3_t::is_zero() const noexcept
     return *this == self_t(0);
 }
 
+inline bool _simd_float3_t::is_black() const noexcept
+{
+    return is_zero();
+}
+
 inline float _simd_float3_t::length() const noexcept
 {
     return std::sqrt(length_square());
@@ -108,6 +113,16 @@ inline float _simd_float3_t::min_elem() const noexcept
     return (std::min)(x, (std::min)(y, z));
 }
 
+inline float _simd_float3_t::lum() const noexcept
+{
+    return 0.2126f * r + 0.7152f * g + 0.0722f * b;
+}
+
+inline bool _simd_float3_t::is_finite() const noexcept
+{
+    return math::is_finite(r) && math::is_finite(g) && math::is_finite(b);
+}
+
 inline bool _simd_float3_t::operator!() const noexcept
 {
     return is_zero();
@@ -158,6 +173,16 @@ inline float distance(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noex
 inline float distance2(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
 {
     return (lhs - rhs).length_square();
+}
+
+inline _simd_float3_t exp(const _simd_float3_t &v) noexcept
+{
+    return _simd_float3_t(_mm_exp_ps(v));
+}
+
+inline _simd_float3_t sqrt(const _simd_float3_t &v) noexcept
+{
+    return _simd_float3_t(_mm_sqrt_ps(v));
 }
 
 inline _simd_float3_t cross(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
