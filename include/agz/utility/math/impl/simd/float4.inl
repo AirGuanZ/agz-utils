@@ -3,6 +3,7 @@
 #ifdef AGZ_UTILS_SSE
 
 #include <immintrin.h>
+#include <xmmintrin.h>
 
 namespace agz::math
 {
@@ -132,12 +133,12 @@ inline const float &_simd_float4_t::operator[](size_t idx) const noexcept
     return *(&x + idx);
 }
 
-inline _simd_float4_t::operator union __m128&() noexcept
+inline _simd_float4_t::operator __m128&() noexcept
 {
     return m128;
 }
 
-inline _simd_float4_t::operator const union __m128&() const noexcept
+inline _simd_float4_t::operator const __m128&() const noexcept
 {
     return m128;
 }
@@ -151,7 +152,8 @@ _simd_float4_t _simd_float4_t::swizzle() const noexcept
 
 inline float dot(const _simd_float4_t &lhs, const _simd_float4_t &rhs) noexcept
 {
-    return _mm_cvtss_f32(_mm_dp_ps(lhs, rhs, 0xff));
+    //return _mm_cvtss_f32(_mm_dp_ps(lhs, rhs, 0xff));
+    return (lhs * rhs).sum();
 }
 
 inline float cos(const _simd_float4_t &lhs, const _simd_float4_t &rhs) noexcept

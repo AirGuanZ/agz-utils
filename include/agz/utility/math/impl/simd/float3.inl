@@ -3,6 +3,7 @@
 #ifdef AGZ_UTILS_SSE
 
 #include <immintrin.h>
+#include <xmmintrin.h>
 
 namespace agz::math
 {
@@ -138,12 +139,12 @@ inline const float &_simd_float3_t::operator[](size_t idx) const noexcept
     return *(&x + idx);
 }
 
-inline _simd_float3_t::operator union __m128&() noexcept
+inline _simd_float3_t::operator __m128&() noexcept
 {
     return m128;
 }
 
-inline _simd_float3_t::operator const union __m128&() const noexcept
+inline _simd_float3_t::operator const __m128&() const noexcept
 {
     return m128;
 }
@@ -177,7 +178,8 @@ inline float distance2(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noe
 
 inline _simd_float3_t exp(const _simd_float3_t &v) noexcept
 {
-    return _simd_float3_t(_mm_exp_ps(v));
+    return _simd_float3_t(std::exp(v.x), std::exp(v.y), std::exp(v.z));
+    //return _simd_float3_t(_mm_exp_ps(v));
 }
 
 inline _simd_float3_t sqrt(const _simd_float3_t &v) noexcept
