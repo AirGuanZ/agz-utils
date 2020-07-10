@@ -95,6 +95,9 @@ _simd_float3_t sqrt(const _simd_float3_t &v) noexcept;
 
 _simd_float3_t cross(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 
+_simd_float3_t elem_min(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
+_simd_float3_t elem_max(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
+
 _simd_float3_t operator+(const _simd_float3_t &lhs, float rhs) noexcept;
 _simd_float3_t operator-(const _simd_float3_t &lhs, float rhs) noexcept;
 _simd_float3_t operator*(const _simd_float3_t &lhs, float rhs) noexcept;

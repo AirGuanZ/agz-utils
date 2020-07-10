@@ -193,6 +193,16 @@ inline _simd_float3_t cross(const _simd_float3_t &lhs, const _simd_float3_t &rhs
         lhs.x * rhs.y - lhs.y * rhs.x);
 }
 
+inline _simd_float3_t elem_min(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
+{
+    return _simd_float3_t(_mm_min_ps(lhs, rhs));
+}
+
+inline _simd_float3_t elem_max(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
+{
+    return _simd_float3_t(_mm_max_ps(lhs, rhs));
+}
+
 inline _simd_float3_t operator+(const _simd_float3_t &lhs, float rhs) noexcept
 {
     return lhs + _simd_float3_t(rhs);

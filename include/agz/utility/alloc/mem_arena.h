@@ -98,6 +98,7 @@ inline void *mem_arena_t::alloc_direct_chunk(size_t bytes, size_t align)
     else
     {
         assert(!data_top_ && !unused_bytes_);
+        new_chunk->next_chunk = nullptr;
         chunk_entry_ = new_chunk;
     }
 

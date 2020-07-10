@@ -12,6 +12,7 @@
 #include "decl/mat3_c.h"
 #include "decl/mat4_c.h"
 #include "decl/quaternion.h"
+#include "decl/rng.h"
 #include "decl/spherical_harmonics.h"
 #include "decl/tensor.h"
 #include "decl/transform2.h"
