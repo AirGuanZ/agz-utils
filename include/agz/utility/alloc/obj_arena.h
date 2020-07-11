@@ -58,7 +58,13 @@ public:
      * @brief 创建指定类型的对象，参数为构造函数参数
      */
     template<typename T, typename...Args>
-    T *create(Args&&...args);
+    T *create(Args &&...args);
+
+    /**
+     * @brief 创建指定类型的对象，但释放时不进行析构
+     */
+    template<typename T, typename...Args>
+    T *create_nodestruct(Args &&...args);
 
     /**
      * @brief 析构并销毁所有之前创建的对象
@@ -103,12 +109,25 @@ T *obj_arena_t::create(Args&&...args)
 {
     void *obj_mem = mem_arena_.alloc(sizeof(T), alignof(T));
     T *obj = new(obj_mem) T(std::forward<Args>(args)...);
-    misc::scope_guard_t obj_guard([&] { obj->~T(); });
+    
+    try
+    {
+        this->add_destructor(obj);
+    }
+    catch(...)
+    {
+        obj->~T();
+        throw;
+    }
 
-    this->add_destructor(obj);
-
-    obj_guard.dismiss();
     return obj;
+}
+
+template<typename T, typename ... Args>
+T *obj_arena_t::create_nodestruct(Args &&... args)
+{
+    void *obj_mem = mem_arena_.alloc(sizeof(T), alignof(T));
+    return new(obj_mem) T(std::forward<Args>(args)...);
 }
 
 inline void obj_arena_t::release()
