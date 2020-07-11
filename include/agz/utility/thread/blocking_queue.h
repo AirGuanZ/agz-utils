@@ -108,7 +108,7 @@ public:
      */
     std::optional<data_t> try_pop_or_stop(bool *stop)
     {
-        std::unique_ptr lk(mut_);
+        std::unique_lock lk(mut_);
 
         if(queue_.empty())
         {
