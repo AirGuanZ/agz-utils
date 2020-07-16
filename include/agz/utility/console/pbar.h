@@ -121,11 +121,7 @@ public:
     void display() const
     {
         const int pos = int(width_ * percent_ / 100);
-
-        const std::chrono::steady_clock::time_point now =
-            std::chrono::steady_clock::now();
-        const auto time_elapsed = std::chrono::duration_cast<
-            std::chrono::milliseconds>(now - start_).count();
+        const auto time_elapsed = get_time_ms();
 
         std::cout << "[";
 
@@ -141,6 +137,14 @@ public:
         std::cout << "] " << int(percent_) << "% "
                   << float(time_elapsed) / 1000.0 << "s   \r";
         std::cout.flush();
+    }
+
+    long long get_time_ms() const noexcept
+    {
+        const std::chrono::steady_clock::time_point now =
+            std::chrono::steady_clock::now();
+        return std::chrono::duration_cast<
+            std::chrono::milliseconds>(now - start_).count();
     }
 
     void done()

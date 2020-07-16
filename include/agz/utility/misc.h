@@ -6,6 +6,7 @@
 #include "misc/endian.h"
 #include "misc/exception.h"
 #include "misc/hash.h"
+#include "misc/pretty_typename.h"
 #include "misc/push_inserter.h"
 #include "misc/type_list.h"
 #include "misc/scope_assignment.h"

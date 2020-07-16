@@ -187,6 +187,11 @@ inline _simd_float3_t sqrt(const _simd_float3_t &v) noexcept
     return _simd_float3_t(_mm_sqrt_ps(v));
 }
 
+inline _simd_float3_t pow(const _simd_float3_t &v, float e) noexcept
+{
+    return _simd_float3_t(std::pow(v.x, e), std::pow(v.y, e), std::pow(v.z, e));
+}
+
 inline _simd_float3_t cross(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept
 {
     return _simd_float3_t(
