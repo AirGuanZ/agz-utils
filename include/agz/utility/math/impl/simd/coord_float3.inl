@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef AGZ_UTILS_SSE
+
 #include <cmath>
 
 #include "../../decl/simd/coord_float3.h"
@@ -124,3 +126,5 @@ inline bool _simd_coord_float3_t::in_positive_z_hemisphere(const vec_t &v) const
 }
 
 } // namespace agz::math
+
+#endif // #ifdef AGZ_UTILS_SSE
