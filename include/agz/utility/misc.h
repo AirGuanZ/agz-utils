@@ -3,6 +3,7 @@
 #include "misc/base64.h"
 #include "misc/bitcast.h"
 #include "misc/construct_from_tuple.h"
+#include "misc/dyn_static_call.h"
 #include "misc/endian.h"
 #include "misc/exception.h"
 #include "misc/hash.h"
