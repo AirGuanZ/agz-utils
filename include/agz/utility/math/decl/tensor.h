@@ -3,6 +3,7 @@
 #include "../../misc/type_list.h"
 #include "common.h"
 #include "vec.h"
+#include "tensor_view.h"
 
 namespace agz::math {
     
@@ -90,6 +91,18 @@ public:
     const P *raw_data() const noexcept;
 
     size_t raw_data_size() const noexcept;
+
+    tensor_view_t<P, D, false> get_subview(
+        const index_t &base,
+        const index_t &shape);
+
+    tensor_view_t<P, D, true> get_subview(
+        const index_t &base,
+        const index_t &shape) const;
+
+    tensor_view_t<P, D, true> get_const_subview(
+        const index_t &base,
+        const index_t &shape) const;
 };
 
 template<typename P, int D, typename F>

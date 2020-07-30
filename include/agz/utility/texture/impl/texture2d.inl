@@ -209,6 +209,30 @@ typename texture2d_t<T>::self_t texture2d_t<T>::subtex(
 }
 
 template<typename T>
+texture2d_view_t<T, false> texture2d_t<T>::subview(
+    int y_beg, int y_end, int x_beg, int x_end) noexcept
+{
+    return texture2d_view_t<T, false>(data_.get_subview(
+        { y_beg, x_beg }, { y_end - y_beg, x_end - x_beg }));
+}
+
+template<typename T>
+texture2d_view_t<T, true> texture2d_t<T>::subview(
+    int y_beg, int y_end, int x_beg, int x_end) const noexcept
+{
+    return texture2d_view_t<T, true>(data_.get_subview(
+        { y_beg, x_beg }, { y_end - y_beg, x_end - x_beg }));
+}
+
+template<typename T>
+texture2d_view_t<T, true> texture2d_t<T>::subview_const(
+    int y_beg, int y_end, int x_beg, int x_end) const noexcept
+{
+    return texture2d_view_t<T, true>(data_.get_subview(
+        { y_beg, x_beg }, { y_end - y_beg, x_end - x_beg }));
+}
+
+template<typename T>
 typename texture2d_t<T>::self_t texture2d_t<T>::flip_vertically() const
 {
     if(!is_available())

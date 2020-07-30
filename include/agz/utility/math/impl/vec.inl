@@ -196,6 +196,30 @@ typename tvec<T, D>::self_t &tvec<T, D>::operator/=(T rhs) noexcept
 }
 
 template<typename T, int D>
+bool tvec<T, D>::elem_less(const self_t &rhs) const noexcept
+{
+    if constexpr(D == 2)
+    {
+        return data[0] < rhs.data[0] &&
+               data[1] < rhs.data[1];
+    }
+    
+    if constexpr(D == 3)
+    {
+        return data[0] < rhs.data[0] &&
+               data[1] < rhs.data[1] &&
+               data[2] < rhs.data[2];
+    }
+
+    for(int i = 0; i != D; ++i)
+    {
+        if(data[i] >= rhs.data[i])
+            return false;
+    }
+    return true;
+}
+
+template<typename T, int D>
 tvec<T, D> operator-(const tvec<T, D> &vec) noexcept
 {
     tvec<T, D> ret(UNINIT);

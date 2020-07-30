@@ -358,6 +358,27 @@ size_t tensor_t<P, D>::raw_data_size() const noexcept
     return sizeof(P) * elem_count_;
 }
 
+template<typename P, int D>
+tensor_view_t<P, D, false> tensor_t<P, D>::get_subview(
+    const index_t &base, const index_t &shape)
+{
+    return tensor_view_t<P, D, false>(this, shape, base);
+}
+
+template<typename P, int D>
+tensor_view_t<P, D, true> tensor_t<P, D>::get_subview(
+    const index_t &base, const index_t &shape) const
+{
+    return tensor_view_t<P, D, true>(this, shape, base);
+}
+
+template<typename P, int D>
+tensor_view_t<P, D, true> tensor_t<P, D>::get_const_subview(
+    const index_t &base, const index_t &shape) const
+{
+    return tensor_view_t<P, D, true>(this, shape, base);
+}
+
 template<typename P, int D, typename F>
 auto elemwise_unary(const tensor_t<P, D> &opd, F &&opr)
 {

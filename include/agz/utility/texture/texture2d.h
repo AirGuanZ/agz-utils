@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "../math/math.h"
+#include "texture2d_view.h"
 
 namespace agz::texture
 {
@@ -65,6 +66,15 @@ public:
     void clear(const T &value);
 
     self_t subtex(int y_beg, int y_end, int x_beg, int x_end) const;
+
+    texture2d_view_t<T, false> subview(
+        int y_beg, int y_end, int x_beg, int x_end) noexcept;
+
+    texture2d_view_t<T, true> subview(
+        int y_beg, int y_end, int x_beg, int x_end) const noexcept;
+
+    texture2d_view_t<T, true> subview_const(
+        int y_beg, int y_end, int x_beg, int x_end) const noexcept;
 
     self_t flip_vertically() const;
 
