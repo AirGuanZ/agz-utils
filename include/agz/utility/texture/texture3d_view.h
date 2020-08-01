@@ -10,11 +10,15 @@ class texture3d_view_t
 {
 public:
 
-    using data_t  = math::tensor_view_t<T, 3, CONST>;
-    using texel_t = typename data_t::elem_t;
-    using self_t  = texture3d_view_t<T, CONST>;
+    using data_t        = math::tensor_view_t<T, 3, CONST>;
+    using texel_t       = typename data_t::elem_t;
+    using const_texel_t = std::add_const_t<std::remove_const_t<texel_t>>;
+    using self_t        = texture3d_view_t<T, CONST>;
 
     texture3d_view_t() = default;
+
+    texture3d_view_t(const self_t &rhs) = default;
+    self_t &operator=(const self_t &rhs) = default;
 
     template<typename U, bool CONST2,
              typename = std::enable_if_t<
@@ -31,10 +35,10 @@ public:
     math::vec3i size()   const noexcept;
 
           texel_t &operator()(int z, int y, int x)       noexcept;
-    const texel_t &operator()(int z, int y, int x) const noexcept;
+    const_texel_t &operator()(int z, int y, int x) const noexcept;
 
           texel_t &at(int z, int y, int x)       noexcept;
-    const texel_t &at(int z, int y, int x) const noexcept;
+    const_texel_t &at(int z, int y, int x) const noexcept;
 
           data_t &get_data()       noexcept;
     const data_t &get_data() const noexcept;

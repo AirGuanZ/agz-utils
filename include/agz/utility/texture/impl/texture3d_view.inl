@@ -58,7 +58,7 @@ typename texture3d_view_t<T, CONST>::texel_t &
 }
 
 template<typename T, bool CONST>
-const typename texture3d_view_t<T, CONST>::texel_t &
+typename texture3d_view_t<T, CONST>::const_texel_t &
     texture3d_view_t<T, CONST>::operator()(int z, int y, int x) const noexcept
 {
     return data_(z, y, x);
@@ -72,7 +72,7 @@ typename texture3d_view_t<T, CONST>::texel_t &
 }
 
 template<typename T, bool CONST>
-const typename texture3d_view_t<T, CONST>::texel_t &
+typename texture3d_view_t<T, CONST>::const_texel_t &
     texture3d_view_t<T, CONST>::at(int z, int y, int x) const noexcept
 {
     return data_(z, y, x);
