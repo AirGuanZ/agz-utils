@@ -38,7 +38,7 @@ public:
 
     template<typename U, bool CONST2,
              typename = std::enable_if_t<
-                std::is_same_v<T, U> && CONST_TENSOR && !CONST2>>
+                std::is_same_v<P, U> && CONST_TENSOR && !CONST2>>
     tensor_view_t(const tensor_view_t<U, D, false> &tv) noexcept;
 
     const index_t &shape() const noexcept;
