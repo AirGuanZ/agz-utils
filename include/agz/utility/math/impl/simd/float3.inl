@@ -187,6 +187,12 @@ inline _simd_float3_t sqrt(const _simd_float3_t &v) noexcept
     return _simd_float3_t(_mm_sqrt_ps(v));
 }
 
+inline _simd_float3_t abs(const _simd_float3_t &v) noexcept
+{
+    static const __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
+    return _simd_float3_t(_mm_andnot_ps(sign_mask, v));
+}
+
 inline _simd_float3_t pow(const _simd_float3_t &v, float e) noexcept
 {
     return _simd_float3_t(std::pow(v.x, e), std::pow(v.y, e), std::pow(v.z, e));

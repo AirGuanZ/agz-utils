@@ -212,4 +212,31 @@ typename texture3d_t<T>::self_t texture3d_t<T>::subtex(
     return ret;
 }
 
+template<typename T>
+texture3d_view_t<T, false> texture3d_t<T>::subview(
+    const math::vec3i &beg, const math::vec3i &end) noexcept
+{
+    const math::vec3i size = end - beg;
+    return texture3d_view_t<T, false>(data_.get_subview(
+        { beg.z, beg.y, beg.x }, { size.z, size.y, size.x }));
+}
+
+template<typename T>
+texture3d_view_t<T, true> texture3d_t<T>::subview(
+    const math::vec3i &beg, const math::vec3i &end) const noexcept
+{
+    const math::vec3i size = end - beg;
+    return texture3d_view_t<T, true>(data_.get_subview(
+        { beg.z, beg.y, beg.x }, { size.z, size.y, size.x }));
+}
+
+template<typename T>
+texture3d_view_t<T, true> texture3d_t<T>::subview_const(
+    const math::vec3i &beg, const math::vec3i &end) const noexcept
+{
+    const math::vec3i size = end - beg;
+    return texture3d_view_t<T, true>(data_.get_subview(
+        { beg.z, beg.y, beg.x }, { size.z, size.y, size.x }));
+}
+
 } // namespace agz::texture

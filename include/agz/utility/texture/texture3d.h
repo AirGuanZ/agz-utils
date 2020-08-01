@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "../math/math.h"
+#include "texture3d_view.h"
 
 namespace agz::texture
 {
@@ -64,6 +65,15 @@ public:
     
     self_t subtex(
         int z_beg, int z_end, int y_beg, int y_end, int x_beg, int x_end) const;
+
+    texture3d_view_t<T, false> subview(
+        const math::vec3i &beg, const math::vec3i &end) noexcept;
+
+    texture3d_view_t<T, true> subview(
+        const math::vec3i &beg, const math::vec3i &end) const noexcept;
+
+    texture3d_view_t<T, true> subview_const(
+        const math::vec3i &beg, const math::vec3i &end) const noexcept;
 
 protected:
 
