@@ -48,4 +48,14 @@ const T *get_temp_ptr(const T &val) noexcept
  */
 #define AGZ_UNACCESSED(X) ((void)(X))
 
+/**
+ * 计算最小的满足下式的x：
+ *      (x >= value) and (x % alignto == 0)
+ */
+template<typename T>
+constexpr T upalign_to(T value, T alignto) noexcept
+{
+    return (value + alignto - 1) / alignto * alignto;
+}
+
 } // namespace agz
