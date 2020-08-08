@@ -2,6 +2,7 @@
 
 #include <type_traits>
 
+#include "../common/common.h"
 #include "../misc/scope_guard.h"
 #include "../misc/uncopyable.h"
 #include "./mem_arena.h"
