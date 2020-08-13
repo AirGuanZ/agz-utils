@@ -5,20 +5,20 @@
 namespace agz::texture
 {
 
-template<typename T, bool CONST>
+template<typename T, bool IS_CONST>
 class texture2d_view_t
 {
 public:
 
-    using data_t  = math::tensor_view_t<T, 2, CONST>;
+    using data_t  = math::tensor_view_t<T, 2, IS_CONST>;
     using texel_t = typename data_t::elem_t;
-    using self_t  = texture2d_view_t<T, CONST>;
+    using self_t  = texture2d_view_t<T, IS_CONST>;
 
     texture2d_view_t() = default;
 
     template<typename U, bool CONST2,
              typename = std::enable_if_t<
-                std::is_same_v<T, U> && CONST && !CONST2>>
+                std::is_same_v<T, U> &&IS_CONST && !CONST2>>
     texture2d_view_t(const texture2d_view_t<U, CONST2> &rhs) noexcept;
 
     explicit texture2d_view_t(data_t data);

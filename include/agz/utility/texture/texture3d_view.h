@@ -5,25 +5,25 @@
 namespace agz::texture
 {
 
-template<typename T, bool CONST>
+template<typename T, bool IS_CONST>
 class texture3d_view_t
 {
 public:
 
-    using data_t        = math::tensor_view_t<T, 3, CONST>;
+    using data_t        = math::tensor_view_t<T, 3, IS_CONST>;
     using texel_t       = typename data_t::elem_t;
     using const_texel_t = std::add_const_t<std::remove_const_t<texel_t>>;
-    using self_t        = texture3d_view_t<T, CONST>;
+    using self_t        = texture3d_view_t<T, IS_CONST>;
 
     texture3d_view_t() = default;
 
     texture3d_view_t(const self_t &rhs) = default;
     self_t &operator=(const self_t &rhs) = default;
 
-    template<typename U, bool CONST2,
+    template<typename U, bool IS_CONST2,
              typename = std::enable_if_t<
-                std::is_same_v<T, U> && CONST && !CONST2>>
-    texture3d_view_t(const texture3d_view_t<U, CONST2> &rhs) noexcept;
+                std::is_same_v<T, U> && IS_CONST && !IS_CONST2>>
+    texture3d_view_t(const texture3d_view_t<U, IS_CONST2> &rhs) noexcept;
 
     explicit texture3d_view_t(data_t data);
 
