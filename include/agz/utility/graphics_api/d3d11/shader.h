@@ -16,7 +16,8 @@ enum class ShaderStage
     HS = 1,
     DS = 2,
     GS = 3,
-    PS = 4
+    PS = 4,
+    CS = 5
 };
 
 constexpr ShaderStage VS = ShaderStage::VS;
@@ -24,6 +25,7 @@ constexpr ShaderStage HS = ShaderStage::HS;
 constexpr ShaderStage DS = ShaderStage::DS;
 constexpr ShaderStage GS = ShaderStage::GS;
 constexpr ShaderStage PS = ShaderStage::PS;
+constexpr ShaderStage CS = ShaderStage::CS;
 
 namespace shaderImpl
 {
@@ -43,6 +45,10 @@ namespace shaderImpl
     template<ShaderStage STAGE>
     void bindSampler(
         UINT slot, ID3D11SamplerState *sampler);
+
+    template<ShaderStage STAGE>
+    void bindUnorderedAccessView(
+        UINT slot, ID3D11UnorderedAccessView *uav, UINT initialCounter);
 
 #define AGZ_D3D11_BIND_CONSTANT_BUFFER(STAGE)                                   \
     template<>                                                                  \
@@ -81,24 +87,42 @@ namespace shaderImpl
     AGZ_D3D11_BIND_CONSTANT_BUFFER(DS)
     AGZ_D3D11_BIND_CONSTANT_BUFFER(GS)
     AGZ_D3D11_BIND_CONSTANT_BUFFER(PS)
+    AGZ_D3D11_BIND_CONSTANT_BUFFER(CS)
 
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW(VS)
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW(HS)
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW(DS)
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW(GS)
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW(PS)
+    AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW(CS)
 
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW_ARRAY(VS)
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW_ARRAY(HS)
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW_ARRAY(DS)
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW_ARRAY(GS)
     AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW_ARRAY(PS)
+    AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW_ARRAY(CS)
 
     AGZ_D3D11_BIND_SAMPLER(VS)
     AGZ_D3D11_BIND_SAMPLER(HS)
     AGZ_D3D11_BIND_SAMPLER(DS)
     AGZ_D3D11_BIND_SAMPLER(GS)
     AGZ_D3D11_BIND_SAMPLER(PS)
+    AGZ_D3D11_BIND_SAMPLER(CS)
+
+    template<ShaderStage STAGE>
+    void bindUnorderedAccessView(
+        UINT slot, ID3D11UnorderedAccessView *uav, UINT initialCounter)
+    {
+        // do nothing
+    }
+
+    template<>
+    inline void bindUnorderedAccessView<ShaderStage::CS>(
+        UINT slot, ID3D11UnorderedAccessView *uav, UINT initialCounter)
+    {
+        gDeviceContext->CSSetUnorderedAccessViews(slot, 1, &uav, &initialCounter);
+    }
 
 #undef AGZ_D3D11_BIND_CONSTANT_BUFFER
 #undef AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW
@@ -191,7 +215,7 @@ public:
 
     }
 
-    void setSampler(ComPtr<ID3D11ShaderResourceView> srv)
+    void setShaderResourceView(ComPtr<ID3D11ShaderResourceView> srv)
     {
         srv_.Swap(srv);
     }
@@ -325,10 +349,48 @@ public:
         }
         else
         {
-            std::vector<ID3D11ShaderResourceView> emptySRVs(srvs_.size());
+            std::vector<ID3D11ShaderResourceView*> Es(srvs_.size(), nullptr);
             shaderImpl::bindShaderResourceViewArray<STAGE>(
-                slot_, static_cast<UINT>(srvs_.size()), srvs_.data());
+                slot_, static_cast<UINT>(srvs_.size()), Es.data());
         }
+    }
+};
+
+template<ShaderStage STAGE>
+class UnorderedAccessViewSlot
+{
+    UINT slot_;
+    ComPtr<ID3D11UnorderedAccessView> uav_;
+    UINT initialCounter_;
+
+public:
+
+    explicit UnorderedAccessViewSlot(UINT slot = 0) noexcept
+        : slot_(slot), initialCounter_(-1)
+    {
+        
+    }
+
+    void setUnorderedAccessView(
+        ComPtr<ID3D11UnorderedAccessView> uav, UINT initialCounter = -1)
+    {
+        uav_.Swap(uav);
+        initialCounter_ = initialCounter;
+    }
+
+    UINT getSlot() const noexcept
+    {
+        return slot_;
+    }
+
+    void bind() const
+    {
+        shaderImpl::bindUnorderedAccessView<STAGE>(slot_, uav_.Get(), initialCounter_);
+    }
+
+    void unbind() const
+    {
+        shaderImpl::bindUnorderedAccessView<STAGE>(slot_, nullptr, -1);
     }
 };
 
@@ -342,6 +404,8 @@ namespace shaderImpl
 
         using Record = RESOURCE;
         using RecordTable = std::map<std::string, Record, std::less<>>;
+
+        ResourceManager() = default;
 
         explicit ResourceManager(RecordTable recordTable) noexcept
             : recordTable_(std::move(recordTable))
@@ -407,6 +471,10 @@ template<ShaderStage STAGE>
 using ShaderResourceViewArraySlotManager =
     shaderImpl::ResourceManager<ShaderResourceViewArraySlot<STAGE>>;
 
+template<ShaderStage STAGE>
+using UnorderedAccessViewSlotManager =
+    shaderImpl::ResourceManager<UnorderedAccessViewSlot<STAGE>>;
+
 namespace shaderImpl
 {
 
@@ -432,6 +500,11 @@ namespace shaderImpl
         UINT count;
     };
 
+    struct UnorderedAccessInfo
+    {
+        UINT slot;
+    };
+
     struct ShaderSamplerInfo
     {
         UINT slot;
@@ -439,9 +512,10 @@ namespace shaderImpl
 
     inline void getShaderReflectionInfo(
         ID3D11ShaderReflection *reflection,
-        std::map<std::string, ConstantBufferInfo> &constantBufferInfo,
-        std::map<std::string, ShaderResourceInfo> &shaderResourceInfo,
-        std::map<std::string, ShaderSamplerInfo>  &shaderSamplerInfo)
+        std::map<std::string, ConstantBufferInfo>  &constantBufferInfo,
+        std::map<std::string, ShaderResourceInfo>  &shaderResourceInfo,
+        std::map<std::string, UnorderedAccessInfo> &unorderedAccessInfo,
+        std::map<std::string, ShaderSamplerInfo>   &shaderSamplerInfo)
     {
         assert(reflection);
 
@@ -455,19 +529,37 @@ namespace shaderImpl
             if(bdDesc.Type == D3D_SIT_CBUFFER)
             {
                 constantBufferInfo.insert(std::make_pair(
-                    std::string(bdDesc.Name), ConstantBufferInfo{ bdDesc.BindPoint }));
+                    std::string(bdDesc.Name),
+                    ConstantBufferInfo{ bdDesc.BindPoint }));
             }
             else if(bdDesc.Type == D3D_SIT_TEXTURE ||
                 bdDesc.Type == D3D_SIT_STRUCTURED ||
                 bdDesc.Type == D3D_SIT_BYTEADDRESS)
             {
                 shaderResourceInfo.insert(std::make_pair(
-                    std::string(bdDesc.Name), ShaderResourceInfo{ bdDesc.BindPoint, bdDesc.BindCount }));
+                    std::string(bdDesc.Name),
+                    ShaderResourceInfo{ bdDesc.BindPoint, bdDesc.BindCount }));
             }
             else if(bdDesc.Type == D3D_SIT_SAMPLER)
             {
                 shaderSamplerInfo.insert(std::make_pair(
-                    std::string(bdDesc.Name), ShaderSamplerInfo{ bdDesc.BindPoint }));
+                    std::string(bdDesc.Name),
+                    ShaderSamplerInfo{ bdDesc.BindPoint }));
+            }
+            else if(bdDesc.Type == D3D_SIT_UAV_RWTYPED ||
+                    bdDesc.Type == D3D_SIT_UAV_RWSTRUCTURED ||
+                    bdDesc.Type == D3D_SIT_UAV_RWBYTEADDRESS ||
+                    bdDesc.Type == D3D_SIT_UAV_APPEND_STRUCTURED ||
+                    bdDesc.Type == D3D_SIT_UAV_CONSUME_STRUCTURED ||
+                    bdDesc.Type == D3D_SIT_UAV_RWSTRUCTURED_WITH_COUNTER)
+            {
+                // TODO: uav array
+                if(bdDesc.BindCount > 1)
+                    throw D3D11Exception("uav array is not implementated");
+
+                unorderedAccessInfo.insert(std::make_pair(
+                    std::string(bdDesc.Name),
+                    UnorderedAccessInfo{ bdDesc.BindPoint }));
             }
         }
     }
@@ -478,6 +570,7 @@ namespace shaderImpl
     template<> struct StageToShaderType<ShaderStage::DS> { using Type = ID3D11DomainShader;   };
     template<> struct StageToShaderType<ShaderStage::GS> { using Type = ID3D11GeometryShader; };
     template<> struct StageToShaderType<ShaderStage::PS> { using Type = ID3D11PixelShader;    };
+    template<> struct StageToShaderType<ShaderStage::CS> { using Type = ID3D11ComputeShader;  };
 
     template<ShaderStage STAGE>
     class StageTrait
@@ -492,7 +585,8 @@ namespace shaderImpl
             if constexpr(STAGE == ShaderStage::HS) return "hs_5_0";
             if constexpr(STAGE == ShaderStage::DS) return "ds_5_0";
             if constexpr(STAGE == ShaderStage::GS) return "gs_5_0";
-            return "ps_5_0";
+            if constexpr(STAGE == ShaderStage::PS) return "ps_5_0";
+            return "cs_5_0";
         }
 
 #ifdef AGZ_DEBUG
@@ -502,11 +596,11 @@ namespace shaderImpl
 #endif
 
         static ComPtr<ID3D10Blob> compile(
-            std::string_view  source,
-            const char       *sourceName,
-            const char       *target,
-            const char       *entry,
-            D3D_SHADER_MACRO *macros)
+            std::string_view        source,
+            const char             *sourceName,
+            const char             *target,
+            const char             *entry,
+            const D3D_SHADER_MACRO *macros)
         {
             ComPtr<ID3D10Blob> ret, err;
             const auto hr = D3DCompile(
@@ -523,10 +617,10 @@ namespace shaderImpl
         }
 
         static ComPtr<ID3D10Blob> compile(
-            std::string_view  source,
-            const char *target,
-            const char *entry,
-            D3D_SHADER_MACRO *macros)
+            std::string_view        source,
+            const char             *target,
+            const char             *entry,
+            const D3D_SHADER_MACRO *macros)
         {
             ComPtr<ID3D10Blob> ret, err;
             const auto hr = D3DCompile(
@@ -565,9 +659,14 @@ namespace shaderImpl
                 hr = gDevice->CreateGeometryShader(
                     compiled, len, nullptr, ret.GetAddressOf());
             }
-            else
+            else if constexpr(STAGE == ShaderStage::PS)
             {
                 hr = gDevice->CreatePixelShader(
+                    compiled, len, nullptr, ret.GetAddressOf());
+            }
+            else
+            {
+                hr = gDevice->CreateComputeShader(
                     compiled, len, nullptr, ret.GetAddressOf());
             }
 
@@ -590,8 +689,10 @@ namespace shaderImpl
                 gDeviceContext->DSSetShader(shader, nullptr, 0);
             else if constexpr(STAGE == ShaderStage::GS)
                 gDeviceContext->GSSetShader(shader, nullptr, 0);
-            else
+            else if constexpr(STAGE == ShaderStage::PS)
                 gDeviceContext->PSSetShader(shader, nullptr, 0);
+            else
+                gDeviceContext->CSSetShader(shader, nullptr, 0);
         }
     };
 
@@ -604,6 +705,7 @@ namespace shaderImpl
         typename ConstantBufferSlotManager         <STAGE>::RecordTable cbRcds_;
         typename ShaderResourceViewSlotManager     <STAGE>::RecordTable srvRcds_;
         typename ShaderResourceViewArraySlotManager<STAGE>::RecordTable srvsRcds_;
+        typename UnorderedAccessViewSlotManager    <STAGE>::RecordTable uavRcds_;
         typename SamplerSlotManager                <STAGE>::RecordTable samRcds_;
 
         void initRcds()
@@ -613,12 +715,14 @@ namespace shaderImpl
             if(!refl)
                 throw D3D11Exception("failed to get shader reflection");
 
-            std::map<std::string, ConstantBufferInfo> constantBuffers;
-            std::map<std::string, ShaderResourceInfo> shaderResources;
-            std::map<std::string, ShaderSamplerInfo>  samplers;
+            std::map<std::string, ConstantBufferInfo>  constantBuffers;
+            std::map<std::string, ShaderResourceInfo>  shaderResources;
+            std::map<std::string, UnorderedAccessInfo> unorderedAccesses;
+            std::map<std::string, ShaderSamplerInfo>   samplers;
 
             getShaderReflectionInfo(
-                refl.Get(), constantBuffers, shaderResources, samplers);
+                refl.Get(),
+                constantBuffers, shaderResources, unorderedAccesses, samplers);
 
             for(auto &p : constantBuffers)
                 cbRcds_[p.first] = ConstantBufferSlot<STAGE>(p.second.slot);
@@ -640,6 +744,12 @@ namespace shaderImpl
                 }
             }
 
+            for(auto &p : unorderedAccesses)
+            {
+                uavRcds_[p.first] = UnorderedAccessViewSlot<STAGE>(
+                    p.second.slot);
+            }
+
             for(auto &p : samplers)
                 samRcds_[p.first] = SamplerSlot<STAGE>(p.second.slot);
         }
@@ -651,11 +761,11 @@ namespace shaderImpl
         static constexpr ShaderStage ShaderStageValue = STAGE;
 
         void initialize(
-            std::string_view  source,
-            const char       *sourceName,
-            const char       *entry,
-            const char       *target,
-            D3D_SHADER_MACRO *macros)
+            std::string_view        source,
+            const char             *sourceName,
+            const char             *entry,
+            const char             *target,
+            const D3D_SHADER_MACRO *macros)
         {
             misc::scope_guard_t guard([&] { this->destroy(); });
 
@@ -671,10 +781,10 @@ namespace shaderImpl
         }
 
         void initialize(
-            std::string_view  source,
-            const char       *entry,
-            const char       *target,
-            D3D_SHADER_MACRO *macros)
+            std::string_view        source,
+            const char             *entry,
+            const char             *target,
+            const D3D_SHADER_MACRO *macros)
         {
             misc::scope_guard_t guard([&] { this->destroy(); });
 
@@ -716,6 +826,7 @@ namespace shaderImpl
             cbRcds_.clear();
             srvRcds_.clear();
             srvsRcds_.clear();
+            uavRcds_.clear();
             samRcds_.clear();
         }
 
@@ -744,6 +855,11 @@ namespace shaderImpl
             return srvsRcds_;
         }
 
+        const auto &getUnorderedAccessViewTable() const noexcept
+        {
+            return uavRcds_;
+        }
+
         const auto &getSamplerTable() const noexcept
         {
             return samRcds_;
@@ -761,6 +877,7 @@ namespace shaderImpl
         ConstantBufferSlotManager<STAGE>          cb_;
         ShaderResourceViewSlotManager<STAGE>      srv_;
         ShaderResourceViewArraySlotManager<STAGE> srvs_;
+        UnorderedAccessViewSlotManager<STAGE>     uav_;
         SamplerSlotManager<STAGE>                 sam_;
 
     public:
@@ -771,6 +888,7 @@ namespace shaderImpl
             : cb_(stage.getConstantBufferTable()),
               srv_(stage.getShaderResourceViewTable()),
               srvs_(stage.getShaderResourceViewArrayTable()),
+              uav_(stage.getUnorderedAccessViewTable()),
               sam_(stage.getSamplerTable())
         {
             
@@ -779,11 +897,13 @@ namespace shaderImpl
         auto getCBMgr()       noexcept { return &cb_; }
         auto getSRVMgr()      noexcept { return &srv_; }
         auto getSRVArrayMgr() noexcept { return &srvs_; }
+        auto getUAVMgr()      noexcept { return &uav_; }
         auto getSamplerMgr()  noexcept { return &sam_; }
 
         auto getCBMgr()       const noexcept { return &cb_; }
         auto getSRVMgr()      const noexcept { return &srv_; }
         auto getSRVArrayMgr() const noexcept { return &srvs_; }
+        auto getUAVMgr()      const noexcept { return &uav_; }
         auto getSamplerMgr()  const noexcept { return &sam_; }
 
         void bind() const
@@ -791,6 +911,7 @@ namespace shaderImpl
             cb_.bind();
             srv_.bind();
             srvs_.bind();
+            uav_.bind();
             sam_.bind();
         }
 
@@ -799,6 +920,7 @@ namespace shaderImpl
             cb_.unbind();
             srv_.unbind();
             srvs_.unbind();
+            uav_.unbind();
             sam_.unbind();
         }
     };
@@ -861,6 +983,20 @@ public:
     }
 
     template<ShaderStage STAGE>
+    UnorderedAccessViewSlotManager<STAGE> *
+        getUnorderedAccessViewSlotManager()
+    {
+        return getStageMgr<STAGE>()->getUAVMgr();
+    }
+
+    template<ShaderStage STAGE>
+    const UnorderedAccessViewSlotManager<STAGE> *
+        getUnorderedAccessViewSlotManager() const
+    {
+        return getStageMgr<STAGE>()->getUAVMgr();
+    }
+
+    template<ShaderStage STAGE>
     SamplerSlotManager<STAGE> *
         getSamplerSlotManager()
     {
@@ -914,6 +1050,21 @@ public:
         getShaderResourceViewArraySlot(std::string_view name) const
     {
         return getShaderResourceViewArraySlotManager<STAGE>()->get(name);
+    }
+
+    template<ShaderStage STAGE>
+    UnorderedAccessViewSlot<STAGE> *
+        getUnorderedAccessViewSlot(std::string_view name)
+    {
+        return getUnorderedAccessViewSlotManager<STAGE>()->get(name);
+    }
+
+
+    template<ShaderStage STAGE>
+    const UnorderedAccessViewSlot<STAGE> *
+        getUnorderedAccessViewSlot(std::string_view name) const
+    {
+        return getUnorderedAccessViewSlotManager<STAGE>()->get(name);
     }
 
     template<ShaderStage STAGE>
@@ -976,11 +1127,11 @@ public:
 
     template<ShaderStage STAGE>
     Self &initializeStage(
-        std::string_view source,
-        const char       *sourceName,
-        D3D_SHADER_MACRO *macros = nullptr,
-        const char       *entry  = "main",
-        const char       *target = defaultTarget<STAGE>())
+        std::string_view        source,
+        const char              *sourceName,
+        const  D3D_SHADER_MACRO *macros = nullptr,
+        const char              *entry  = "main",
+        const char              *target = defaultTarget<STAGE>())
     {
         auto &stage = std::get<shaderImpl::Stage<STAGE>>(stages_);
         stage.initialize(source, sourceName, entry, target, macros);
@@ -989,10 +1140,10 @@ public:
 
     template<ShaderStage STAGE>
     Self &initializeStage(
-        std::string_view source,
-        D3D_SHADER_MACRO *macros = nullptr,
-        const char       *entry  = "main",
-        const char       *target = defaultTarget<STAGE>())
+        std::string_view        source,
+        const D3D_SHADER_MACRO *macros = nullptr,
+        const char             *entry  = "main",
+        const char             *target = defaultTarget<STAGE>())
     {
         auto &stage = std::get<shaderImpl::Stage<STAGE>>(stages_);
         stage.initialize(source, entry, target, macros);
@@ -1001,10 +1152,10 @@ public:
     
     template<ShaderStage STAGE>
     Self &initializeStage(
-        const char       *source,
-        D3D_SHADER_MACRO *macros = nullptr,
-        const char       *entry  = "main",
-        const char       *target = defaultTarget<STAGE>())
+        const char             *source,
+        const D3D_SHADER_MACRO *macros = nullptr,
+        const char             *entry  = "main",
+        const char             *target = defaultTarget<STAGE>())
     {
         this->initializeStage<STAGE>(
             std::string_view(source), macros, entry, target);
@@ -1021,10 +1172,10 @@ public:
 
     template<ShaderStage STAGE>
     Self &initializeStageFromFile(
-        const std::string &filename,
-        D3D_SHADER_MACRO  *macros = nullptr,
-        const char        *entry = "main",
-        const char        *target = defaultTarget<STAGE>())
+        const std::string       &filename,
+        const D3D_SHADER_MACRO  *macros = nullptr,
+        const char              *entry  = "main",
+        const char              *target = defaultTarget<STAGE>())
     {
         const auto source = file::read_txt_file(filename);
         this->initializeStage<STAGE>(

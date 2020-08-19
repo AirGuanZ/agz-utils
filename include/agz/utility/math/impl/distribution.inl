@@ -14,7 +14,7 @@ T uniform_integer(T beg, T end, F u)
     assert(beg < end);
     assert(0 <= u && u <= 1);
     const T ret = beg + static_cast<T>((end - beg) * u);
-    return std::min(ret, end - 1);
+    return (std::min)(ret, end - 1);
 }
 
 template<typename F, typename T>
@@ -139,7 +139,7 @@ T alias_sampler_t<F, T>::sample(F u) const noexcept
     const T n = static_cast<T>(table_.size());
     const F nu = n * u;
 
-    const T i = std::min(static_cast<T>(nu), n - 1);
+    const T i = (std::min)(static_cast<T>(nu), n - 1);
     const F s = nu - i;
 
     if(s <= table_[i].accept_prob)
@@ -157,7 +157,7 @@ T alias_sampler_t<F, T>::sample(F u1, F u2) const noexcept
     const T n = static_cast<T>(table_.size());
     const F nu = n * u1;
 
-    const T i = std::min(static_cast<T>(nu), n - 1);
+    const T i = (std::min)(static_cast<T>(nu), n - 1);
 
     if(u2 <= table_[i].accept_prob)
         return i;
@@ -232,7 +232,7 @@ std::pair<tvec3<F>, F> zweighted_on_hemisphere(F u1, F u2) noexcept
         sam = r * tvec2<F>(std::cos(theta), std::sin(theta));
     }
 
-    const F z = std::sqrt(std::max(F(0), 1 - sam.length_square()));
+    const F z = std::sqrt((std::max)(F(0), 1 - sam.length_square()));
     return { { sam.x, sam.y, z }, z * invPI<F> };
 }
 

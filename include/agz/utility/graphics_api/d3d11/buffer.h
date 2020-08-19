@@ -77,6 +77,8 @@ public:
     ID3D11Buffer *const *getAddr() const noexcept;
 
     operator ID3D11Buffer *() const noexcept;
+
+    operator ComPtr<ID3D11Buffer>() const noexcept;
 };
 
 inline ComPtr<ID3D11Buffer> createBuffer(
@@ -281,6 +283,12 @@ template<typename Struct>
 ConstantBuffer<Struct>::operator ID3D11Buffer*() const noexcept
 {
     return buf_.Get();
+}
+
+template<typename Struct>
+ConstantBuffer<Struct>::operator ComPtr<struct ID3D11Buffer>() const noexcept
+{
+    return buf_;
 }
 
 AGZ_D3D11_END
