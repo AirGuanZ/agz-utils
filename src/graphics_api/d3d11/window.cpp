@@ -149,14 +149,14 @@ namespace impl
             [[fallthrough]];
         case WM_SYSKEYDOWN:
             gWindow->_rawKeyDown(static_cast<uint32_t>(wParam));
-            return 0;
+            break;
         case WM_KEYUP:
             gWindow->_keyUp(
                 event::keycode::win_vk_to_keycode(static_cast<int>(wParam)));
             [[fallthrough]];
         case WM_SYSKEYUP:
             gWindow->_rawKeyUp(static_cast<uint32_t>(wParam));
-            return 0;
+            break;
         case WM_CHAR:
             if(0 < wParam && wParam < 0x10000)
                 gWindow->_charInput(static_cast<uint32_t>(wParam));
