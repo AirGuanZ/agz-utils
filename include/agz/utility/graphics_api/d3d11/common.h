@@ -32,9 +32,6 @@ public:
     using runtime_error::runtime_error;
 };
 
-inline ID3D11Device        *gDevice        = nullptr;
-inline ID3D11DeviceContext *gDeviceContext = nullptr;
-
 #define AGZ_D3D11_DECL_EVENT_MGR_HANDLER(EventMgr, EventName)                  \
     void attach(event::receiver_t<EventName> *handler)                         \
         { EventMgr.attach(handler); }                                          \

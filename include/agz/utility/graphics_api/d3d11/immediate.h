@@ -155,12 +155,12 @@ inline void Immediate2D::drawLine(
     lineShader_.bind();
     lineState_.bind();
     vertexBuffer.bind(0);
-    gDeviceContext->IASetInputLayout(lineInputLayout_.Get());
-    gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    deviceContext.d3dDeviceContext->IASetInputLayout(lineInputLayout_.Get());
+    deviceContext.d3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
-    gDeviceContext->Draw(2, 0);
+    deviceContext.d3dDeviceContext->Draw(2, 0);
 
-    gDeviceContext->IASetInputLayout(nullptr);
+    deviceContext.d3dDeviceContext->IASetInputLayout(nullptr);
     vertexBuffer.unbind(0);
     lineState_.unbind();
     lineShader_.unbind();

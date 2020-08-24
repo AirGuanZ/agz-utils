@@ -1,5 +1,6 @@
 #pragma once
 
+#include "device.h"
 #include "shader.h"
 
 AGZ_D3D11_BEGIN
@@ -60,7 +61,7 @@ public:
         const void *vertexShaderByteCode, size_t len) const
     {
         ComPtr<ID3D11InputLayout> ret;
-        if(FAILED(gDevice->CreateInputLayout(
+        if(FAILED(device.d3dDevice->CreateInputLayout(
             elems_.data(), static_cast<UINT>(elems_.size()),
             vertexShaderByteCode, len, ret.GetAddressOf())))
             throw D3D11Exception("failed to create input layout");

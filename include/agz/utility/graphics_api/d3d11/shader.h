@@ -6,7 +6,8 @@
 
 #include "../../file.h"
 #include "../../misc.h"
-#include "common.h"
+#include "device.h"
+#include "deviceContext.h"
 
 AGZ_D3D11_BEGIN
 
@@ -55,7 +56,8 @@ namespace shaderImpl
     inline void bindConstantBuffer<ShaderStage::STAGE>(                         \
         UINT slot, ID3D11Buffer *buffer)                                        \
     {                                                                           \
-        gDeviceContext->STAGE##SetConstantBuffers(slot, 1, &buffer);            \
+        deviceContext.d3dDeviceContext->STAGE##SetConstantBuffers(              \
+            slot, 1, &buffer);                                                  \
     }
 
 #define AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW(STAGE)                              \
@@ -63,7 +65,8 @@ namespace shaderImpl
     inline void bindShaderResourceView<ShaderStage::STAGE>(                     \
         UINT slot, ID3D11ShaderResourceView *srv)                               \
     {                                                                           \
-        gDeviceContext->STAGE##SetShaderResources(slot, 1, &srv);               \
+        deviceContext.d3dDeviceContext->STAGE##SetShaderResources(              \
+            slot, 1, &srv);                                                     \
     }
 
 #define AGZ_D3D11_BIND_SHADER_RESOURCE_VIEW_ARRAY(STAGE)                        \
@@ -71,7 +74,8 @@ namespace shaderImpl
     inline void bindShaderResourceViewArray<ShaderStage::STAGE>(                \
         UINT slot, UINT count, ID3D11ShaderResourceView **srv)                  \
     {                                                                           \
-        gDeviceContext->STAGE##SetShaderResources(slot, count, srv);            \
+        deviceContext.d3dDeviceContext->STAGE##SetShaderResources(              \
+            slot, count, srv);                                                  \
     }
 
 #define AGZ_D3D11_BIND_SAMPLER(STAGE)                                           \
@@ -79,7 +83,8 @@ namespace shaderImpl
     inline void bindSampler<ShaderStage::STAGE>(                                \
         UINT slot, ID3D11SamplerState *sampler)                                 \
     {                                                                           \
-        gDeviceContext->STAGE##SetSamplers(slot, 1, &sampler);                  \
+        deviceContext.d3dDeviceContext->STAGE##SetSamplers(                     \
+            slot, 1, &sampler);                                                 \
     }
 
     AGZ_D3D11_BIND_CONSTANT_BUFFER(VS)
@@ -121,7 +126,8 @@ namespace shaderImpl
     inline void bindUnorderedAccessView<ShaderStage::CS>(
         UINT slot, ID3D11UnorderedAccessView *uav, UINT initialCounter)
     {
-        gDeviceContext->CSSetUnorderedAccessViews(slot, 1, &uav, &initialCounter);
+        deviceContext.d3dDeviceContext->CSSetUnorderedAccessViews(
+            slot, 1, &uav, &initialCounter);
     }
 
 #undef AGZ_D3D11_BIND_CONSTANT_BUFFER
@@ -641,32 +647,32 @@ namespace shaderImpl
             HRESULT hr;
             if constexpr(STAGE == ShaderStage::VS)
             {
-                hr = gDevice->CreateVertexShader(
+                hr = device.d3dDevice->CreateVertexShader(
                     compiled, len, nullptr, ret.GetAddressOf());
             }
             else if constexpr(STAGE == ShaderStage::HS)
             {
-                hr = gDevice->CreateHullShader(
+                hr = device.d3dDevice->CreateHullShader(
                     compiled, len, nullptr, ret.GetAddressOf());
             }
             else if constexpr(STAGE == ShaderStage::DS)
             {
-                hr = gDevice->CreateDomainShader(
+                hr = device.d3dDevice->CreateDomainShader(
                     compiled, len, nullptr, ret.GetAddressOf());
             }
             else if constexpr(STAGE == ShaderStage::GS)
             {
-                hr = gDevice->CreateGeometryShader(
+                hr = device.d3dDevice->CreateGeometryShader(
                     compiled, len, nullptr, ret.GetAddressOf());
             }
             else if constexpr(STAGE == ShaderStage::PS)
             {
-                hr = gDevice->CreatePixelShader(
+                hr = device.d3dDevice->CreatePixelShader(
                     compiled, len, nullptr, ret.GetAddressOf());
             }
             else
             {
-                hr = gDevice->CreateComputeShader(
+                hr = device.d3dDevice->CreateComputeShader(
                     compiled, len, nullptr, ret.GetAddressOf());
             }
 
@@ -682,17 +688,17 @@ namespace shaderImpl
         static void bind(D3DShaderType *shader)
         {
             if constexpr(STAGE == ShaderStage::VS)
-                gDeviceContext->VSSetShader(shader, nullptr, 0);
+                deviceContext.d3dDeviceContext->VSSetShader(shader, nullptr, 0);
             else if constexpr(STAGE == ShaderStage::HS)
-                gDeviceContext->HSSetShader(shader, nullptr, 0);
+                deviceContext.d3dDeviceContext->HSSetShader(shader, nullptr, 0);
             else if constexpr(STAGE == ShaderStage::DS)
-                gDeviceContext->DSSetShader(shader, nullptr, 0);
+                deviceContext.d3dDeviceContext->DSSetShader(shader, nullptr, 0);
             else if constexpr(STAGE == ShaderStage::GS)
-                gDeviceContext->GSSetShader(shader, nullptr, 0);
+                deviceContext.d3dDeviceContext->GSSetShader(shader, nullptr, 0);
             else if constexpr(STAGE == ShaderStage::PS)
-                gDeviceContext->PSSetShader(shader, nullptr, 0);
+                deviceContext.d3dDeviceContext->PSSetShader(shader, nullptr, 0);
             else
-                gDeviceContext->CSSetShader(shader, nullptr, 0);
+                deviceContext.d3dDeviceContext->CSSetShader(shader, nullptr, 0);
         }
     };
 

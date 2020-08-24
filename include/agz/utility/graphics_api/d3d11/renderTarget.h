@@ -117,24 +117,25 @@ inline void RenderTarget::addDepthStencil(
 
 inline void RenderTarget::clearColorBuffer(int index, const Color4 &color)
 {
-    gDeviceContext->ClearRenderTargetView(rawRTVs_[index], &color.r);
+    deviceContext.d3dDeviceContext->ClearRenderTargetView(
+        rawRTVs_[index], &color.r);
 }
 
 inline void RenderTarget::clearDepth(float depth)
 {
-    gDeviceContext->ClearDepthStencilView(
+    deviceContext.d3dDeviceContext->ClearDepthStencilView(
         DSV_.Get(), D3D11_CLEAR_DEPTH, depth, 0);
 }
 
 inline void RenderTarget::clearStencil(uint8_t stencil)
 {
-    gDeviceContext->ClearDepthStencilView(
+    deviceContext.d3dDeviceContext->ClearDepthStencilView(
         DSV_.Get(), D3D11_CLEAR_STENCIL, 1, stencil);
 }
 
 inline void RenderTarget::clearDepthStencil(float depth, uint8_t stencil)
 {
-    gDeviceContext->ClearDepthStencilView(
+    deviceContext.d3dDeviceContext->ClearDepthStencilView(
         DSV_.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil);
 }
 
@@ -159,12 +160,12 @@ inline void RenderTarget::useDefaultViewport() const
     vp.Height   = static_cast<float>(height_);
     vp.MinDepth = 0;
     vp.MaxDepth = 1;
-    gDeviceContext->RSSetViewports(1, &vp);
+    deviceContext.d3dDeviceContext->RSSetViewports(1, &vp);
 }
 
 inline void RenderTarget::bind() const
 {
-    gDeviceContext->OMSetRenderTargets(
+    deviceContext.d3dDeviceContext->OMSetRenderTargets(
         static_cast<UINT>(colors_.size()), rawRTVs_.data(), DSV_.Get());
 }
 
@@ -172,7 +173,7 @@ inline void RenderTarget::unbind() const
 {
     static ID3D11RenderTargetView *
         EMPTY_RTV[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
-    gDeviceContext->OMSetRenderTargets(
+    deviceContext.d3dDeviceContext->OMSetRenderTargets(
         D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, EMPTY_RTV, nullptr);
 }
 
@@ -195,11 +196,8 @@ inline void RenderTarget::addColorBuffer(
     if(enableSRV)
         texDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
-    ComPtr<ID3D11Texture2D> tex;
-    if(FAILED(gDevice->CreateTexture2D(
-        &texDesc, nullptr, tex.GetAddressOf())))
-        throw D3D11Exception("failed to create texture2d");
-
+    ComPtr<ID3D11Texture2D> tex = device.createTex2D(texDesc, nullptr);
+    
     D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
     rtvDesc.Format = rtvFormat;
     if(sampleDesc_.Count == 1)
@@ -210,11 +208,8 @@ inline void RenderTarget::addColorBuffer(
     else
         rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
 
-    ComPtr<ID3D11RenderTargetView> rtv;
-    if(FAILED(gDevice->CreateRenderTargetView(
-        tex.Get(), &rtvDesc, rtv.GetAddressOf())))
-        throw D3D11Exception("failed to create render target view");
-
+    ComPtr<ID3D11RenderTargetView> rtv = device.createRTV(tex, rtvDesc);
+    
     if(!enableSRV)
     {
         colors_.push_back({ std::move(tex), std::move(rtv), nullptr });
@@ -233,11 +228,8 @@ inline void RenderTarget::addColorBuffer(
     else
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
 
-    ComPtr<ID3D11ShaderResourceView> srv;
-    if(FAILED(gDevice->CreateShaderResourceView(
-        tex.Get(), &srvDesc, srv.GetAddressOf())))
-        throw D3D11Exception("failed to create shader resource view");
-
+    ComPtr<ID3D11ShaderResourceView> srv = device.createSRV(tex, srvDesc);
+    
     colors_.push_back({ std::move(tex), std::move(rtv), std::move(srv) });
     rawRTVs_.push_back(colors_.back().RTV.Get());
 }
@@ -261,11 +253,8 @@ inline void RenderTarget::addDepthStencil(
     if(enableSRV)
         texDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
-    ComPtr<ID3D11Texture2D> tex;
-    if(FAILED(gDevice->CreateTexture2D(
-        &texDesc, nullptr, tex.GetAddressOf())))
-        throw D3D11Exception("failed to create texture2d");
-
+    ComPtr<ID3D11Texture2D> tex = device.createTex2D(texDesc, nullptr);
+    
     D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
     dsvDesc.Format = dsvFormat;
     dsvDesc.Flags = 0;
@@ -278,11 +267,8 @@ inline void RenderTarget::addDepthStencil(
     else
         dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
 
-    ComPtr<ID3D11DepthStencilView> dsv;
-    if(FAILED(gDevice->CreateDepthStencilView(
-        tex.Get(), &dsvDesc, dsv.GetAddressOf())))
-        throw D3D11Exception("failed to create depth stencil view");
-
+    ComPtr<ID3D11DepthStencilView> dsv = device.createDSV(tex, dsvDesc);
+    
     if(!enableSRV)
     {
         dsTex_ = std::move(tex);
@@ -301,11 +287,8 @@ inline void RenderTarget::addDepthStencil(
     else
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
 
-    ComPtr<ID3D11ShaderResourceView> srv;
-    if(FAILED(gDevice->CreateShaderResourceView(
-        tex.Get(), &srvDesc, srv.GetAddressOf())))
-        throw D3D11Exception("failed to create shader resource view");
-
+    ComPtr<ID3D11ShaderResourceView> srv = device.createSRV(tex, srvDesc);
+    
     dsTex_    = std::move(tex);
     DSV_      = std::move(dsv);
     depthSRV_ = std::move(srv);

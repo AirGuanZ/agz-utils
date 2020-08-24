@@ -9,6 +9,8 @@
 #include <agz/utility/graphics_api/d3d11/imgui/imgui_impl_dx11.h>
 #include <agz/utility/graphics_api/d3d11/imgui/imgui_impl_win32.h>
 #include <agz/utility/graphics_api/d3d11/imgui/inputDispatcher.h>
+#include <agz/utility/graphics_api/d3d11/device.h>
+#include <agz/utility/graphics_api/d3d11/deviceContext.h>
 #include <agz/utility/graphics_api/d3d11/window.h>
 #include <agz/utility/system.h>
 
@@ -262,8 +264,8 @@ Window::~Window()
         ImGui::DestroyContext();
     }
 
-    gDevice        = nullptr;
-    gDeviceContext = nullptr;
+    device.d3dDevice = nullptr;;
+    deviceContext.d3dDeviceContext= nullptr;
 
     impl_->rtv.Reset();
     impl_->dsb.Reset();
@@ -308,12 +310,12 @@ HWND Window::getWindowHandle() const noexcept
 
 ID3D11Device *Window::getDevice() const noexcept
 {
-    return gDevice;
+    return device.d3dDevice;
 }
 
 ID3D11DeviceContext *Window::getDeviceContext() const noexcept
 {
-    return gDeviceContext;
+    return deviceContext.d3dDeviceContext;;
 }
 
 void Window::newImGuiFrame()
@@ -545,14 +547,20 @@ void Window::_resize()
     impl_->rtv = impl::CreateD3D11RenderTargetView(
         impl_->swapChain.Get(), impl_->device.Get());
 
-    auto [depthStencilBuffer, depthStencilView] = impl::CreateD3D11DepthStencilBuffer(
-        impl_->device.Get(), impl_->clientWidth, impl_->clientHeight,
-        impl_->depthStencilFormat,
-        impl_->sampleCount,
-        impl_->sampleQuality);
+    if(impl_->depthStencilFormat != DXGI_FORMAT_UNKNOWN)
+    {
+        auto [depthStencilBuffer, depthStencilView] =
+            impl::CreateD3D11DepthStencilBuffer(
+                impl_->device.Get(),
+                impl_->clientWidth,
+                impl_->clientHeight,
+                impl_->depthStencilFormat,
+                impl_->sampleCount,
+                impl_->sampleQuality);
 
-    impl_->dsb = depthStencilBuffer;
-    impl_->dsv = depthStencilView;
+        impl_->dsb = depthStencilBuffer;
+        impl_->dsv = depthStencilView;
+    }
     
     useDefaultRTVAndDSV();
     useDefaultViewport();
@@ -808,8 +816,8 @@ void Window::initD3D11(const WindowDesc &desc)
     impl_->backbufferFormat   = desc.backbufferFormat;
     impl_->depthStencilFormat = desc.depthStencilFormat;
 
-    gDevice        = impl_->device.Get();
-    gDeviceContext = impl_->deviceContext.Get();
+    device.d3dDevice = impl_->device.Get();
+    deviceContext.d3dDeviceContext = impl_->deviceContext.Get();
 
     impl::gWindow = this;
 }

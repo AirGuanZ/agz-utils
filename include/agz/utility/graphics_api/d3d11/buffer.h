@@ -1,6 +1,7 @@
 #pragma once
 
-#include "common.h"
+#include "device.h"
+#include "deviceContext.h"
 
 AGZ_D3D11_BEGIN
 
@@ -28,6 +29,8 @@ public:
     void bind(int inputSlot) const;
 
     void unbind(int inputSlot) const;
+
+    ComPtr<ID3D11Buffer> getBuffer() const;
 };
 
 template<typename Index>
@@ -51,6 +54,10 @@ public:
     void bind() const;
 
     void unbind() const;
+
+    static constexpr DXGI_FORMAT getFormat() noexcept;
+
+    ComPtr<ID3D11Buffer> getBuffer() const;
 };
 
 template<typename Struct>
@@ -89,12 +96,8 @@ inline ComPtr<ID3D11Buffer> createBuffer(
     subrsc.SysMemPitch      = 0;
     subrsc.SysMemSlicePitch = 0;
 
-    ComPtr<ID3D11Buffer> buf;
-    if(FAILED(gDevice->CreateBuffer(
-        &desc, initData ? &subrsc : nullptr, buf.GetAddressOf())))
-        throw D3D11Exception("failed to create d3d11 buffer");
-
-    return buf;
+    return device.createBuffer(
+        desc, initData ? &subrsc : nullptr);
 }
 
 template<typename Vertex>
@@ -141,7 +144,7 @@ template<typename Vertex>
 void VertexBuffer<Vertex>::bind(int inputSlot) const
 {
     const UINT stride = sizeof(Vertex), offset = 0;
-    gDeviceContext->IASetVertexBuffers(
+    deviceContext.d3dDeviceContext->IASetVertexBuffers(
         inputSlot, 1, buf_.GetAddressOf(), &stride, &offset);
 }
 
@@ -150,8 +153,14 @@ void VertexBuffer<Vertex>::unbind(int inputSlot) const
 {
     const UINT strideAndOffset = 0;
     ID3D11Buffer *EMPTY_BUFFER = nullptr;
-    gDeviceContext->IASetVertexBuffers(
+    deviceContext.d3dDeviceContext->IASetVertexBuffers(
         inputSlot, 1, &EMPTY_BUFFER, &strideAndOffset, &strideAndOffset);
+}
+
+template<typename Vertex>
+ComPtr<ID3D11Buffer> VertexBuffer<Vertex>::getBuffer() const
+{
+    return buf_;
 }
 
 template<typename Index>
@@ -197,6 +206,18 @@ UINT IndexBuffer<Index>::getIndexCount() const noexcept
 template<typename Index>
 void IndexBuffer<Index>::bind() const
 {
+    deviceContext.d3dDeviceContext->IASetIndexBuffer(buf_.Get(), getFormat(), 0);
+}
+
+template<typename Index>
+void IndexBuffer<Index>::unbind() const
+{
+    deviceContext.d3dDeviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+}
+
+template<typename Index>
+constexpr DXGI_FORMAT IndexBuffer<Index>::getFormat() noexcept
+{
     static_assert(
         std::is_same_v<Index, uint16_t> ||
         std::is_same_v<Index, uint32_t>);
@@ -206,13 +227,13 @@ void IndexBuffer<Index>::bind() const
         DXGI_FORMAT_R16_UINT :
         DXGI_FORMAT_R32_UINT;
 
-    gDeviceContext->IASetIndexBuffer(buf_.Get(), FMT, 0);
+    return FMT;
 }
 
 template<typename Index>
-void IndexBuffer<Index>::unbind() const
+ComPtr<ID3D11Buffer> IndexBuffer<Index>::getBuffer() const
 {
-    gDeviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+    return buf_;
 }
 
 template<typename Struct>
@@ -260,11 +281,11 @@ template<typename Struct>
 void ConstantBuffer<Struct>::update(const Struct &data)
 {
     D3D11_MAPPED_SUBRESOURCE mappedSubrsc;
-    if(FAILED(gDeviceContext->Map(
+    if(FAILED(deviceContext.d3dDeviceContext->Map(
         buf_.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubrsc)))
         throw D3D11Exception("failed to map constant buffer to memory");
     std::memcpy(mappedSubrsc.pData, &data, sizeof(Struct));
-    gDeviceContext->Unmap(buf_.Get(), 0);
+    deviceContext.d3dDeviceContext->Unmap(buf_.Get(), 0);
 }
 
 template<typename Struct>

@@ -1,5 +1,7 @@
 #ifdef AGZ_ENABLE_D3D11
 
+#include <agz/utility/graphics_api/d3d11/device.h>
+#include <agz/utility/graphics_api/d3d11/deviceContext.h>
 #include <agz/utility/graphics_api/d3d11/texture2d.h>
 #include <agz/utility/image.h>
 #include <agz/utility/misc.h>
@@ -73,24 +75,17 @@ namespace
         subrscData.SysMemPitch      = sizeof(T) * channels * width;
         subrscData.SysMemSlicePitch = 0;
 
-        ComPtr<ID3D11Texture2D> tex;
-        if(FAILED(gDevice->CreateTexture2D(
-            &desc, &subrscData, tex.GetAddressOf())))
-            throw D3D11Exception("failed to create texture2d");
-
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         srvDesc.Format                    = format;
         srvDesc.ViewDimension             = D3D11_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Texture2D.MipLevels       = mipLevels == 0 ? -1 : mipLevels;
         srvDesc.Texture2D.MostDetailedMip = 0;
 
-        ComPtr<ID3D11ShaderResourceView> srv;
-        if(FAILED(gDevice->CreateShaderResourceView(
-            tex.Get(), &srvDesc, srv.GetAddressOf())))
-            throw D3D11Exception("failed to create shader resource view");
-
+        auto tex = device.createTex2D(desc, &subrscData);
+        auto srv = device.createSRV(tex, srvDesc);
+        
         if(mipLevels == 0 || mipLevels > 1)
-            gDeviceContext->GenerateMips(srv.Get());
+            deviceContext.d3dDeviceContext->GenerateMips(srv.Get());
 
         return srv;
     }

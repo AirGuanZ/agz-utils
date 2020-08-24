@@ -1,5 +1,6 @@
 #pragma once
 
+#include "device.h"
 #include "shader.h"
 
 AGZ_D3D11_BEGIN
@@ -68,31 +69,31 @@ inline PipelineState PipelineState::getCurrent()
     PipelineState ret;
 
     UINT sampleMask;
-    gDeviceContext->OMGetBlendState(
+    deviceContext.d3dDeviceContext->OMGetBlendState(
         ret.blend_.GetAddressOf(), ret.blendFactors_, &sampleMask);
 
     UINT stencilRef;
-    gDeviceContext->OMGetDepthStencilState(
+    deviceContext.d3dDeviceContext->OMGetDepthStencilState(
         ret.depthStencil_.GetAddressOf(), &stencilRef);
 
-    gDeviceContext->RSGetState(ret.rasterizer_.GetAddressOf());
+    deviceContext.d3dDeviceContext->RSGetState(ret.rasterizer_.GetAddressOf());
 
     return ret;
 }
 
 inline void PipelineState::bind() const
 {
-    gDeviceContext->OMSetBlendState(
+    deviceContext.d3dDeviceContext->OMSetBlendState(
         blend_.Get(), blendFactors_, 0xffffffff);
-    gDeviceContext->OMSetDepthStencilState(depthStencil_.Get(), 0);
-    gDeviceContext->RSSetState(rasterizer_.Get());
+    deviceContext.d3dDeviceContext->OMSetDepthStencilState(depthStencil_.Get(), 0);
+    deviceContext.d3dDeviceContext->RSSetState(rasterizer_.Get());
 }
 
 inline void PipelineState::unbind() const
 {
-    gDeviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
-    gDeviceContext->OMSetDepthStencilState(nullptr, 0);
-    gDeviceContext->RSSetState(nullptr);
+    deviceContext.d3dDeviceContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
+    deviceContext.d3dDeviceContext->OMSetDepthStencilState(nullptr, 0);
+    deviceContext.d3dDeviceContext->RSSetState(nullptr);
 }
 
 inline PipelineState &PipelineState::setBlendState(
@@ -132,10 +133,8 @@ inline PipelineState &PipelineState::setBlendState(
     desc.RenderTarget[0].BlendOpAlpha          = opAlpha;
     desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-    ComPtr<ID3D11BlendState> newBlend;
-    if(FAILED(gDevice->CreateBlendState(&desc, newBlend.GetAddressOf())))
-        throw D3D11Exception("failed to create blend state object");
-
+    ComPtr<ID3D11BlendState> newBlend = device.createBlendState(desc);
+    
     if(blendFactors)
     {
         blendFactors_[0] = blendFactors[0];
@@ -194,11 +193,9 @@ inline PipelineState &PipelineState::setDepthStencilState(
     desc.BackFace.StencilPassOp       = backStencilPassOp;
     desc.BackFace.StencilFunc         = backStencilFunc;
 
-    ComPtr<ID3D11DepthStencilState> newState;
-    if(FAILED(gDevice->CreateDepthStencilState(
-        &desc, newState.GetAddressOf())))
-        throw D3D11Exception("failed to create depth stencil state object");
-
+    ComPtr<ID3D11DepthStencilState> newState =
+        device.createDepthStencilState(desc);
+    
     depthStencil_.Swap(newState);
     return *this;
 }
@@ -234,11 +231,8 @@ inline PipelineState &PipelineState::setRasterizerState(
     desc.MultisampleEnable     = enableMultisample;
     desc.AntialiasedLineEnable = enableAntialiasedLine;
 
-    ComPtr<ID3D11RasterizerState> newState;
-    if(FAILED(gDevice->CreateRasterizerState(
-        &desc, newState.GetAddressOf())))
-        throw D3D11Exception("failed to create rasterizer state object");
-
+    ComPtr<ID3D11RasterizerState> newState = device.createRasterizerState(desc);
+    
     rasterizer_.Swap(newState);
     return *this;
 }
