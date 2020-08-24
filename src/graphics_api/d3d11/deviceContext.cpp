@@ -27,4 +27,9 @@ void DeviceContext::drawIndexed(UINT idxCnt, UINT idxOffset, UINT vtxOffset)
     d3dDeviceContext->DrawIndexed(idxCnt, idxOffset, vtxOffset);
 }
 
+void DeviceContext::dispatch(UINT x, UINT y, UINT z)
+{
+    d3dDeviceContext->Dispatch(x, y, z);
+}
+
 AGZ_D3D11_END

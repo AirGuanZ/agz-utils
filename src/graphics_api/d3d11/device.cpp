@@ -13,6 +13,17 @@ ComPtr<ID3D11Texture2D> Device::createTex2D(
     return ret;
 }
 
+ComPtr<ID3D11Texture3D> Device::createTex3D(
+    const D3D11_TEXTURE3D_DESC   &desc,
+    const D3D11_SUBRESOURCE_DATA *subrscData)
+{
+    ComPtr<ID3D11Texture3D> ret;
+    if(FAILED(d3dDevice->CreateTexture3D(
+        &desc, subrscData, ret.GetAddressOf())))
+        throw D3D11Exception("failed to create texture3d");
+    return ret;
+}
+
 ComPtr<ID3D11Buffer> Device::createBuffer(
     const D3D11_BUFFER_DESC      &desc,
     const D3D11_SUBRESOURCE_DATA *subrscData)

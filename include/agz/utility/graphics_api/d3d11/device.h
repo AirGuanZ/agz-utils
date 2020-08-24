@@ -12,11 +12,15 @@ public:
 
     ComPtr<ID3D11Texture2D> createTex2D(
         const D3D11_TEXTURE2D_DESC   &desc,
-        const D3D11_SUBRESOURCE_DATA *subrscData);
+        const D3D11_SUBRESOURCE_DATA *subrscData = nullptr);
+
+    ComPtr<ID3D11Texture3D> createTex3D(
+        const D3D11_TEXTURE3D_DESC   &desc,
+        const D3D11_SUBRESOURCE_DATA *subrscData = nullptr);
 
     ComPtr<ID3D11Buffer> createBuffer(
         const D3D11_BUFFER_DESC      &desc,
-        const D3D11_SUBRESOURCE_DATA *subrscData);
+        const D3D11_SUBRESOURCE_DATA *subrscData = nullptr);
 
     ComPtr<ID3D11ShaderResourceView> createSRV(
         ID3D11Resource                        *rsc,

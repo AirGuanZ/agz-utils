@@ -19,6 +19,10 @@ public:
     void draw(UINT vtxCnt, UINT vtxOffset);
 
     void drawIndexed(UINT idxCnt, UINT idxOffset, UINT vtxOffset);
+
+    void dispatch(UINT x, UINT y = 1, UINT z = 1);
+
+    ID3D11DeviceContext *operator->() noexcept { return d3dDeviceContext; }
 };
 
 inline DeviceContext deviceContext = { nullptr };
