@@ -1,5 +1,7 @@
 #pragma once
 
+#include <agz/utility/texture.h>
+
 #include "common.h"
 
 AGZ_D3D11_BEGIN

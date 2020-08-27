@@ -36,6 +36,8 @@ struct WindowDesc
     bool fullscreen = false;
     bool vsync      = true;
 
+    bool disableTimeout = false;
+
     int sampleCount   = 1;
     int sampleQuality = 0;
 

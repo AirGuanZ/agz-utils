@@ -598,7 +598,7 @@ namespace shaderImpl
 #ifdef AGZ_DEBUG
         static constexpr UINT COMPILE_FLAG = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #else
-        static constexpr UINT COMPILE_FLAG = 0;
+        static constexpr UINT COMPILE_FLAG = D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #endif
 
         static ComPtr<ID3D10Blob> compile(

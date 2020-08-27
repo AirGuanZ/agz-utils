@@ -119,7 +119,7 @@ namespace
                 format, width, height, mipLevels, dataChannels, data);
         }
 
-        std::vector<Desired> desiredData(width * height * desireChannels, 0);
+        std::vector<Desired> desiredData(width * height * desireChannels, 1);
 
         const int texelCount = width * height;
         const int minChannels = (std::min)(dataChannels, desireChannels);
@@ -187,6 +187,9 @@ ComPtr<ID3D11ShaderResourceView> Texture2DLoader::loadFromFile(
     if(stdstr::ends_with(stdstr::to_lower(filename), ".hdr"))
     {
         const auto data = img::load_rgb_from_hdr_file(filename);
+        if(!data.is_available())
+            throw D3D11Exception("failed to load hdr from " + filename);
+
         return loadFromMemory(
             format, data.shape()[1], data.shape()[0], mipLevels,
             3, &data.raw_data()->r);
@@ -197,6 +200,9 @@ ComPtr<ID3D11ShaderResourceView> Texture2DLoader::loadFromFile(
     if(channels == 1)
     {
         const auto data = img::load_gray_from_file(filename);
+        if(!data.is_available())
+            throw D3D11Exception("failed to load texture from " + filename);
+
         return loadFromMemory(
             format, data.shape()[1], data.shape()[0], mipLevels,
             1, data.raw_data());
@@ -205,6 +211,9 @@ ComPtr<ID3D11ShaderResourceView> Texture2DLoader::loadFromFile(
     if(channels == 3)
     {
         const auto data = img::load_rgb_from_file(filename);
+        if(!data.is_available())
+            throw D3D11Exception("failed to load texture from " + filename);
+
         return loadFromMemory(
             format, data.shape()[1], data.shape()[0], mipLevels,
             3, &data.raw_data()->r);
@@ -213,6 +222,9 @@ ComPtr<ID3D11ShaderResourceView> Texture2DLoader::loadFromFile(
     if(channels == 4)
     {
         const auto data = img::load_rgba_from_file(filename);
+        if(!data.is_available())
+            throw D3D11Exception("failed to load texture from " + filename);
+
         return loadFromMemory(
             format, data.shape()[1], data.shape()[0], mipLevels,
             4, &data.raw_data()->r);

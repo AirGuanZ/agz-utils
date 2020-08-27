@@ -2,6 +2,8 @@
 
 #include <thread>
 
+#include <d3d11_1.h>
+
 #include <dxgi1_4.h>
 #include <dxgidebug.h>
 
@@ -708,9 +710,13 @@ void Window::initD3D11(const WindowDesc &desc)
 {
     // device & device context
 
-    D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+    const D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_1;
 
     UINT createDeviceFlag = 0;
+
+    if(desc.disableTimeout)
+        createDeviceFlag |= D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
+
 #ifdef AGZ_DEBUG
     createDeviceFlag |= D3D11_CREATE_DEVICE_DEBUG;
 #endif

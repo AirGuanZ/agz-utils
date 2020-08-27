@@ -24,7 +24,7 @@ void mouseWheel(int offset)
 {
     if(!GetCurrentContext())
         return;
-    GetIO().MouseWheel += offset;
+    GetIO().MouseWheel += offset / 120.0f;
 }
 
 void keyDown(int vk)
