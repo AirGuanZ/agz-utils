@@ -18,6 +18,8 @@ namespace
         {
         case DXGI_FORMAT_R8G8B8A8_UNORM:
             return 4;
+        case DXGI_FORMAT_R8_UNORM:
+            return 1;
         case DXGI_FORMAT_R32G32B32A32_FLOAT:
             return 4;
         case DXGI_FORMAT_R32G32B32_FLOAT:
@@ -34,6 +36,8 @@ namespace
         switch(format)
         {
         case DXGI_FORMAT_R8G8B8A8_UNORM:
+            return false;
+        case DXGI_FORMAT_R8_UNORM:
             return false;
         case DXGI_FORMAT_R32G32B32A32_FLOAT:
             return true;

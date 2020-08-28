@@ -8,6 +8,8 @@ class RenderTarget
 {
 public:
 
+    RenderTarget();
+
     explicit RenderTarget(
         const Int2 &size,
         int         sampleCount   = 1,
@@ -73,6 +75,12 @@ private:
     ComPtr<ID3D11DepthStencilView>   DSV_;
     ComPtr<ID3D11ShaderResourceView> depthSRV_;
 };
+
+inline RenderTarget::RenderTarget()
+    : RenderTarget({ 640, 480 }, 1, 0)
+{
+    
+}
 
 inline RenderTarget::RenderTarget(
     const Int2 &size, int sampleCount, int sampleQuality)
@@ -171,10 +179,8 @@ inline void RenderTarget::bind() const
 
 inline void RenderTarget::unbind() const
 {
-    static ID3D11RenderTargetView *
-        EMPTY_RTV[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
-    deviceContext.d3dDeviceContext->OMSetRenderTargets(
-        D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, EMPTY_RTV, nullptr);
+    ID3D11RenderTargetView *EMPTY_RTV[1] = { nullptr };
+    deviceContext.d3dDeviceContext->OMSetRenderTargets(0, EMPTY_RTV, nullptr);
 }
 
 inline void RenderTarget::addColorBuffer(

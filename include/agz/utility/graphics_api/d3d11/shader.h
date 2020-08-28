@@ -1123,7 +1123,8 @@ class Shader : public misc::uncopyable_t
 
 public:
 
-    using Self = Shader<STAGES...>;
+    using Self   = Shader<STAGES...>;
+    using RscMgr = ResourceManager<STAGES...>;
 
     template<ShaderStage STAGE>
     static const char *defaultTarget() noexcept
