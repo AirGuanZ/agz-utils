@@ -37,9 +37,9 @@ public:
 
     void clearDepthStencil(float depth, uint8_t stencil);
 
-    ComPtr<ID3D11ShaderResourceView> getColorShaderResourceView(int index);
+    ComPtr<ID3D11ShaderResourceView> getColorShaderResourceView(int index) const;
 
-    ComPtr<ID3D11ShaderResourceView> getDepthShaderResourceView();
+    ComPtr<ID3D11ShaderResourceView> getDepthShaderResourceView() const;
 
     void useDefaultViewport() const;
 
@@ -148,13 +148,13 @@ inline void RenderTarget::clearDepthStencil(float depth, uint8_t stencil)
 }
 
 inline ComPtr<ID3D11ShaderResourceView>
-    RenderTarget::getColorShaderResourceView(int index)
+    RenderTarget::getColorShaderResourceView(int index) const
 {
     return colors_[index].SRV;
 }
 
 inline ComPtr<ID3D11ShaderResourceView>
-    RenderTarget::getDepthShaderResourceView()
+    RenderTarget::getDepthShaderResourceView() const
 {
     return depthSRV_;
 }
