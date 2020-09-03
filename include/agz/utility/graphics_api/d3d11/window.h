@@ -41,7 +41,9 @@ struct WindowDesc
     int sampleCount   = 1;
     int sampleQuality = 0;
 
-    DXGI_FORMAT backbufferFormat   = DXGI_FORMAT_R8G8B8A8_UNORM;
+    DXGI_FORMAT backbufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+    // use DXGI_FORMAT_UNKNOWN to disable depth stencil buffer
     DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 };
 

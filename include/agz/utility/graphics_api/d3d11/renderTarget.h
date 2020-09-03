@@ -17,6 +17,10 @@ public:
 
     Int2 getSize() const noexcept;
 
+    int getWidth() const noexcept;
+
+    int getHeight() const noexcept;
+
     void addColorBuffer(
         DXGI_FORMAT format, DXGI_FORMAT rtvFormat);
 
@@ -96,7 +100,17 @@ inline RenderTarget::RenderTarget(
 
 inline Int2 RenderTarget::getSize() const noexcept
 {
-    return Int2(static_cast<int>(width_), static_cast<int>(height_));
+    return { getWidth(), getHeight() };
+}
+
+inline int RenderTarget::getWidth() const noexcept
+{
+    return static_cast<int>(width_);
+}
+
+inline int RenderTarget::getHeight() const noexcept
+{
+    return static_cast<int>(height_);
 }
 
 inline void RenderTarget::addColorBuffer(
