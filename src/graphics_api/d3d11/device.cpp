@@ -143,4 +143,34 @@ ComPtr<ID3D11SamplerState> Device::createSampler(
     return ret;
 }
 
+ComPtr<ID3D11SamplerState> Device::createSampler(
+    D3D11_FILTER               filter,
+    D3D11_TEXTURE_ADDRESS_MODE addressU,
+    D3D11_TEXTURE_ADDRESS_MODE addressV,
+    D3D11_TEXTURE_ADDRESS_MODE addressW,
+    float                      mipLODBias,
+    UINT                       maxAnisotropy,
+    D3D11_COMPARISON_FUNC      comparisonFunc,
+    const Color4              &borderColor,
+    float                      minLOD,
+    float                      maxLOD)
+{
+    D3D11_SAMPLER_DESC desc;
+    desc.Filter         = filter;
+    desc.AddressU       = addressU;
+    desc.AddressV       = addressV;
+    desc.AddressW       = addressW;
+    desc.MipLODBias     = mipLODBias;
+    desc.MaxAnisotropy  = maxAnisotropy;
+    desc.ComparisonFunc = comparisonFunc;
+    desc.BorderColor[0] = borderColor.r;
+    desc.BorderColor[1] = borderColor.g;
+    desc.BorderColor[2] = borderColor.b;
+    desc.BorderColor[3] = borderColor.a;
+    desc.MinLOD         = minLOD;
+    desc.MaxLOD         = maxLOD;
+
+    return createSampler(desc);
+}
+
 AGZ_D3D11_END

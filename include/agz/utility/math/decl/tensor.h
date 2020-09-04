@@ -5,7 +5,8 @@
 #include "vec.h"
 #include "tensor_view.h"
 
-namespace agz::math {
+namespace agz::math
+{
     
 template<typename P, int D>
 class tensor_t

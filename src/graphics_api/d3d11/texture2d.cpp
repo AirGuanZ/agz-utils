@@ -74,19 +74,17 @@ namespace
             desc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
         }
 
-        D3D11_SUBRESOURCE_DATA subrscData;
-        subrscData.pSysMem          = data;
-        subrscData.SysMemPitch      = sizeof(T) * channels * width;
-        subrscData.SysMemSlicePitch = 0;
-
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         srvDesc.Format                    = format;
         srvDesc.ViewDimension             = D3D11_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Texture2D.MipLevels       = mipLevels == 0 ? -1 : mipLevels;
         srvDesc.Texture2D.MostDetailedMip = 0;
 
-        auto tex = device.createTex2D(desc, &subrscData);
+        auto tex = device.createTex2D(desc);
         auto srv = device.createSRV(tex, srvDesc);
+
+        deviceContext->UpdateSubresource(
+            tex.Get(), 0, nullptr, data, sizeof(T) * channels * width, 0);
         
         if(mipLevels == 0 || mipLevels > 1)
             deviceContext.d3dDeviceContext->GenerateMips(srv.Get());

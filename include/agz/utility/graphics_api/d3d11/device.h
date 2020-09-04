@@ -65,6 +65,18 @@ public:
 
     ComPtr<ID3D11SamplerState> createSampler(
         const D3D11_SAMPLER_DESC &desc);
+
+    ComPtr<ID3D11SamplerState> createSampler(
+        D3D11_FILTER               filter,
+        D3D11_TEXTURE_ADDRESS_MODE addressU,
+        D3D11_TEXTURE_ADDRESS_MODE addressV,
+        D3D11_TEXTURE_ADDRESS_MODE addressW,
+        float                      mipLODBias     = 0,
+        UINT                       maxAnisotropy  = 1,
+        D3D11_COMPARISON_FUNC      comparisonFunc = D3D11_COMPARISON_NEVER,
+        const Color4              &borderColor    = { 0, 0, 0, 0 },
+        float                      minLOD         = -FLT_MAX,
+        float                      maxLOD         = +FLT_MAX);
 };
 
 inline Device device = { nullptr };

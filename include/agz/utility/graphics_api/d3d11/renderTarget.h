@@ -4,7 +4,7 @@
 
 AGZ_D3D11_BEGIN
 
-class RenderTarget
+class RenderTarget : public misc::uncopyable_t
 {
 public:
 
@@ -14,6 +14,12 @@ public:
         const Int2 &size,
         int         sampleCount   = 1,
         int         sampleQuality = 0);
+
+    RenderTarget(RenderTarget &&moveFrom) noexcept;
+
+    RenderTarget &operator=(RenderTarget &&moveFrom) noexcept;
+
+    void swap(RenderTarget &swapWith) noexcept;
 
     Int2 getSize() const noexcept;
 
@@ -96,6 +102,30 @@ inline RenderTarget::RenderTarget(
       }
 {
     
+}
+
+inline RenderTarget::RenderTarget(RenderTarget &&moveFrom) noexcept
+    : RenderTarget()
+{
+    swap(moveFrom);
+}
+
+inline RenderTarget &RenderTarget::operator=(RenderTarget &&moveFrom) noexcept
+{
+    swap(moveFrom);
+    return *this;
+}
+
+inline void RenderTarget::swap(RenderTarget &swapWith) noexcept
+{
+    std::swap(width_,      swapWith.width_);
+    std::swap(height_,     swapWith.height_);
+    std::swap(sampleDesc_, swapWith.sampleDesc_);
+    std::swap(colors_,     swapWith.colors_);
+    std::swap(rawRTVs_,    swapWith.rawRTVs_);
+    std::swap(dsTex_,      swapWith.dsTex_);
+    std::swap(DSV_,        swapWith.DSV_);
+    std::swap(depthSRV_,   swapWith.depthSRV_);
 }
 
 inline Int2 RenderTarget::getSize() const noexcept
