@@ -65,6 +65,8 @@ class ConstantBuffer
 {
     ComPtr<ID3D11Buffer> buf_;
 
+    static_assert(sizeof(Struct) % 16 == 0);
+
 public:
 
     void initialize();
