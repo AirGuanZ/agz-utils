@@ -5,7 +5,8 @@
 #include "common.h"
 #include "vec.h"
 
-namespace agz::math {
+namespace agz::math
+{
 
 namespace spherical_harmonics
 {

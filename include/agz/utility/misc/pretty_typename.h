@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <typeinfo>
 
@@ -45,7 +46,7 @@ inline std::string typeid_to_name(const std::type_info &info)
     std::unique_ptr<char, void(*)(void *)> own
     (
 #ifndef _MSC_VER
-        abi::__cxa_demangle(typeid(TR).name(), nullptr,
+        abi::__cxa_demangle(info.name(), nullptr,
             nullptr, nullptr),
 #else
         nullptr,

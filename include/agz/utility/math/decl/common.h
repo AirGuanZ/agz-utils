@@ -80,13 +80,13 @@ constexpr double PI_d = PI<double>;
  * @brief 弧度转角度
  */
 template<typename T>
-T rad2deg(T rad) noexcept;
+constexpr T rad2deg(T rad) noexcept;
 
 /**
  * @brief 角度转弧度
  */
 template<typename T>
-T deg2rad(T deg) noexcept;
+constexpr T deg2rad(T deg) noexcept;
 
 template<typename T, typename>
 T clamp(T val, T min_v, T max_v) noexcept
@@ -141,13 +141,13 @@ T determinant(T m00, T m01, T m02, T m03,
 }
 
 template<typename T>
-T rad2deg(T rad) noexcept
+constexpr T rad2deg(T rad) noexcept
 {
     static_assert(std::is_floating_point_v<T>); return rad / PI<T> * 180;
 }
 
 template<typename T>
-T deg2rad(T deg) noexcept
+constexpr T deg2rad(T deg) noexcept
 {
     static_assert(std::is_floating_point_v<T>); return deg / 180 * PI<T>;
 }

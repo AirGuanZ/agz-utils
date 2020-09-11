@@ -3,7 +3,8 @@
 #include "common.h"
 #include "vec3.h"
 
-namespace agz::math {
+namespace agz::math
+{
 
 /**
  * @brief column-major 3x3 matrix

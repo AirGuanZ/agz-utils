@@ -92,6 +92,7 @@ float distance2(const _simd_float3_t &lhs, const _simd_float3_t &rhs) noexcept;
 
 _simd_float3_t exp(const _simd_float3_t &v) noexcept;
 _simd_float3_t sqrt(const _simd_float3_t &v) noexcept;
+_simd_float3_t abs(const _simd_float3_t &v) noexcept;
 
 _simd_float3_t pow(const _simd_float3_t &v, float e) noexcept;
 

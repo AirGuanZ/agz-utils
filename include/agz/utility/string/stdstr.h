@@ -149,13 +149,13 @@ template<typename...Args>
 std::string cat(Args&&...args);
 
 /**
- * @brief 用给定字符填充str的左侧，使其长度不小于width，返回填充得到的新串
+ * @brief 用给定字符填充str的右侧，使其长度不小于width，返回填充得到的新串
  */
 inline std::string align_left(
     std::string_view str, size_t width, char padder = ' ');
 
 /**
- * @brief 用给定字符填充str的右侧，使其长度不小于width，返回填充得到的新串
+ * @brief 用给定字符填充str的左侧，使其长度不小于width，返回填充得到的新串
  */
 inline std::string align_right(
     std::string_view str, size_t width, char padder = ' ');

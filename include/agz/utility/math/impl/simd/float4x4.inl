@@ -506,6 +506,22 @@ inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::perspectiv
 		0, 0, 1, 0);
 }
 
+inline _simd_float4x4_c_t _simd_float4x4_c_t::left_transform::orthographics(
+	float width, float height,
+	float near_plane, float far_plane) noexcept
+{
+	const float r = 0.5f * width;
+	const float t = 0.5f * height;
+	const float f = far_plane;
+	const float n = near_plane;
+
+	return self_t(
+	    1 / r, 0,	  0,	       0,
+		0,     1 / t, 0,	       0,
+		0,	   0,    2 / (f - n), (f + n) / (n - f),
+		0,	   0,	  0,		   1);
+}
+
 inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::look_at(
 	const float3 &eye, const float3 &dst, const float3 &up) noexcept
 {

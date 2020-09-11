@@ -108,6 +108,10 @@ public:
             float fov_y_rad, float w_over_h,
             float near_plane, float far_plane) noexcept;
 
+        static self_t orthographics(
+            float width, float height,
+            float near_plane, float far_plane) noexcept;
+
         static self_t look_at(
             const float3 &eye, const float3 &dst,
             const float3 &up) noexcept;

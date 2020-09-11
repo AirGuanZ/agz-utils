@@ -59,6 +59,8 @@ public:
     self_t &operator-=(T rhs) noexcept;
     self_t &operator*=(T rhs) noexcept;
     self_t &operator/=(T rhs) noexcept;
+
+    bool elem_less(const self_t &rhs) const noexcept;
 };
 
 template<typename T, int D> tvec<T, D> operator-(
