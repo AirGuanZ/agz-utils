@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../decl/vec2.h"
+
 namespace agz::math::lowd
 {
 

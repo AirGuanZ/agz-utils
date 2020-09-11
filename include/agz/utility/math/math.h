@@ -39,7 +39,6 @@
 #include "impl/color4.inl"
 #include "impl/coord.inl"
 #include "impl/distribution.inl"
-#include "impl/low_discrepancy.inl"
 #include "impl/mat3_c.inl"
 #include "impl/mat4_c.inl"
 #include "impl/quaternion.inl"
@@ -52,6 +51,7 @@
 #include "impl/vec2.inl"
 #include "impl/vec3.inl"
 #include "impl/vec4.inl"
+#include "impl/low_discrepancy.inl"
 
 #include "impl/simd/float3.inl"
 #include "impl/simd/float4.inl"
