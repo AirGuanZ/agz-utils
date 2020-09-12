@@ -1,6 +1,4 @@
 ﻿#include <cassert>
-#include <climits>
-#include <cstring>
 
 #include <agz/utility/file/file_raw.h>
 #include <agz/utility/image/load_image.h>
@@ -112,6 +110,26 @@ namespace agz::img
 template<typename P>
 using image_buffer = math::tensor_t<P, 2>;
 
+std::vector<math::byte> load_bytes_from_memory(
+    const void *data, size_t byte_length,
+    int *width, int *height, int *channels)
+{
+    int w, h, c;
+    unsigned char *bytes = stbi_load_from_memory(
+        static_cast<const stbi_uc *>(data),
+        static_cast<int>(byte_length),
+        &w, &h, &c, 0);
+    if(!bytes)
+        return {};
+
+    AGZ_SCOPE_GUARD({ stbi_image_free(bytes); });
+
+    *width    = w;
+    *height   = h;
+    *channels = c;
+    return std::vector<math::byte>(bytes, bytes + w * h * c);
+}
+
 image_buffer<math::byte> load_gray_from_memory(const void *data, size_t byte_length)
 {
     int w, h, channels;
@@ -210,6 +228,15 @@ math::tensor_t<math::color3f, 2> load_rgb_from_hdr_memory(
         idx += 3;
         return ret;
     });
+}
+
+std::vector<math::byte> load_bytes_from_file(
+    const std::string &filename,
+    int *width, int *height, int *channels)
+{
+    const auto content = file::read_raw_file(filename);
+    return load_bytes_from_memory(
+        content.data(), content.size(), width, height, channels);
 }
 
 image_buffer<math::byte> load_gray_from_file(const std::string &filename)

@@ -84,6 +84,9 @@ public:
     self_t adj()     const noexcept;
     self_t adjoint() const noexcept;
 
+    bool operator==(const self_t &rhs) const noexcept;
+    bool operator!=(const self_t &rhs) const noexcept;
+
     self_t &operator+=(const self_t &rhs) noexcept;
     self_t &operator-=(const self_t &rhs) noexcept;
     self_t &operator*=(const self_t &rhs) noexcept;

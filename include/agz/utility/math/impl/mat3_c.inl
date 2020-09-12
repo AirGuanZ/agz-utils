@@ -277,6 +277,20 @@ typename tmat3_c<T>::self_t tmat3_c<T>::adjoint() const noexcept
 }
 
 template<typename T>
+bool tmat3_c<T>::operator==(const self_t &rhs) const noexcept
+{
+    return data[0] == rhs.data[0] &&
+           data[1] == rhs.data[1] &&
+           data[2] == rhs.data[2];
+}
+
+template<typename T>
+bool tmat3_c<T>::operator!=(const self_t &rhs) const noexcept
+{
+    return !(*this == rhs);
+}
+
+template<typename T>
 typename tmat3_c<T>::self_t &tmat3_c<T>::operator+=(const self_t &rhs) noexcept
 {
     return *this = *this + rhs;

@@ -61,9 +61,9 @@ typename ttransform2<T, COLUMN_MAJOR>::self_t
 
 template<typename T, bool COLUMN_MAJOR>
 typename ttransform2<T, COLUMN_MAJOR>::self_t
-    ttransform2<T, COLUMN_MAJOR>::scale(const tvec3<T> &ratio) noexcept
+    ttransform2<T, COLUMN_MAJOR>::scale(const tvec2<T> &ratio) noexcept
 {
-    return scale(ratio.x, ratio.y, ratio.z);
+    return scale(ratio.x, ratio.y);
 }
 
 template<typename T, bool COLUMN_MAJOR>
@@ -148,6 +148,18 @@ const typename ttransform2<T, COLUMN_MAJOR>::mat_t&
 ttransform2<T, COLUMN_MAJOR>::get_inv_mat() const noexcept
 {
     return inv_;
+}
+
+template<typename T, bool COLUMN_MAJOR>
+bool ttransform2<T, COLUMN_MAJOR>::operator==(const self_t &rhs) const noexcept
+{
+    return mat_ == rhs.mat_;
+}
+
+template<typename T, bool COLUMN_MAJOR>
+bool ttransform2<T, COLUMN_MAJOR>::operator!=(const self_t &rhs) const noexcept
+{
+    return mat_ != rhs.mat_;
 }
 
 template<typename T, bool C>

@@ -32,7 +32,7 @@ public:
 
     static self_t rotate(T rad)                     noexcept;
 
-    static self_t scale(const tvec3<T> &ratio) noexcept;
+    static self_t scale(const tvec2<T> &ratio) noexcept;
     static self_t scale(T x, T y)         noexcept;
 
     self_t operator*=(const self_t &rhs) noexcept;
@@ -50,6 +50,9 @@ public:
 
     const mat_t &get_mat()     const noexcept;
     const mat_t &get_inv_mat() const noexcept;
+
+    bool operator==(const self_t &rhs) const noexcept;
+    bool operator!=(const self_t &rhs) const noexcept;
 };
 
 template<typename T, bool C>
