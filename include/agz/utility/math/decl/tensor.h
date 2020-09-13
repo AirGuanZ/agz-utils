@@ -88,6 +88,9 @@ public:
     template<typename F>
     auto map(F &&func) const;
 
+    template<typename F>
+    void map_inplace(F &&func) const;
+
           P *raw_data() noexcept;
     const P *raw_data() const noexcept;
 

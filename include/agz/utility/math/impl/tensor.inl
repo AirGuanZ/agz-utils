@@ -341,6 +341,17 @@ auto tensor_t<P, D>::map(F &&func) const
 }
 
 template<typename P, int D>
+template<typename F>
+void tensor_t<P, D>::map_inplace(F &&func) const
+{
+    if(!is_available())
+        return;
+
+    for(int i = 0; i < elem_count_; ++i)
+        func(data_[i]);
+}
+
+template<typename P, int D>
 P *tensor_t<P, D>::raw_data() noexcept
 {
     return data_;

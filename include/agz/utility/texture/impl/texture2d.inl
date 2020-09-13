@@ -171,6 +171,13 @@ auto texture2d_t<T>::map(Func &&func) const
 }
 
 template<typename T>
+template<typename Func>
+void texture2d_t<T>::map_inplace(Func &&func) const
+{
+    data_.map_inplace(std::forward<Func>(func));
+}
+
+template<typename T>
 T *texture2d_t<T>::raw_data() noexcept
 {
     return is_available() ? data_.raw_data() : nullptr;

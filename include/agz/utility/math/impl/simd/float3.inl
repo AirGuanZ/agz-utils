@@ -121,7 +121,7 @@ inline float _simd_float3_t::lum() const noexcept
 
 inline bool _simd_float3_t::is_finite() const noexcept
 {
-    return math::is_finite(r) && math::is_finite(g) && math::is_finite(b);
+    return math::is_finite(r) & math::is_finite(g) & math::is_finite(b);
 }
 
 inline bool _simd_float3_t::operator!() const noexcept
