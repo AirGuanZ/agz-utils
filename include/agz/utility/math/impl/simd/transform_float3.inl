@@ -182,6 +182,16 @@ inline const float4x4 &_simd_transform_float3_t::get_inv_mat() const noexcept
     return inv_;
 }
 
+inline bool _simd_transform_float3_t::operator==(const self_t &rhs) const noexcept
+{
+    return mat_ == rhs.mat_;
+}
+
+inline bool _simd_transform_float3_t::operator!=(const self_t &rhs) const noexcept
+{
+    return !(*this == rhs);
+}
+
 inline _simd_transform_float3_t operator*(
     const _simd_transform_float3_t &lhs,
     const _simd_transform_float3_t &rhs) noexcept

@@ -535,6 +535,22 @@ inline _simd_float4x4_c_t::self_t _simd_float4x4_c_t::left_transform::look_at(
 		0, 0, 0, 1).inverse();
 }
 
+inline bool operator==(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept
+{
+	return lhs[0] == rhs[0] &&
+		   lhs[1] == rhs[1] &&
+		   lhs[2] == rhs[2] &&
+		   lhs[3] == rhs[3];
+}
+
+inline bool operator!=(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept
+{
+	return lhs[0] != rhs[0] ||
+		   lhs[1] != rhs[1] ||
+		   lhs[2] != rhs[2] ||
+		   lhs[3] != rhs[3];
+}
+
 inline _simd_float4x4_c_t operator+(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept
 {
 	_simd_float4x4_c_t ret(UNINIT);

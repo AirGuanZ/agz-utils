@@ -120,6 +120,9 @@ public:
 
 using float4x4 = _simd_float4x4_c_t;
 
+bool operator==(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
+bool operator!=(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
+
 _simd_float4x4_c_t operator+(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
 _simd_float4x4_c_t operator-(const _simd_float4x4_c_t &lhs, const _simd_float4x4_c_t &rhs) noexcept;
 

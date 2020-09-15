@@ -54,6 +54,9 @@ public:
     const float4x4 &get_mat()     const noexcept;
     const float4x4 &get_inv_mat() const noexcept;
 
+    bool operator==(const self_t &rhs) const noexcept;
+    bool operator!=(const self_t &rhs) const noexcept;
+
     // conv with ttransform3<float3>
 
     _simd_transform_float3_t(const ttransform3<float> &ori) noexcept

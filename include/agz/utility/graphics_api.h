@@ -15,6 +15,14 @@
 
 #endif // #ifdef AGZ_ENABLE_OPENGL
 
+#ifdef AGZ_ENABLE_GL
+
+#include "./graphics_api/gl/keyboard.h"
+#include "./graphics_api/gl/mouse.h"
+#include "./graphics_api/gl/window.h"
+
+#endif // #ifdef AGZ_ENABLE_GL
+
 #ifdef AGZ_ENABLE_D3D11
 
 #include "./graphics_api/d3d11/imgui/imgui.h"
@@ -35,3 +43,10 @@
 #include "./graphics_api/d3d11/window.h"
 
 #endif // #ifdef AGZ_ENABLE_D3D11
+
+#if defined(AGZ_ENABLE_GL) || defined(AGZ_ENABLE_D3D11)
+
+#include "./graphics_api/imgui/imgui.h"
+#include "./graphics_api/imgui/imfilebrowser.h"
+
+#endif // #if defined(AGZ_ENABLE_GL) || defined(AGZ_ENABLE_D3D11)
