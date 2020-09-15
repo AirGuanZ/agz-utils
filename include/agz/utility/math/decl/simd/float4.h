@@ -6,6 +6,7 @@
 
 #include "../vec2.h"
 #include "../vec3.h"
+#include "./float3.h"
 
 namespace agz::math
 {
@@ -26,6 +27,7 @@ public:
 
     _simd_float4_t()                                   noexcept;
     _simd_float4_t(float x, float y, float z, float w) noexcept;
+    _simd_float4_t(const _simd_float3_t &xyz, float w) noexcept;
 
     explicit _simd_float4_t(const __m128 &m128) noexcept;
     _simd_float4_t &operator=(const __m128 &m128) noexcept;
@@ -49,8 +51,8 @@ public:
 
     _simd_float4_t saturate() const noexcept;
 
-    auto sum()     const noexcept;
-    auto product() const noexcept;
+    float sum()     const noexcept;
+    float product() const noexcept;
 
     float max_elem() const noexcept;
     float min_elem() const noexcept;

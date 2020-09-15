@@ -20,6 +20,12 @@ inline _simd_float4_t::_simd_float4_t(float x, float y, float z, float w) noexce
     
 }
 
+inline _simd_float4_t::_simd_float4_t(const _simd_float3_t &xyz, float w) noexcept
+    : _simd_float4_t(xyz.x, xyz.y, xyz.z, w)
+{
+    
+}
+
 inline _simd_float4_t::_simd_float4_t(const __m128 &m128) noexcept
     : m128(m128)
 {
@@ -96,12 +102,12 @@ inline _simd_float4_t::self_t _simd_float4_t::saturate() const noexcept
     return clamp(0, 1);
 }
 
-inline auto _simd_float4_t::sum() const noexcept
+inline float _simd_float4_t::sum() const noexcept
 {
     return (x + y) + (z + w);
 }
 
-inline auto _simd_float4_t::product() const noexcept
+inline float _simd_float4_t::product() const noexcept
 {
     return (x * y) * (z * w);
 }

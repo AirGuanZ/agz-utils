@@ -1,5 +1,6 @@
 #ifdef AGZ_ENABLE_D3D11
 
+#include <agz/utility/graphics_api/imgui/imgui.h>
 #include <agz/utility/graphics_api/d3d11/imgui/inputDispatcher.h>
 
 namespace ImGui::Input

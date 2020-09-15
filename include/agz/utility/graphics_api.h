@@ -25,8 +25,8 @@
 
 #ifdef AGZ_ENABLE_D3D11
 
-#include "./graphics_api/d3d11/imgui/imgui.h"
-#include "./graphics_api/d3d11/imgui/imfilebrowser.h"
+#include "./graphics_api/imgui/imgui.h"
+#include "./graphics_api/imgui/imfilebrowser.h"
 
 #include "./graphics_api/d3d11/buffer.h"
 #include "./graphics_api/d3d11/device.h"
