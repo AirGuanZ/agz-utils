@@ -191,7 +191,8 @@ public:
     /**
      * @brief 设置uniform变量的值
      */
-    template<typename Var>
+    template<typena
+    me Var>
     void set(uniform_variable_t<Var> var, const Var &val)
     {
 

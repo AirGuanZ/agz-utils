@@ -22,10 +22,12 @@ struct window_t::impl_t
     bool close = false;
     bool focus = false;
 
-    int2 framebuffer_size;
+    vec2i framebuffer_size;
 
     keyboard_t keyboard;
     mouse_t    mouse;
+
+    bool imgui = false;
 };
 
 namespace
@@ -35,6 +37,7 @@ namespace
         keycode_t keys[GLFW_KEY_LAST + 1];
 
         glfw_keycode_table_t()
+            : keys{}
         {
             for(auto &k : keys)
                 k = KEY_UNKNOWN;
@@ -158,11 +161,12 @@ namespace
         int         action,
         int         mods)
     {
-        ImGui_ImplGlfw_KeyCallback(glfw_window, key, scancode, action, mods);
-
         window_t *window;
         if(!find_window(glfw_window, &window))
             return;
+
+        if(window->_imgui())
+            ImGui_ImplGlfw_KeyCallback(glfw_window, key, scancode, action, mods);
 
         static const glfw_keycode_table_t table;
         if(key < 0 || key >= static_cast<int>(array_size(table.keys)))
@@ -182,11 +186,12 @@ namespace
         GLFWwindow  *glfw_window,
         unsigned int c)
     {
-        ImGui_ImplGlfw_CharCallback(glfw_window, c);
-
         window_t *window;
         if(!find_window(glfw_window, &window))
             return;
+
+        if(window->_imgui())
+            ImGui_ImplGlfw_CharCallback(glfw_window, c);
 
         window->_char(c);
     }
@@ -197,11 +202,12 @@ namespace
         int         action,
         int         mods)
     {
-        ImGui_ImplGlfw_MouseButtonCallback(glfw_window, button, action, mods);
-
         window_t *window;
         if(!find_window(glfw_window, &window))
             return;
+
+        if(window->_imgui())
+            ImGui_ImplGlfw_MouseButtonCallback(glfw_window, button, action, mods);
 
         mouse_button_t btn;
         if(button == GLFW_MOUSE_BUTTON_LEFT)
@@ -224,11 +230,12 @@ namespace
         double      xoffset,
         double      yoffset)
     {
-        ImGui_ImplGlfw_ScrollCallback(glfw_window, xoffset, yoffset);
-
         window_t *window;
         if(!find_window(glfw_window, &window))
             return;
+
+        if(window->_imgui())
+            ImGui_ImplGlfw_ScrollCallback(glfw_window, xoffset, yoffset);
 
         if(yoffset != 0)
             window->_wheel_scroll(static_cast<int>(yoffset));
@@ -323,11 +330,16 @@ window_t::window_t(const window_desc_t &desc, bool maximized)
 
     // imgui
 
-    ImGui::CreateContext();
-    ImGui::StyleColorsLight();
+    impl_->imgui = desc.imgui;
 
-    ImGui_ImplGlfw_InitForOpenGL(impl_->window, false);
-    ImGui_ImplOpenGL3_Init("#version 330");
+    if(desc.imgui)
+    {
+        ImGui::CreateContext();
+        ImGui::StyleColorsLight();
+
+        ImGui_ImplGlfw_InitForOpenGL(impl_->window, false);
+        ImGui_ImplOpenGL3_Init("#version 330");
+    }
 
     // cancel guards
 
@@ -337,9 +349,12 @@ window_t::window_t(const window_desc_t &desc, bool maximized)
 
 window_t::~window_t()
 {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext(ImGui::GetCurrentContext());
+    if(impl_->imgui)
+    {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext(ImGui::GetCurrentContext());
+    }
 
     glfwSetWindowCloseCallback    (impl_->window, nullptr);
     glfwSetFramebufferSizeCallback(impl_->window, nullptr);
@@ -359,6 +374,7 @@ window_t::~window_t()
 
 void window_t::new_imgui_frame()
 {
+    assert(impl_->imgui);
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -366,6 +382,7 @@ void window_t::new_imgui_frame()
 
 void window_t::render_imgui()
 {
+    assert(impl_->imgui);
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -442,7 +459,7 @@ int window_t::get_framebuffer_height() const noexcept
     return impl_->framebuffer_size.y;
 }
 
-int2 window_t::get_framebuffer_size() const noexcept
+vec2i window_t::get_framebuffer_size() const noexcept
 {
     return impl_->framebuffer_size;
 }
@@ -474,6 +491,11 @@ void window_t::use_default_viewport() const
     glViewport(0, 0, impl_->framebuffer_size.x, impl_->framebuffer_size.y);
 }
 
+bool window_t::_imgui() const noexcept
+{
+    return impl_->imgui;
+}
+
 void window_t::_close(bool close_flag)
 {
     impl_->close = close_flag;
@@ -487,6 +509,8 @@ void window_t::_resize()
         impl_->window,
         &impl_->framebuffer_size.x,
         &impl_->framebuffer_size.y);
+
+    use_default_viewport();
 
     event_mgr_.send(window_resize_event_t{
         impl_->framebuffer_size.x,

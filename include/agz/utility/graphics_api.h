@@ -17,8 +17,12 @@
 
 #ifdef AGZ_ENABLE_GL
 
+#include "./graphics_api/gl/buffer.h"
+#include "./graphics_api/gl/immediate2d.h"
 #include "./graphics_api/gl/keyboard.h"
 #include "./graphics_api/gl/mouse.h"
+#include "./graphics_api/gl/shader.h"
+#include "./graphics_api/gl/vertex_array_object.h"
 #include "./graphics_api/gl/window.h"
 
 #endif // #ifdef AGZ_ENABLE_GL

@@ -22,7 +22,7 @@ using window_event_manager_t = event::sender_t<
 
 struct window_desc_t
 {
-    int2 size         = { 640, 480 };
+    vec2i size        = { 640, 480 };
     std::string title = "opengl window";
 
     bool resizable  = true;
@@ -39,6 +39,8 @@ struct window_desc_t
     depth_stencil_format_t depth_stencil_format = d24s8;
 
     int multisamples = 0;
+
+    bool imgui = true;
 };
 
 class window_t : public misc::uncopyable_t
@@ -83,7 +85,7 @@ public:
 
     int get_framebuffer_height() const noexcept;
 
-    int2 get_framebuffer_size() const noexcept;
+    vec2i get_framebuffer_size() const noexcept;
 
     float get_framebuffer_w_over_h() const noexcept;
 
@@ -108,6 +110,8 @@ public:
     AGZ_GL_DECL_EVENT_MGR_HANDLER(event_mgr_, window_resize_event_t)
 
     // internal
+
+    bool _imgui() const noexcept;
 
     void _close(bool close_flag);
 
