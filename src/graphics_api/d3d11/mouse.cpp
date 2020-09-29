@@ -1,3 +1,5 @@
+#ifdef AGZ_ENABLE_D3D11
+
 #include <Windows.h>
 
 #include <agz/utility/graphics_api/d3d11/mouse.h>
@@ -121,3 +123,5 @@ void Mouse::_msg(UINT msg, WPARAM wParam)
 }
 
 AGZ_D3D11_END
+
+#endif // #ifdef AGZ_ENABLE_D3D11

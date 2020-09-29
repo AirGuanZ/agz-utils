@@ -1,3 +1,5 @@
+#ifdef AGZ_ENABLE_D3D11
+
 #include <agz/utility/graphics_api/d3d11/vertexArrayObject.h>
 
 AGZ_D3D11_BEGIN
@@ -74,3 +76,5 @@ void VertexArrayObject::unbind() const
 }
 
 AGZ_D3D11_END
+
+#endif // #ifdef AGZ_ENABLE_D3D11
