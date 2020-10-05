@@ -1,3 +1,5 @@
+#ifdef AGZ_ENABLE_GL
+
 #include <agz/utility/graphics_api/gl/immediate2d.h>
 
 AGZ_GL_BEGIN
@@ -147,3 +149,5 @@ void main()
 }
 
 AGZ_GL_END
+
+#endif // #ifdef AGZ_ENABLE_GL
