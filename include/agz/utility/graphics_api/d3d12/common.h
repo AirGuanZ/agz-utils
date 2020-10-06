@@ -1,0 +1,69 @@
+#pragma once
+
+#include <string>
+#include <system_error>
+
+#include <d3d12.h>
+#include <dxgi.h>
+
+#include <agz/utility/math.h>
+#include <wrl/client.h>
+
+#define AGZ_D3D12_BEGIN namespace agz::d3d12 {
+#define AGZ_D3D12_END   }
+
+AGZ_D3D12_BEGIN
+
+using Float2 = math::vec2f;
+using Float3 = math::vec3f;
+using Float4 = math::vec4f;
+
+using Int2 = math::vec2i;
+using Int3 = math::vec3i;
+
+using Mat4   = math::mat4f_c;
+using Trans4 = Mat4::right_transform;
+
+using Microsoft::WRL::ComPtr;
+
+class D3D12Exception : public std::runtime_error
+{
+public:
+
+    using runtime_error::runtime_error;
+};
+
+#define AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(EventSender, EventName)             \
+    void attach(event::receiver_t<EventName> *handler)                          \
+        { EventSender.attach(handler); }                                        \
+    void attach(std::shared_ptr<event::receiver_t<EventName>> handler)          \
+        { EventSender.attach(handler); }                                        \
+    void detach(event::receiver_t<EventName> *handler)                          \
+        { EventSender.detach(handler); }                                        \
+    void detach(std::shared_ptr<event::receiver_t<EventName>> handler)          \
+        { EventSender.detach(handler); }
+
+#define AGZ_D3D12_CHECK_HR(X)                                                   \
+    do {                                                                        \
+        const HRESULT autoname_hr = X;                                          \
+        if(!SUCCEEDED(autoname_hr))                                             \
+        {                                                                       \
+            throw D3D12Exception(                                               \
+                    std::string("errcode = ")                                   \
+                    + std::to_string(autoname_hr) + "."                         \
+                    + std::system_category().message(autoname_hr));             \
+        }                                                                       \
+    } while(false)
+
+#define AGZ_D3D12_CHECK_HR_MSG(E, X)                                            \
+    do {                                                                        \
+        const HRESULT autoname_hr = X;                                          \
+        if(!SUCCEEDED(autoname_hr))                                             \
+        {                                                                       \
+            throw D3D12Exception((E) + std::string(".errcode = ")               \
+                    + std::to_string(autoname_hr) + "."                         \
+                    + std::system_category().message(autoname_hr));             \
+        }                                                                       \
+    } while(false)
+
+AGZ_D3D12_END

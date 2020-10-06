@@ -43,7 +43,6 @@
 #include "./graphics_api/d3d11/renderTarget.h"
 #include "./graphics_api/d3d11/shader.h"
 #include "./graphics_api/d3d11/texture2d.h"
-#include "./graphics_api/d3d11/vertexArrayObject.h"
 #include "./graphics_api/d3d11/window.h"
 
 #endif // #ifdef AGZ_ENABLE_D3D11
