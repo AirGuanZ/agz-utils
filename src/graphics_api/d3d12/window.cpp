@@ -52,6 +52,8 @@ struct Window::Data
 
     bool shouldClos = false;
     bool isInFocus  = true;
+
+    Input input;
 };
 
 Window::Window(const WindowDesc &desc)
@@ -80,12 +82,17 @@ HWND Window::getWindowHandle() noexcept
 
 void Window::doEvents()
 {
+    data_->input._startUpdatingKeyboard();
+
     MSG msg;
     while(PeekMessage(&msg, data_->hWnd, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    data_->input._endUpdatingKeyboard();
+    data_->input._updateMouse();
 }
 
 bool Window::isInFocus() const noexcept
@@ -97,17 +104,52 @@ void Window::waitForFocus()
 {
     if(isInFocus())
         return;
+
+    auto input = getInput();
+    const bool showCursor = input->isCursorVisible();
+    const bool lockCursor = input->isCursorLocked();
+    const int  lockX      = input->getCursorLockX();
+    const int  lockY      = input->getCursorLockY();
+
+    input->showCursor(true);
+    input->setCursorLock(false, lockX, lockY);
+
     do
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         doEvents();
 
     } while(!isInFocus());
+
+    input->showCursor(showCursor);
+    input->setCursorLock(lockCursor, lockX, lockY);
+
+    input->_updateMouse();
 }
 
 void Window::setMaximized()
 {
     ShowWindow(data_->hWnd, SW_MAXIMIZE);
+}
+
+Input *Window::getInput() noexcept
+{
+    return &data_->input;
+}
+
+int Window::getClientWidth() const noexcept
+{
+    return data_->clientSize.x;
+}
+
+int Window::getClientHeight() const noexcept
+{
+    return data_->clientSize.y;
+}
+
+Int2 Window::getClientSize() const noexcept
+{
+    return data_->clientSize;
 }
 
 bool Window::getCloseFlag() const noexcept
@@ -118,6 +160,63 @@ bool Window::getCloseFlag() const noexcept
 void Window::setCloseFlag(bool closeFlag) noexcept
 {
     data_->shouldClos = closeFlag;
+}
+
+void Window::_close()
+{
+    data_->shouldClos = true;
+    eventSender_.send(WindowCloseEvent{});
+}
+
+void Window::_getFocus()
+{
+    data_->isInFocus = true;
+    eventSender_.send(WindowGetFocusEvent{});
+}
+
+void Window::_lostFocus()
+{
+    data_->isInFocus = false;
+    eventSender_.send(WindowLostFocusEvent{});
+}
+
+void Window::_resize()
+{
+    updateClientSize();
+    eventSender_.send(
+        WindowResizeEvent{ data_->clientSize.x, data_->clientSize.y });
+}
+
+void Window::_mouseMsg(UINT msg, WPARAM wParam)
+{
+    data_->input._msgMouse(msg, wParam);
+}
+
+void Window::_keyDown(KeyCode kc)
+{
+    if(kc != KEY_UNKNOWN)
+        data_->input._msgDown(kc);
+}
+
+void Window::_keyUp(KeyCode kc)
+{
+    if(kc != KEY_UNKNOWN)
+        data_->input._msgUp(kc);
+}
+
+void Window::_rawKeyDown(uint32_t vk)
+{
+    data_->input._msgRawDown(vk);
+}
+
+void Window::_rawKeyUp(uint32_t vk)
+{
+    data_->input._msgRawUp(vk);
+}
+
+void Window::_charInput(uint32_t ch)
+{
+    data_->input._msgChar(ch);
 }
 
 void Window::initWin32Window(const WindowDesc &desc)
@@ -162,9 +261,10 @@ void Window::initWin32Window(const WindowDesc &desc)
     const Int2 winSize = detail::clientSizeToWindowSize(
         data_->style, { clientW, clientH });
 
-    Int2 winPos;
-    winPos.x = workAreaRect.left  + (workAreaW - winSize.x) / 2;
-    winPos.y = workAreaRect.right + (workAreaH - winSize.y) / 2;
+    Int2 winPos = {
+        workAreaRect.left + (workAreaW - winSize.x) / 2,
+        workAreaRect.top  + (workAreaH - winSize.y) / 2
+    };
 
     // window
 
@@ -180,14 +280,16 @@ void Window::initWin32Window(const WindowDesc &desc)
 
     // show & focus
 
+    detail::handleToWindow().insert({ data_->hWnd, this });
+    data_->input.setWindowHandle(data_->hWnd);
+
     ShowWindow(data_->hWnd, SW_SHOW);
     UpdateWindow(data_->hWnd);
+
     SetForegroundWindow(data_->hWnd);
     SetFocus(data_->hWnd);
 
     updateClientSize();
-
-    detail::handleToWindow().insert({ data_->hWnd, this });
 }
 
 void Window::updateClientSize()
@@ -196,6 +298,56 @@ void Window::updateClientSize()
     GetClientRect(data_->hWnd, &clientRect);
     data_->clientSize.x = clientRect.right  - clientRect.left;
     data_->clientSize.y = clientRect.bottom - clientRect.top;
+}
+
+LRESULT detail::windowMessageProc(
+    HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    const auto winIt = handleToWindow().find(hWnd);
+    if(winIt == handleToWindow().end())
+        return DefWindowProcW(hWnd, msg, wParam, lParam);
+    const auto win = winIt->second;
+
+    win->_mouseMsg(msg, wParam);
+
+    switch(msg)
+    {
+    case WM_CLOSE:
+        win->_close();
+        return 0;
+    case WM_SETFOCUS:
+        win->_getFocus();
+        break;
+    case WM_KILLFOCUS:
+        win->_lostFocus();
+        break;
+    case WM_SIZE:
+        if(wParam != SIZE_MINIMIZED)
+            win->_resize();
+        break;
+    case WM_KEYDOWN:
+        win->_keyDown(
+            event::keycode::win_vk_to_keycode(static_cast<int>(wParam)));
+        [[fallthrough]];
+    case WM_SYSKEYDOWN:
+        win->_rawKeyDown(static_cast<uint32_t>(wParam));
+        break;
+    case WM_KEYUP:
+        win->_keyUp(
+            event::keycode::win_vk_to_keycode(static_cast<int>(wParam)));
+        [[fallthrough]];
+    case WM_SYSKEYUP:
+        win->_rawKeyUp(static_cast<uint32_t>(wParam));
+        break;
+    case WM_CHAR:
+        if(0 < wParam && wParam < 0x10000)
+            win->_charInput(static_cast<uint32_t>(wParam));
+        break;
+    default:
+        break;
+    }
+
+    return DefWindowProcW(hWnd, msg, wParam, lParam);
 }
 
 AGZ_D3D12_END

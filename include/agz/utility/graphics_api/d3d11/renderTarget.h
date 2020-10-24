@@ -33,11 +33,21 @@ public:
     void addColorBuffer(
         DXGI_FORMAT format, DXGI_FORMAT rtvFormat, DXGI_FORMAT srvFormat);
 
+    void addColorBuffer(
+        ComPtr<ID3D11Texture2D>          tex,
+        ComPtr<ID3D11RenderTargetView>   rtv,
+        ComPtr<ID3D11ShaderResourceView> srv);
+
     void addDepthStencil(
         DXGI_FORMAT format, DXGI_FORMAT dsvFormat);
 
     void addDepthStencil(
         DXGI_FORMAT format, DXGI_FORMAT dsvFormat, DXGI_FORMAT srvFormat);
+
+    void addDepthStencil(
+        ComPtr<ID3D11Texture2D>          tex,
+        ComPtr<ID3D11DepthStencilView>   dsv,
+        ComPtr<ID3D11ShaderResourceView> srv);
 
     void clearColorBuffer(int index, const Color4 &color);
 
@@ -155,6 +165,16 @@ inline void RenderTarget::addColorBuffer(
     addColorBuffer(format, rtvFormat, true, srvFormat);
 }
 
+inline void RenderTarget::addColorBuffer(
+    ComPtr<ID3D11Texture2D>          tex,
+    ComPtr<ID3D11RenderTargetView>   rtv,
+    ComPtr<ID3D11ShaderResourceView> srv)
+{
+    auto rawRTV = rtv.Get();
+    colors_.push_back({ std::move(tex), std::move(rtv), std::move(srv) });
+    rawRTVs_.push_back(rawRTV);
+}
+
 inline void RenderTarget::addDepthStencil(
     DXGI_FORMAT format, DXGI_FORMAT dsvFormat)
 {
@@ -165,6 +185,16 @@ inline void RenderTarget::addDepthStencil(
     DXGI_FORMAT format, DXGI_FORMAT dsvFormat, DXGI_FORMAT srvFormat)
 {
     addDepthStencil(format, dsvFormat, true, srvFormat);
+}
+
+inline void RenderTarget::addDepthStencil(
+    ComPtr<ID3D11Texture2D>          tex,
+    ComPtr<ID3D11DepthStencilView>   dsv,
+    ComPtr<ID3D11ShaderResourceView> srv)
+{
+    dsTex_    = std::move(tex);
+    DSV_      = std::move(dsv);
+    depthSRV_ = std::move(srv);
 }
 
 inline void RenderTarget::clearColorBuffer(int index, const Color4 &color)

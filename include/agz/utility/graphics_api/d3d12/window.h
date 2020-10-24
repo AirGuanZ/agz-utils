@@ -1,28 +1,25 @@
 #pragma once
 
-#include <agz/utility/graphics_api/d3d12/common.h>
+#include <agz/utility/graphics_api/d3d12/input.h>
 #include <agz/utility/event.h>
 
 AGZ_D3D12_BEGIN
 
-struct WindowCloseEvent      { };
-struct WindowGetFocusEvent   { };
-struct WindowLostFocusEvent  { };
-struct WindowPreResizeEvent  { };
-struct WindowPostResizeEvent { int width, height; };
+struct WindowCloseEvent     { };
+struct WindowGetFocusEvent  { };
+struct WindowLostFocusEvent { };
+struct WindowResizeEvent    { int width, height; };
 
-using WindowCloseHandler      = event::functional_receiver_t<WindowCloseEvent>;
-using WindowGetFocusHandler   = event::functional_receiver_t<WindowGetFocusEvent>;
-using WindowLostFocusHandler  = event::functional_receiver_t<WindowLostFocusEvent>;
-using WindowPreResizeHandler  = event::functional_receiver_t<WindowPreResizeEvent>;
-using WindowPostResizeHandler = event::functional_receiver_t<WindowPostResizeEvent>;
+using WindowCloseHandler     = event::functional_receiver_t<WindowCloseEvent>;
+using WindowGetFocusHandler  = event::functional_receiver_t<WindowGetFocusEvent>;
+using WindowLostFocusHandler = event::functional_receiver_t<WindowLostFocusEvent>;
+using WindowResizeHandler    = event::functional_receiver_t<WindowResizeEvent>;
 
 using WindowEventSender = event::sender_t<
     WindowCloseEvent,
     WindowGetFocusEvent,
     WindowLostFocusEvent,
-    WindowPreResizeEvent,
-    WindowPostResizeEvent>;
+    WindowResizeEvent>;
 
 struct WindowDesc
 {
@@ -51,6 +48,16 @@ public:
 
     void setMaximized();
 
+    Input *getInput() noexcept;
+
+    // size
+
+    int getClientWidth() const noexcept;
+
+    int getClientHeight() const noexcept;
+
+    Int2 getClientSize() const noexcept;
+
     // close flag
 
     bool getCloseFlag() const noexcept;
@@ -62,8 +69,7 @@ public:
     AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowCloseEvent)
     AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowGetFocusEvent)
     AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowLostFocusEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowPreResizeEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowPostResizeEvent)
+    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowResizeEvent)
 
     // internal use
 
@@ -74,6 +80,18 @@ public:
     void _lostFocus();
 
     void _resize();
+
+    void _mouseMsg(UINT msg, WPARAM wParam);
+
+    void _keyDown(KeyCode kc);
+
+    void _keyUp(KeyCode kc);
+
+    void _rawKeyDown(uint32_t vk);
+
+    void _rawKeyUp(uint32_t vk);
+
+    void _charInput(uint32_t ch);
 
 private:
 

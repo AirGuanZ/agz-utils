@@ -33,6 +33,36 @@ public:
     using runtime_error::runtime_error;
 };
 
+struct ShaderRegister { UINT registerSpace; UINT registerIndex; };
+
+constexpr ShaderRegister b0 = { 0, 0 };
+constexpr ShaderRegister b1 = { 0, 1 };
+constexpr ShaderRegister b2 = { 0, 2 };
+constexpr ShaderRegister b3 = { 0, 3 };
+constexpr ShaderRegister b4 = { 0, 4 };
+constexpr ShaderRegister b5 = { 0, 5 };
+
+constexpr ShaderRegister t0 = { 0, 0 };
+constexpr ShaderRegister t1 = { 0, 1 };
+constexpr ShaderRegister t2 = { 0, 2 };
+constexpr ShaderRegister t3 = { 0, 3 };
+constexpr ShaderRegister t4 = { 0, 4 };
+constexpr ShaderRegister t5 = { 0, 5 };
+
+constexpr ShaderRegister s0 = { 0, 0 };
+constexpr ShaderRegister s1 = { 0, 1 };
+constexpr ShaderRegister s2 = { 0, 2 };
+constexpr ShaderRegister s3 = { 0, 3 };
+constexpr ShaderRegister s4 = { 0, 4 };
+constexpr ShaderRegister s5 = { 0, 5 };
+
+constexpr ShaderRegister u0 = { 0, 0 };
+constexpr ShaderRegister u1 = { 0, 1 };
+constexpr ShaderRegister u2 = { 0, 2 };
+constexpr ShaderRegister u3 = { 0, 3 };
+constexpr ShaderRegister u4 = { 0, 4 };
+constexpr ShaderRegister u5 = { 0, 5 };
+
 #define AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(EventSender, EventName)             \
     void attach(event::receiver_t<EventName> *handler)                          \
         { EventSender.attach(handler); }                                        \

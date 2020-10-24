@@ -47,6 +47,22 @@
 
 #endif // #ifdef AGZ_ENABLE_D3D11
 
+#ifdef AGZ_ENABLE_D3D12
+
+#include "./graphics_api/d3d12/debug.h"
+#include "./graphics_api/d3d12/descriptorHeap.h"
+#include "./graphics_api/d3d12/descriptorHeapRaw.h"
+#include "./graphics_api/d3d12/device.h"
+#include "./graphics_api/d3d12/input.h"
+#include "./graphics_api/d3d12/pipeline.h"
+#include "./graphics_api/d3d12/queueWaiter.h"
+#include "./graphics_api/d3d12/renderGraph.h"
+#include "./graphics_api/d3d12/rootSignature.h"
+#include "./graphics_api/d3d12/swapChain.h"
+#include "./graphics_api/d3d12/window.h"
+
+#endif // #ifdef AGZ_ENABLE_D3D12
+
 #if defined(AGZ_ENABLE_GL) || defined(AGZ_ENABLE_D3D11)
 
 #include "./graphics_api/imgui/imgui.h"
