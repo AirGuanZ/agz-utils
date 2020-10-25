@@ -98,12 +98,26 @@ void RenderGraph::workingFunc(int threadIndex)
     auto &threadData = perThreadData_[threadIndex];
     auto &cmdAlloc   = threadData.cmdAllocPerFrame[frameIndex];
 
-    cmdAlloc->Reset();
-
+    if(cmdAlloc.graphics)
+        cmdAlloc.graphics->Reset();
+    if(cmdAlloc.compute)
+        cmdAlloc.compute->Reset();
+    
     for(auto &s : threadData.sections)
     {
         auto *cmdList = s.cmdListPerFrame[frameIndex].Get();
-        cmdList->Reset(cmdAlloc.Get(), nullptr);
+        
+        if(cmdList->GetType() == D3D12_COMMAND_LIST_TYPE_DIRECT)
+        {
+            assert(cmdAlloc.graphics);
+            cmdList->Reset(cmdAlloc.graphics.Get(), nullptr);
+        }
+        else
+        {
+            assert(cmdList->GetType() == D3D12_COMMAND_LIST_TYPE_COMPUTE);
+            assert(cmdAlloc.compute);
+            cmdList->Reset(cmdAlloc.compute.Get(), nullptr);
+        }
 
         s.section.execute(cmdList, rawRscs_.data());
 

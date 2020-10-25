@@ -21,12 +21,16 @@ public:
 
     void setInitialState(D3D12_RESOURCE_STATES state);
 
+    void setHeapType(D3D12_HEAP_TYPE heapType);
+
 private:
 
     friend class RenderGraphBuilder;
 
     std::string name_;
     int         index_;
+
+    D3D12_HEAP_TYPE heapType_;
 
     D3D12_RESOURCE_DESC desc_;
 
@@ -116,6 +120,8 @@ public:
 
     void setQueueCount (int count);
 
+    void setFrameCount(int count);
+
     InternalResource *addInternalResource(std::string name);
 
     ExternalResource *addExternalResource(std::string name);
@@ -124,9 +130,10 @@ public:
 
     void addArc(Vertex *head, Vertex *tail);
 
-    RenderGraph build(
+    std::unique_ptr<RenderGraph> build(
         ID3D12Device                                     *device,
-        std::initializer_list<ComPtr<ID3D12CommandQueue>> cmdQueues) const;
+        std::initializer_list<ComPtr<ID3D12CommandQueue>> cmdQueues,
+        ResourceManager                                  &rscMgr) const;
 
 private:
 
@@ -151,18 +158,29 @@ private:
         std::vector<ComPtr<ID3D12Fence>> waitFences;
         ComPtr<ID3D12Fence>              signalFence;
 
-        bool mustSubmit = false;
+        int sectionIndex = 0;
+        bool mustSubmit  = false;
+    };
+
+    struct SectionRecord
+    {
+        std::vector<int> passes;
+        int              threadIndex;
+        int              queueIndex;
+        int              indexInThread;
     };
 
     struct ThreadRecord
     {
         std::vector<int> passes;
+        std::vector<int> sections;
     };
 
     std::vector<int> topologySortPasses() const;
 
     int threadCount_;
     int queueCount_;
+    int frameCount_;
 
     std::vector<std::unique_ptr<Resource>> rscs_;
     std::vector<std::unique_ptr<Vertex>>   vtxs_;

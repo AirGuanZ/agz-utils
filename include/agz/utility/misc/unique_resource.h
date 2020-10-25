@@ -63,9 +63,20 @@ public:
         return resource_;
     }
 
-    const R operator->() const noexcept
+    const auto operator->() const noexcept
     {
-        return resource_;
+        if constexpr(std::is_pointer_v<R>)
+            return resource_;
+        else
+            return &resource_;
+    }
+
+    auto operator->() noexcept
+    {
+        if constexpr(std::is_pointer_v<R>)
+            return resource_;
+        else
+            return &resource_;
     }
 
     std::add_lvalue_reference_t<

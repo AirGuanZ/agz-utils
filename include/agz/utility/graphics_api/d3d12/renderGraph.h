@@ -79,8 +79,14 @@ private:
     {
         std::vector<SectionRecord> sections;
 
-        // thread index -> command list allocator
-        std::vector<ComPtr<ID3D12CommandAllocator>> cmdAllocPerFrame;
+        struct CommandListAllocator
+        {
+            ComPtr<ID3D12CommandAllocator> graphics;
+            ComPtr<ID3D12CommandAllocator> compute;
+        };
+
+        // frame index -> command list allocator
+        std::vector<CommandListAllocator> cmdAllocPerFrame;
     };
 
     struct Sync
@@ -105,8 +111,9 @@ private:
 
     std::vector<PerThreadData> perThreadData_;
 
-    std::vector<Resource>        rscs_;
-    std::vector<ID3D12Resource*> rawRscs_;
+    std::vector<Resource>                   rscs_;
+    std::vector<ID3D12Resource*>            rawRscs_;
+    std::map<std::string, int, std::less<>> name2Rsc_;
 
     std::vector<ComPtr<ID3D12CommandQueue>> cmdQueues_;
 };

@@ -9,7 +9,7 @@ namespace rg
 
 InternalResource::InternalResource(std::string name, int index)
     : name_(std::move(name)), index_(index),
-      desc_{},
+      heapType_(D3D12_HEAP_TYPE_DEFAULT), desc_{},
       clear_(false), clearValue_{},
       initialState_(D3D12_RESOURCE_STATE_COMMON)
 {
@@ -30,6 +30,11 @@ void InternalResource::setClearValue(const D3D12_CLEAR_VALUE &clearValue)
 void InternalResource::setInitialState(D3D12_RESOURCE_STATES state)
 {
     initialState_ = state;
+}
+
+void InternalResource::setHeapType(D3D12_HEAP_TYPE heapType)
+{
+    heapType_ = heapType;
 }
 
 ExternalResource::ExternalResource(std::string name, int index)
@@ -85,7 +90,7 @@ void Vertex::setCallback(std::shared_ptr<Callback> callback)
 }
 
 RenderGraphBuilder::RenderGraphBuilder()
-    : threadCount_(0), queueCount_(0)
+    : threadCount_(0), queueCount_(0), frameCount_(0)
 {
     
 }
@@ -98,6 +103,11 @@ void RenderGraphBuilder::setThreadCount(int count)
 void RenderGraphBuilder::setQueueCount(int count)
 {
     queueCount_ = count;
+}
+
+void RenderGraphBuilder::setFrameCount(int count)
+{
+    frameCount_ = count;
 }
 
 InternalResource *RenderGraphBuilder::addInternalResource(std::string name)
@@ -129,9 +139,10 @@ void RenderGraphBuilder::addArc(Vertex *head, Vertex *tail)
     tail->in_ .insert(head);
 }
 
-RenderGraph RenderGraphBuilder::build(
+std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
     ID3D12Device                                     *device,
-    std::initializer_list<ComPtr<ID3D12CommandQueue>> cmdQueues) const
+    std::initializer_list<ComPtr<ID3D12CommandQueue>> cmdQueues,
+    ResourceManager                                  &rscMgr) const
 {
     std::vector<PassRecord> passRecords(vtxs_.size());
 
@@ -139,11 +150,11 @@ RenderGraph RenderGraphBuilder::build(
 
     // assign passes to threads
 
-    std::vector<ThreadRecord> thread2Passes(threadCount_);
+    std::vector<ThreadRecord> threadRecords(threadCount_);
     for(int i : linearPasses)
     {
         const int threadIndex = vtxs_[i]->threadIndex_;
-        thread2Passes[threadIndex].passes.push_back(i);
+        threadRecords[threadIndex].passes.push_back(i);
     }
 
     // collect all users of each resource
@@ -213,6 +224,8 @@ RenderGraph RenderGraphBuilder::build(
     // generate fences & submission flags
 
     std::vector<ComPtr<ID3D12Fence>> allFences;
+    int totalSectionCount = 0;
+
     for(auto &vtx : vtxs_)
     {
         ComPtr<ID3D12Fence> fence;
@@ -238,22 +251,298 @@ RenderGraph RenderGraphBuilder::build(
 
             if(vtx->queueIndex_  != out->queueIndex_ ||
                vtx->threadIndex_ != out->threadIndex_)
+            {
                 passRecords[vtx->index_].mustSubmit = true;
+                ++totalSectionCount;
+            }
         }
     }
 
-    for(auto &tr : thread2Passes)
+    for(auto &tr : threadRecords)
     {
-        if(tr.passes.empty())
-            continue;
-        passRecords[tr.passes.back()].mustSubmit = true;
+        if(!tr.passes.empty())
+        {
+            passRecords[tr.passes.back()].mustSubmit = true;
+            ++totalSectionCount;
+        }
+    }
+
+    // generate sections
+
+    std::vector<SectionRecord> sectionRecords;
+    bool needNewSection = true;
+
+    for(auto &tp : threadRecords)
+    {
+        for(int passIdx : tp.passes)
+        {
+            auto &pass = passRecords[passIdx];
+
+            if(needNewSection)
+            {
+                auto &threadRecord = threadRecords[vtxs_[passIdx]->threadIndex_];
+
+                const int sectionIndex =
+                    static_cast<int>(sectionRecords.size());
+
+                const int sectionIndexInThread =
+                    static_cast<int>(threadRecord.sections.size());
+
+                sectionRecords.push_back(
+                    SectionRecord{
+                        .passes        = {},
+                        .threadIndex   = vtxs_[passIdx]->threadIndex_,
+                        .queueIndex    = vtxs_[passIdx]->queueIndex_,
+                        .indexInThread = sectionIndexInThread
+                    });
+
+                threadRecord.sections.push_back(sectionIndex);
+
+                needNewSection = false;
+            }
+
+            pass.sectionIndex = static_cast<int>(sectionRecords.size() - 1);
+            sectionRecords.back().passes.push_back(passIdx);
+
+            if(pass.mustSubmit)
+                needNewSection = true;
+        }
     }
 
     // generate render graph
 
-    RenderGraph renderGraph;
+    auto renderGraph = std::make_unique<RenderGraph>();
 
-    // TODO
+    // allocate and fill per-thread data
+
+    renderGraph->perThreadData_.resize(threadCount_);
+    for(int threadIdx = 0; threadIdx < threadCount_; ++threadIdx)
+    {
+        auto &threadData   = renderGraph->perThreadData_[threadIdx];
+        auto &threadRecord = threadRecords[threadIdx];
+
+        threadData.sections.resize(threadRecord.sections.size());
+    }
+
+    for(int threadIdx = 0; threadIdx < threadCount_; ++threadIdx)
+    {
+        auto &threadData   = renderGraph->perThreadData_[threadIdx];
+        auto &threadRecord = threadRecords[threadIdx];
+
+        // sections
+
+        bool hasGraphicsSection = false;
+        bool hasComputeSection  = false;
+
+        for(size_t secIdxInThread = 0;
+            secIdxInThread < threadRecord.sections.size();
+            ++secIdxInThread)
+        {
+            const int secIdx    = threadRecord.sections[secIdxInThread];
+            auto &section       = threadData.sections[secIdxInThread];
+            auto &sectionRecord = sectionRecords[secIdx];
+
+            // queue index
+
+            section.queueIdx = sectionRecord.queueIndex;
+
+            // self dependency
+
+            ++section.targetDependencyCount;
+
+            // output sections
+
+            std::set<RenderGraph::SectionRecord*> outputs;
+            for(int passIdx : sectionRecord.passes)
+            {
+                for(auto outVtx : vtxs_[passIdx]->out_)
+                {
+                    auto &outPass      = passRecords[outVtx->index_];
+                    auto &outSecRecord = sectionRecords[outPass.sectionIndex];
+
+                    auto &outSec =
+                        renderGraph->perThreadData_[outSecRecord.threadIndex]
+                                   .sections[outSecRecord.indexInThread];
+
+                    ++outSec.targetDependencyCount;
+                    outputs.insert(&outSec);
+                }
+            }
+
+            std::copy(
+                outputs.begin(),
+                outputs.end(),
+                std::back_inserter(section.outputs));
+
+            // need graphics/compute command allocator?
+
+            const D3D12_COMMAND_LIST_TYPE cmdListType =
+                vtxs_[sectionRecord.passes.front()]->cmdListType_;
+
+            if(cmdListType == D3D12_COMMAND_LIST_TYPE_DIRECT)
+                hasGraphicsSection = true;
+            else if(cmdListType == D3D12_COMMAND_LIST_TYPE_COMPUTE)
+                hasComputeSection = true;
+            else
+            {
+                throw D3D12Exception(
+                    "unsupported command list type in render graph");
+            }
+
+            // wait/signal fences
+
+            for(int passIdx : sectionRecord.passes)
+            {
+                auto &pass = passRecords[passIdx];
+
+                std::copy(
+                    pass.waitFences.begin(),
+                    pass.waitFences.end(),
+                    std::back_inserter(section.waitFences));
+
+                if(pass.signalFence)
+                {
+                    // there must be a submission after a signal fence
+                    // so a section must have no more than one signal fence
+                    assert(!section.signalFence);
+                    section.signalFence = pass.signalFence;
+                }
+            }
+
+            // passes
+
+            for(int passIdx : sectionRecord.passes)
+            {
+                auto &passRecord = passRecords[passIdx];
+                auto vtx         = vtxs_[passIdx].get();
+
+                Pass pass;
+                pass.setCallback(vtx->callback_);
+
+                for(auto &t : passRecord.transitions)
+                    pass.addResourceStateTransition(t.idx, t.beg, t.mid, t.end);
+            }
+        }
+
+        // command allocators
+
+        threadData.cmdAllocPerFrame.resize(frameCount_);
+        for(auto &cmdAlloc : threadData.cmdAllocPerFrame)
+        {
+            if(hasGraphicsSection)
+            {
+                AGZ_D3D12_CHECK_HR_MSG(
+                    "failed to create command allocator for render graph",
+                    device->CreateCommandAllocator(
+                        D3D12_COMMAND_LIST_TYPE_DIRECT,
+                        IID_PPV_ARGS(cmdAlloc.graphics.GetAddressOf())));
+            }
+
+            if(hasComputeSection)
+            {
+                AGZ_D3D12_CHECK_HR_MSG(
+                    "failed to create command allocator for render graph",
+                    device->CreateCommandAllocator(
+                        D3D12_COMMAND_LIST_TYPE_COMPUTE,
+                        IID_PPV_ARGS(cmdAlloc.compute.GetAddressOf())));
+            }
+        }
+    }
+
+    // create per-frame command list
+
+    for(int threadIdx = 0; threadIdx < threadCount_; ++threadIdx)
+    {
+        auto &threadData   = renderGraph->perThreadData_[threadIdx];
+        auto &threadRecord = threadRecords[threadIdx];
+
+        for(size_t secIdxInThread = 0;
+            secIdxInThread < threadRecord.sections.size();
+            ++secIdxInThread)
+        {
+            const int secIdx    = threadRecord.sections[secIdxInThread];
+            auto &section       = threadData.sections[secIdxInThread];
+            auto &sectionRecord = sectionRecords[secIdx];
+
+            section.cmdListPerFrame.resize(frameCount_);
+            for(auto &cmdList : section.cmdListPerFrame)
+            {
+                const D3D12_COMMAND_LIST_TYPE cmdListType =
+                    vtxs_[sectionRecord.passes.front()]->cmdListType_;
+
+                auto cmdAlloc =
+                    cmdListType == D3D12_COMMAND_LIST_TYPE_DIRECT ?
+                    threadData.cmdAllocPerFrame[0].graphics.Get() :
+                    threadData.cmdAllocPerFrame[0].compute.Get();
+
+                AGZ_D3D12_CHECK_HR_MSG(
+                    "failed to create command list for render graph",
+                    device->CreateCommandList(
+                        0, cmdListType, cmdAlloc, nullptr,
+                        IID_PPV_ARGS(cmdList.GetAddressOf())));
+
+                cmdList->Close();
+            }
+        }
+    }
+
+    // resources
+
+    renderGraph->rawRscs_.resize(rscs_.size());
+
+    for(size_t rscIdx = 0; rscIdx < rscs_.size(); ++rscIdx)
+    {
+        match_variant(
+            *rscs_[rscIdx],
+            [&](const InternalResource &r)
+        {
+            ResourceManager::UniqueResource rsc =
+                r.clear_ ?
+                rscMgr.create(
+                    r.heapType_, r.desc_,
+                    r.initialState_, r.clearValue_) :
+                rscMgr.create(
+                    r.heapType_, r.desc_,
+                    r.initialState_);
+
+            renderGraph->rawRscs_[rscIdx] = rsc->resource.Get();
+
+            renderGraph->rscs_.emplace_back(
+                RenderGraph::InternalResource{
+                    .idx = static_cast<int>(rscIdx),
+                    .rsc = std::move(rsc)
+                });
+
+            renderGraph->name2Rsc_.insert({ r.name_, rscIdx });
+        },
+            [&](const ExternalResource &r)
+        {
+            renderGraph->rscs_.emplace_back(
+                RenderGraph::ExternalResource{
+                    .idx = static_cast<int>(rscIdx),
+                    .rsc = {}
+                });
+
+            renderGraph->name2Rsc_.insert({ r.name_, rscIdx });
+        });
+    }
+
+    // command queues
+
+    renderGraph->cmdQueues_ = cmdQueues;
+
+    // sync
+
+    renderGraph->sync_ = std::make_unique<RenderGraph::Sync>();
+
+    // threads
+
+    for(int i = 0; i < threadCount_; ++i)
+    {
+        renderGraph->threads_.emplace_back(
+            &RenderGraph::workingThread, renderGraph.get(), i);
+    }
+
     return renderGraph;
 }
 
