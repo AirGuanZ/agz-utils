@@ -1,4 +1,4 @@
-#ifdef AGZ_ENABLE_D3D11
+#if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_D3D12)
 
 // dear imgui: Platform Binding for Windows (standard windows API for 32 and 64 bits applications)
 // This needs to be used along with a Renderer (e.g. DirectX11, OpenGL3, Vulkan..)
@@ -10,7 +10,7 @@
 //  [X] Platform: Gamepad support. Enabled with 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad'.
 
 #include <agz/utility/graphics_api/imgui/imgui.h>
-#include <agz/utility/graphics_api/d3d11/imgui/imgui_impl_win32.h>
+#include <agz/utility/graphics_api/imgui/imgui_impl_win32.h>
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -448,4 +448,4 @@ float ImGui_ImplWin32_GetDpiScaleForHwnd(void* hwnd)
 
 //---------------------------------------------------------------------------------------------------------
 
-#endif // #ifdef AGZ_ENABLE_D3D11
+#endif // #ifdef AGZ_ENABLE_D3D11 || defined(AGZ_ENABLE_D3D12)

@@ -35,6 +35,8 @@ public:
 
     ~SwapChain();
 
+    DXGI_FORMAT getImageFormat() const noexcept;
+
     int getImageCount() const noexcept;
 
     int getImageIndex() const noexcept;

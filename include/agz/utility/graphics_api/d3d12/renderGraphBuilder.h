@@ -23,6 +23,8 @@ public:
 
     void setHeapType(D3D12_HEAP_TYPE heapType);
 
+    int getIndex() const noexcept;
+
 private:
 
     friend class RenderGraphBuilder;
@@ -50,6 +52,8 @@ public:
 
     void setFinalState(D3D12_RESOURCE_STATES state);
 
+    int getIndex() const noexcept;
+
 private:
 
     friend class RenderGraphBuilder;
@@ -65,7 +69,7 @@ class Vertex : public misc::uncopyable_t
 {
 public:
 
-    using Callback = std::function<void(ID3D12GraphicsCommandList *)>;
+    using Callback = Pass::Callback;
 
     Vertex(std::string name, int index);
 
@@ -79,7 +83,7 @@ public:
 
     void setThread(int index);
 
-    void setCallback(std::shared_ptr<Callback> callback);
+    void setCallback(Callback callback);
 
 private:
 
@@ -134,7 +138,7 @@ public:
         ID3D12Device                                     *device,
         std::initializer_list<ComPtr<ID3D12CommandQueue>> cmdQueues,
         ResourceManager                                  &rscMgr) const;
-
+    
 private:
 
     using Resource = misc::variant_t<InternalResource, ExternalResource>;

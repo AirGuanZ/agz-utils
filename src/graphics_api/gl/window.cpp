@@ -5,8 +5,8 @@
 #include <agz/utility/graphics_api/gl/window.h>
 #include <agz/utility/system.h>
 
-#include <agz/utility/graphics_api/gl/imgui/imgui_impl_glfw.h>
-#include <agz/utility/graphics_api/gl/imgui/imgui_impl_opengl3.h>
+#include <agz/utility/graphics_api/imgui/imgui_impl_glfw.h>
+#include <agz/utility/graphics_api/imgui/imgui_impl_opengl3.h>
 #include <agz/utility/graphics_api/imgui/imgui.h>
 
 #include <GL/glew.h>

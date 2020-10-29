@@ -4,6 +4,12 @@
 
 AGZ_D3D12_BEGIN
 
+ResourceManager::ResourceManager()
+    : allocator_(nullptr)
+{
+    
+}
+
 ResourceManager::ResourceManager(ID3D12Device *device, IDXGIAdapter *adapter)
     : allocator_(nullptr)
 {
@@ -20,13 +26,30 @@ ResourceManager::ResourceManager(ID3D12Device *device, IDXGIAdapter *adapter)
         CreateAllocator(&allocatorDesc, &allocator_));
 }
 
-ResourceManager::~ResourceManager()
+ResourceManager::ResourceManager(ResourceManager &&other) noexcept
+    : ResourceManager()
 {
-    assert(allocator_);
-    allocator_->Release();
+    swap(other);
 }
 
-ResourceManager::UniqueResource ResourceManager::create(
+ResourceManager &ResourceManager::operator=(ResourceManager &&other) noexcept
+{
+    swap(other);
+    return *this;
+}
+
+void ResourceManager::swap(ResourceManager &other) noexcept
+{
+    std::swap(allocator_, other.allocator_);
+}
+
+ResourceManager::~ResourceManager()
+{
+    if(allocator_)
+        allocator_->Release();
+}
+
+UniqueResource ResourceManager::create(
     D3D12_HEAP_TYPE            heapType,
     const D3D12_RESOURCE_DESC &desc,
     D3D12_RESOURCE_STATES      initialState)
@@ -34,7 +57,7 @@ ResourceManager::UniqueResource ResourceManager::create(
     return create(heapType, desc, initialState, nullptr);
 }
 
-ResourceManager::UniqueResource ResourceManager::create(
+UniqueResource ResourceManager::create(
     D3D12_HEAP_TYPE            heapType,
     const D3D12_RESOURCE_DESC &desc,
     D3D12_RESOURCE_STATES      initialState,
@@ -43,7 +66,23 @@ ResourceManager::UniqueResource ResourceManager::create(
     return create(heapType, desc, initialState, &clearValue);
 }
 
-ResourceManager::UniqueResource ResourceManager::create(
+Buffer ResourceManager::createDefaultBuffer(
+    size_t                byteSize,
+    D3D12_RESOURCE_STATES initState)
+{
+    Buffer buffer;
+    buffer.initializeDefault(*this, byteSize, initState);
+    return buffer;
+}
+
+Buffer ResourceManager::createUploadBuffer(size_t byteSize)
+{
+    Buffer buffer;
+    buffer.initializeUpload(*this, byteSize);
+    return buffer;
+}
+
+UniqueResource ResourceManager::create(
     D3D12_HEAP_TYPE            heapType,
     const D3D12_RESOURCE_DESC &desc,
     D3D12_RESOURCE_STATES      initialState,
@@ -62,7 +101,7 @@ ResourceManager::UniqueResource ResourceManager::create(
             &allocation, IID_PPV_ARGS(rsc.GetAddressOf())));
 
     return UniqueResource(
-        { std::move(rsc), allocation }, ResourceDeleter{});
+        { std::move(rsc), allocation }, detail::ResourceDeleter{});
 }
 
 AGZ_D3D12_END

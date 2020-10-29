@@ -38,7 +38,7 @@
 //  2016-10-15: Misc: Added a void* user_data parameter to Clipboard function handlers.
 
 #include <agz/utility/graphics_api/imgui/imgui.h>
-#include <agz/utility/graphics_api/gl/imgui/imgui_impl_glfw.h>
+#include <agz/utility/graphics_api/imgui/imgui_impl_glfw.h>
 
 // GLFW
 #include <GLFW/glfw3.h>

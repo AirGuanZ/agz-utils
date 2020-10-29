@@ -1,4 +1,4 @@
-#if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_GL)
+#if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_D3D12) || defined(AGZ_ENABLE_GL)
 
 // dear imgui, v1.79 WIP
 // (main code and documentation)
@@ -10870,4 +10870,4 @@ void ImGui::ShowMetricsWindow(bool*) { }
 
 #endif // #ifndef IMGUI_DISABLE
 
-#endif // #if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_GL)
+#endif // #if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_D3D12) || defined(AGZ_ENABLE_GL)

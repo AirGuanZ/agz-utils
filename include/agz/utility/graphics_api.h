@@ -49,14 +49,24 @@
 
 #ifdef AGZ_ENABLE_D3D12
 
+#include "./graphics_api/imgui/imgui.h"
+#include "./graphics_api/imgui/imfilebrowser.h"
+
+#include "./graphics_api/d3d12/buffer.h"
+#include "./graphics_api/d3d12/d3d12Context.h"
 #include "./graphics_api/d3d12/debug.h"
 #include "./graphics_api/d3d12/descriptorHeap.h"
 #include "./graphics_api/d3d12/descriptorHeapRaw.h"
 #include "./graphics_api/d3d12/device.h"
+#include "./graphics_api/d3d12/frameFence.h"
+#include "./graphics_api/d3d12/imguiIntegration.h"
 #include "./graphics_api/d3d12/input.h"
 #include "./graphics_api/d3d12/pipeline.h"
 #include "./graphics_api/d3d12/queueWaiter.h"
 #include "./graphics_api/d3d12/renderGraph.h"
+#include "./graphics_api/d3d12/renderGraphBuilder.h"
+#include "./graphics_api/d3d12/resourceManager.h"
+#include "./graphics_api/d3d12/resourceUploader.h"
 #include "./graphics_api/d3d12/rootSignature.h"
 #include "./graphics_api/d3d12/swapChain.h"
 #include "./graphics_api/d3d12/window.h"

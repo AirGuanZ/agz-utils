@@ -69,7 +69,7 @@
 #endif
 
 #include <agz/utility/graphics_api/imgui/imgui.h>
-#include <agz/utility/graphics_api/gl/imgui/imgui_impl_opengl3.h>
+#include <agz/utility/graphics_api/imgui/imgui_impl_opengl3.h>
 
 #include <stdio.h>
 #if defined(_MSC_VER) && _MSC_VER <= 1500 // MSVC 2008 or earlier

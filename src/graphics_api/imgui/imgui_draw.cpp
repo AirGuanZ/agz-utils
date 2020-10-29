@@ -1,4 +1,4 @@
-#if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_GL)
+#if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_D3D12) || defined(AGZ_ENABLE_GL)
 
 // dear imgui, v1.79 WIP
 // (drawing and font code)
@@ -3806,4 +3806,4 @@ static const char* GetDefaultCompressedFontDataTTFBase85()
 
 #endif // #ifndef IMGUI_DISABLE
 
-#endif // #if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_GL)
+#endif // #if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_D3D12) || defined(AGZ_ENABLE_GL)

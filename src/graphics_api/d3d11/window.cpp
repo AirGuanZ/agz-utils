@@ -8,9 +8,9 @@
 #include <dxgidebug.h>
 
 #include <agz/utility/graphics_api/imgui/imgui.h>
-#include <agz/utility/graphics_api/d3d11/imgui/imgui_impl_dx11.h>
-#include <agz/utility/graphics_api/d3d11/imgui/imgui_impl_win32.h>
-#include <agz/utility/graphics_api/d3d11/imgui/inputDispatcher.h>
+#include <agz/utility/graphics_api/imgui/inputDispatcher.h>
+#include <agz/utility/graphics_api/imgui/imgui_impl_dx11.h>
+#include <agz/utility/graphics_api/imgui/imgui_impl_win32.h>
 #include <agz/utility/graphics_api/d3d11/device.h>
 #include <agz/utility/graphics_api/d3d11/deviceContext.h>
 #include <agz/utility/graphics_api/d3d11/window.h>

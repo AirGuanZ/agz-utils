@@ -70,7 +70,7 @@ public:
     AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowGetFocusEvent)
     AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowLostFocusEvent)
     AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowResizeEvent)
-
+    
     // internal use
 
     void _close();

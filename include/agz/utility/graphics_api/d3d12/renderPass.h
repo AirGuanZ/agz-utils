@@ -9,11 +9,45 @@ AGZ_D3D12_BEGIN
 namespace rg
 {
 
+class PassContext
+{
+public:
+
+    PassContext(
+        ID3D12GraphicsCommandList *cmdList,
+        ID3D12Resource *const *rscs) noexcept
+        : cmdList_(cmdList), rscs_(rscs)
+    {
+        
+    }
+
+    ID3D12GraphicsCommandList *getCommandList() noexcept
+    {
+        return cmdList_;
+    }
+
+    ID3D12Resource *getResource(int index) noexcept
+    {
+        return rscs_[index];
+    }
+
+    ID3D12GraphicsCommandList *operator->() noexcept
+    {
+        return cmdList_;
+    }
+
+private:
+
+    ID3D12GraphicsCommandList *cmdList_;
+
+    ID3D12Resource *const *rscs_;
+};
+
 class Pass : public misc::uncopyable_t
 {
 public:
 
-    using Callback = std::function<void(ID3D12GraphicsCommandList*)>;
+    using Callback = std::function<void(PassContext&)>;
 
     Pass() = default;
 
@@ -58,13 +92,20 @@ public:
             }
         }
 
-        cmdList->ResourceBarrier(
-            static_cast<UINT>(beforeBarriers.size()), beforeBarriers.data());
+        if(!beforeBarriers.empty())
+        {
+            cmdList->ResourceBarrier(
+                static_cast<UINT>(beforeBarriers.size()), beforeBarriers.data());
+        }
 
-        (*callback_)(cmdList);
+        PassContext passContext(cmdList, rscs);
+        (*callback_)(passContext);
 
-        cmdList->ResourceBarrier(
-            static_cast<UINT>(afterBarriers.size()), afterBarriers.data());
+        if(!afterBarriers.empty())
+        {
+            cmdList->ResourceBarrier(
+                static_cast<UINT>(afterBarriers.size()), afterBarriers.data());
+        }
     }
 
 private:
@@ -100,7 +141,9 @@ public:
         passes_.push_back(std::move(pass));
     }
 
-    void execute(ID3D12GraphicsCommandList *cmdList, ID3D12Resource *const *rscs) const
+    void execute(
+        ID3D12GraphicsCommandList *cmdList,
+        ID3D12Resource     *const *rscs) const
     {
         for(auto &p : passes_)
             p.execute(cmdList, rscs);

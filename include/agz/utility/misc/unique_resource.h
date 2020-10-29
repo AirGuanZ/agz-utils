@@ -39,11 +39,11 @@ public:
         return *this;
     }
 
-    void swap(unique_resource_t &&other) noexcept
+    void swap(unique_resource_t &other) noexcept
     {
         std::swap(resource_, other.resource_);
-        std::swap(deleter_, other.deleter_);
-        std::swap(execute_, other.execute_);
+        std::swap(deleter_,  other.deleter_);
+        std::swap(execute_,  other.execute_);
     }
 
     void reset()

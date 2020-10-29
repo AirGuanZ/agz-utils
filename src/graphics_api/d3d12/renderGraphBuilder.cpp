@@ -37,6 +37,11 @@ void InternalResource::setHeapType(D3D12_HEAP_TYPE heapType)
     heapType_ = heapType;
 }
 
+int InternalResource::getIndex() const noexcept
+{
+    return index_;
+}
+
 ExternalResource::ExternalResource(std::string name, int index)
     : name_(std::move(name)), index_(index),
       initialState_(D3D12_RESOURCE_STATE_COMMON),
@@ -53,6 +58,11 @@ void ExternalResource::setInitialState(D3D12_RESOURCE_STATES state)
 void ExternalResource::setFinalState(D3D12_RESOURCE_STATES state)
 {
     finalState_ = state;
+}
+
+int ExternalResource::getIndex() const noexcept
+{
+    return index_;
 }
 
 Vertex::Vertex(std::string name, int index)
@@ -84,9 +94,9 @@ void Vertex::setThread(int index)
     threadIndex_ = index;
 }
 
-void Vertex::setCallback(std::shared_ptr<Callback> callback)
+void Vertex::setCallback(Callback callback)
 {
-    callback_ = std::move(callback);
+    callback_ = std::make_unique<Callback>(std::move(callback));
 }
 
 RenderGraphBuilder::RenderGraphBuilder()
@@ -321,7 +331,10 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
         auto &threadData   = renderGraph->perThreadData_[threadIdx];
         auto &threadRecord = threadRecords[threadIdx];
 
-        threadData.sections.resize(threadRecord.sections.size());
+        threadData.sectionCount = threadRecord.sections.size();
+        threadData.sections =
+            std::make_unique<RenderGraph::SectionRecord[]>(
+                threadData.sectionCount);
     }
 
     for(int threadIdx = 0; threadIdx < threadCount_; ++threadIdx)
@@ -362,12 +375,15 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
 
                     auto &outSec =
                         renderGraph->perThreadData_[outSecRecord.threadIndex]
-                                   .sections[outSecRecord.indexInThread];
+                                    .sections[outSecRecord.indexInThread];
 
-                    ++outSec.targetDependencyCount;
-                    outputs.insert(&outSec);
+                    if(&outSec != &section)
+                        outputs.insert(&outSec);
                 }
             }
+
+            for(auto o : outputs)
+                ++o->targetDependencyCount;
 
             std::copy(
                 outputs.begin(),
@@ -402,8 +418,8 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
 
                 if(pass.signalFence)
                 {
-                    // there must be a submission after a signal fence
-                    // so a section must have no more than one signal fence
+                    // a submission always exists with a signal fence
+                    // so any section has no more than one signal fence
                     assert(!section.signalFence);
                     section.signalFence = pass.signalFence;
                 }
@@ -413,14 +429,13 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
 
             for(int passIdx : sectionRecord.passes)
             {
-                auto &passRecord = passRecords[passIdx];
-                auto vtx         = vtxs_[passIdx].get();
-
                 Pass pass;
-                pass.setCallback(vtx->callback_);
+                pass.setCallback(vtxs_[passIdx]->callback_);
 
-                for(auto &t : passRecord.transitions)
+                for(auto &t : passRecords[passIdx].transitions)
                     pass.addResourceStateTransition(t.idx, t.beg, t.mid, t.end);
+
+                section.section.addPass(std::move(pass));
             }
         }
 
@@ -496,14 +511,19 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
             *rscs_[rscIdx],
             [&](const InternalResource &r)
         {
-            ResourceManager::UniqueResource rsc =
-                r.clear_ ?
-                rscMgr.create(
+            UniqueResource rsc;
+            if(r.clear_)
+            {
+                rsc = rscMgr.create(
                     r.heapType_, r.desc_,
-                    r.initialState_, r.clearValue_) :
-                rscMgr.create(
+                    r.initialState_, r.clearValue_);
+            }
+            else
+            {
+                rsc = rscMgr.create(
                     r.heapType_, r.desc_,
                     r.initialState_);
+            }
 
             renderGraph->rawRscs_[rscIdx] = rsc->resource.Get();
 
@@ -513,7 +533,8 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
                     .rsc = std::move(rsc)
                 });
 
-            renderGraph->name2Rsc_.insert({ r.name_, rscIdx });
+            renderGraph->name2Rsc_.insert(
+                { r.name_, static_cast<int>(rscIdx) });
         },
             [&](const ExternalResource &r)
         {
@@ -523,7 +544,8 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
                     .rsc = {}
                 });
 
-            renderGraph->name2Rsc_.insert({ r.name_, rscIdx });
+            renderGraph->name2Rsc_.insert(
+                { r.name_, static_cast<int>(rscIdx) });
         });
     }
 
@@ -548,8 +570,43 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
 
 std::vector<int> RenderGraphBuilder::topologySortPasses() const
 {
-    // TODO
-    return {};
+    // vertex index -> number of prevs
+    std::vector<size_t> inCount(vtxs_.size());
+
+    // indices of unprocessed vertices with no prevs
+    std::queue<size_t> Q;
+
+    for(size_t i = 0; i < vtxs_.size(); ++i)
+    {
+        const size_t c = vtxs_[i]->in_.size();
+        inCount[i] = c;
+        if(!c)
+            Q.push(i);
+    }
+
+    std::vector<int> result;
+    result.reserve(vtxs_.size());
+
+    while(!Q.empty())
+    {
+        const int vIdx = static_cast<int>(Q.front());
+        Q.pop();
+        result.push_back(vIdx);
+
+        for(auto out : vtxs_[vIdx]->out_)
+        {
+            if(!--inCount[out->index_])
+                Q.push(out->index_);
+        }
+    }
+
+    if(result.size() != vtxs_.size())
+    {
+        throw D3D12Exception(
+            "failed to find a topological order in render graph");
+    }
+
+    return result;
 }
 
 } // namespace rg

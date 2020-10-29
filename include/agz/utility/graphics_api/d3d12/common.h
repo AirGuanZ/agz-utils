@@ -67,7 +67,7 @@ constexpr ShaderRegister u5 = { 0, 5 };
     void attach(event::receiver_t<EventName> *handler)                          \
         { EventSender.attach(handler); }                                        \
     void attach(std::shared_ptr<event::receiver_t<EventName>> handler)          \
-        { EventSender.attach(handler); }                                        \
+        { EventSender.attach(std::move(handler)); }                                        \
     void detach(event::receiver_t<EventName> *handler)                          \
         { EventSender.detach(handler); }                                        \
     void detach(std::shared_ptr<event::receiver_t<EventName>> handler)          \

@@ -2,7 +2,8 @@
 
 #include <D3D12MemAlloc.h>
 
-#include <agz/utility/graphics_api/d3d12/common.h>
+#include <agz/utility/graphics_api/d3d12/buffer.h>
+#include <agz/utility/graphics_api/d3d12/uniqueResource.h>
 #include <agz/utility/misc.h>
 
 AGZ_D3D12_BEGIN
@@ -11,26 +12,24 @@ class ResourceManager : public misc::uncopyable_t
 {
 public:
 
-    struct Resource
+    enum BufferUsage
     {
-        ComPtr<ID3D12Resource> resource;
-        D3D12MA::Allocation   *allocation = nullptr;
+        Default,
+        Static,
+        Dynamic
     };
 
-    struct ResourceDeleter
-    {
-        void operator()(Resource &rsc) const
-        {
-            rsc.resource.Reset();
-            rsc.allocation->Release();
-        }
-    };
-
-    using UniqueResource = misc::unique_resource_t<Resource, ResourceDeleter>;
+    ResourceManager();
 
     ResourceManager(ID3D12Device *device, IDXGIAdapter *adapter);
 
+    ResourceManager(ResourceManager &&other) noexcept;
+
+    ResourceManager &operator=(ResourceManager &&other) noexcept;
+
     ~ResourceManager();
+
+    void swap(ResourceManager &other) noexcept;
 
     UniqueResource create(
         D3D12_HEAP_TYPE            heapType,
@@ -42,6 +41,12 @@ public:
         const D3D12_RESOURCE_DESC &desc,
         D3D12_RESOURCE_STATES      initialState,
         const D3D12_CLEAR_VALUE   &clearValue);
+
+    Buffer createDefaultBuffer(
+        size_t                byteSize,
+        D3D12_RESOURCE_STATES initState);
+
+    Buffer createUploadBuffer(size_t byteSize);
 
 private:
     

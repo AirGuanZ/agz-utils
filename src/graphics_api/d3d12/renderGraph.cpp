@@ -54,8 +54,11 @@ void RenderGraph::runAsync(int frameIndex)
 
     for(auto &d : perThreadData_)
     {
-        for(auto &s : d.sections)
+        for(size_t i = 0; i < d.sectionCount; ++i)
+        {
+            auto &s = d.sections[i];
             s.restDependencyCount = s.targetDependencyCount;
+        }
     }
 
     sync_->latch.set_counter(static_cast<int>(threads_.size()));
@@ -70,6 +73,45 @@ void RenderGraph::runAsync(int frameIndex)
 void RenderGraph::sync()
 {
     sync_->latch.wait();
+}
+
+void RenderGraph::setExternalResource(int index, ComPtr<ID3D12Resource> rsc)
+{
+    assert(index < static_cast<int>(rscs_.size()));
+    match_variant(
+        rscs_[index],
+        [&](const InternalResource &r)
+    {
+        throw D3D12Exception(
+            "resource " + std::to_string(index) + " is not an external resource");
+    },
+        [&](ExternalResource &r)
+    {
+        r.rsc = std::move(rsc);
+        rawRscs_[index] = r.rsc.Get();
+    });
+}
+
+void RenderGraph::setExternalResource(
+    std::string_view name, ComPtr<ID3D12Resource> rsc)
+{
+    const auto it = name2Rsc_.find(name);
+    if(it == name2Rsc_.end())
+        throw D3D12Exception("unknown external resource: " + std::string(name));
+    setExternalResource(it->second, std::move(rsc));
+}
+
+void RenderGraph::clearExternalResources()
+{
+    for(auto &rsc : rscs_)
+    {
+        auto r = rsc.as_if<ExternalResource>();
+        if(!r)
+            continue;
+
+        r->rsc.Reset();
+        rawRscs_[r->idx] = nullptr;
+    }
 }
 
 void RenderGraph::increaseNumOfFinishedDependency(SectionRecord *section)
@@ -102,11 +144,12 @@ void RenderGraph::workingFunc(int threadIndex)
         cmdAlloc.graphics->Reset();
     if(cmdAlloc.compute)
         cmdAlloc.compute->Reset();
-    
-    for(auto &s : threadData.sections)
+
+    for(size_t i = 0; i < threadData.sectionCount; ++i)
     {
+        auto &s       = threadData.sections[i];
         auto *cmdList = s.cmdListPerFrame[frameIndex].Get();
-        
+
         if(cmdList->GetType() == D3D12_COMMAND_LIST_TYPE_DIRECT)
         {
             assert(cmdAlloc.graphics);
@@ -135,7 +178,7 @@ void RenderGraph::workingThread(int threadIndex)
         {
             std::unique_lock lk(sync_->mutex);
             sync_->cond.wait(
-                lk, [=] { return trigger == threadTrigger_; });
+                lk, [=] { return trigger != threadTrigger_; });
             newTrigger = threadTrigger_;
         }
 

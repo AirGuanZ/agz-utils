@@ -1,7 +1,7 @@
-#ifdef AGZ_ENABLE_D3D11
+#if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_D3D12)
 
 #include <agz/utility/graphics_api/imgui/imgui.h>
-#include <agz/utility/graphics_api/d3d11/imgui/inputDispatcher.h>
+#include <agz/utility/graphics_api/imgui/inputDispatcher.h>
 
 namespace ImGui::Input
 {
@@ -53,4 +53,4 @@ void charInput(unsigned short ch)
 
 } // namespace ImGui::Input
 
-#endif // #ifdef AGZ_ENABLE_D3D11
+#endif // #if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_D3D12)

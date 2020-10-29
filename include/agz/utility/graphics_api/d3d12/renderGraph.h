@@ -29,6 +29,12 @@ public:
 
     void sync();
 
+    void setExternalResource(int index, ComPtr<ID3D12Resource> rsc);
+
+    void setExternalResource(std::string_view name, ComPtr<ID3D12Resource> rsc);
+
+    void clearExternalResources();
+
 private:
 
     friend class RenderGraphBuilder;
@@ -36,7 +42,7 @@ private:
     struct InternalResource
     {
         int idx;
-        ResourceManager::UniqueResource rsc;
+        UniqueResource rsc;
     };
 
     struct ExternalResource
@@ -77,7 +83,8 @@ private:
 
     struct PerThreadData
     {
-        std::vector<SectionRecord> sections;
+        size_t sectionCount;
+        std::unique_ptr<SectionRecord[]> sections;
 
         struct CommandListAllocator
         {

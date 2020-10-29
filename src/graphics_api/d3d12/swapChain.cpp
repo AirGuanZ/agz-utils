@@ -93,6 +93,11 @@ SwapChain::~SwapChain()
     swapChain_->SetFullscreenState(FALSE, nullptr);
 }
 
+DXGI_FORMAT SwapChain::getImageFormat() const noexcept
+{
+    return imageFormat_;
+}
+
 int SwapChain::getImageCount() const noexcept
 {
     return static_cast<int>(images_.size());

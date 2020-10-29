@@ -62,6 +62,9 @@ Device::~Device()
 
     queueWaiter_.reset();
 
+    graphicsQueue_.Reset();
+    computeQueue_.Reset();
+
     device_.Reset();
     adapter_.Reset();
 
@@ -76,6 +79,10 @@ Device::~Device()
             DXGI_DEBUG_RLO_FLAGS(
                 DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
     }
+
+#else
+
+    AGZ_UNACCESSED(DXGI_DEBUG_RLO_SUMMARY);
 
 #endif
 }
