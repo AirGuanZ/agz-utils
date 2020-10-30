@@ -2,7 +2,6 @@
 
 #include <map>
 
-#include <agz/utility/graphics_api/d3d12/renderPass.h>
 #include <agz/utility/graphics_api/d3d12/resourceManager.h>
 #include <agz/utility/thread.h>
 
@@ -10,6 +9,91 @@ AGZ_D3D12_BEGIN
 
 namespace rg
 {
+
+class PassContext
+{
+public:
+
+    PassContext(
+        ID3D12GraphicsCommandList *cmdList,
+        ID3D12Resource *const     *rscs) noexcept
+        : cmdList_(cmdList), rscs_(rscs) { }
+
+    ID3D12GraphicsCommandList *getCommandList() noexcept { return cmdList_; }
+
+    ID3D12Resource *getResource(int index) noexcept { return rscs_[index]; }
+
+    ID3D12GraphicsCommandList *operator->() noexcept { return cmdList_; }
+
+private:
+
+    ID3D12GraphicsCommandList *cmdList_;
+
+    ID3D12Resource *const *rscs_;
+};
+
+class Pass : public misc::uncopyable_t
+{
+public:
+
+    using Callback = std::function<void(PassContext&)>;
+
+    Pass() = default;
+
+    Pass(Pass &&other) noexcept = default;
+
+    Pass &operator=(Pass &&other) noexcept = default;
+
+    void setCallback(std::shared_ptr<Callback> callback) noexcept;
+
+    void addResourceStateTransition(
+        int                   idx,
+        D3D12_RESOURCE_STATES beg,
+        D3D12_RESOURCE_STATES mid,
+        D3D12_RESOURCE_STATES end);
+
+    void execute(
+        ID3D12GraphicsCommandList *cmdList,
+        ID3D12Resource    * const *rscs) const;
+
+private:
+
+    friend class RenderGraphBuilder;
+
+    struct ResourceStateTransition
+    {
+        int idx;
+
+        D3D12_RESOURCE_STATES beg;
+        D3D12_RESOURCE_STATES mid;
+        D3D12_RESOURCE_STATES end;
+    };
+
+    std::shared_ptr<Callback> callback_;
+
+    std::vector<ResourceStateTransition> rscStateTransitions_;
+};
+
+class Section : public misc::uncopyable_t
+{
+public:
+
+    Section() = default;
+
+    Section(Section &&other) noexcept = default;
+
+    Section &operator=(Section &&other) noexcept = default;
+
+    void addPass(Pass pass);
+
+    void execute(
+        ID3D12GraphicsCommandList *cmdList,
+        ID3D12Resource     *const *rscs) const;
+
+private:
+
+    std::vector<Pass> passes_;
+};
 
 class RenderGraph : public misc::uncopyable_t
 {

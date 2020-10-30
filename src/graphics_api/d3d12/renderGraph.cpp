@@ -1,11 +1,79 @@
 #ifdef AGZ_ENABLE_D3D12
 
+#include <d3dx12.h>
+
 #include <agz/utility/graphics_api/d3d12/renderGraph.h>
 
 AGZ_D3D12_BEGIN
 
 namespace rg
 {
+
+void Pass::setCallback(std::shared_ptr<Callback> callback) noexcept
+{
+    callback_ = std::move(callback);
+}
+
+void Pass::addResourceStateTransition(
+    int                   idx,
+    D3D12_RESOURCE_STATES beg,
+    D3D12_RESOURCE_STATES mid,
+    D3D12_RESOURCE_STATES end)
+{
+    rscStateTransitions_.push_back({ idx, beg, mid, end });
+}
+
+void Pass::execute(
+    ID3D12GraphicsCommandList *cmdList,
+    ID3D12Resource    * const *rscs) const
+{
+    std::vector<D3D12_RESOURCE_BARRIER> beforeBarriers, afterBarriers;
+
+    for(auto &t : rscStateTransitions_)
+    {
+        if(t.beg != t.mid)
+        {
+            beforeBarriers.push_back(
+                CD3DX12_RESOURCE_BARRIER::Transition(
+                    rscs[t.idx], t.beg, t.mid));
+        }
+
+        if(t.mid != t.end)
+        {
+            afterBarriers.push_back(
+                CD3DX12_RESOURCE_BARRIER::Transition(
+                    rscs[t.idx], t.mid, t.end));
+        }
+    }
+
+    if(!beforeBarriers.empty())
+    {
+        cmdList->ResourceBarrier(
+            static_cast<UINT>(beforeBarriers.size()), beforeBarriers.data());
+    }
+
+    PassContext passContext(cmdList, rscs);
+    (*callback_)(passContext);
+
+    if(!afterBarriers.empty())
+    {
+        cmdList->ResourceBarrier(
+            static_cast<UINT>(afterBarriers.size()), afterBarriers.data());
+    }
+}
+
+void Section::addPass(Pass pass)
+{
+    passes_.push_back(std::move(pass));
+}
+
+void Section::execute(
+    ID3D12GraphicsCommandList *cmdList,
+    ID3D12Resource     *const *rscs) const
+{
+    for(auto &p : passes_)
+        p.execute(cmdList, rscs);
+}
 
 RenderGraph::RenderGraph(RenderGraph &&other) noexcept
     : RenderGraph()
