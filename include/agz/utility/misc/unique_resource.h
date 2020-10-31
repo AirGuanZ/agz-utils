@@ -10,6 +10,7 @@ class unique_resource_t
 {
     R resource_;
     D deleter_;
+
     bool execute_ = false;
 
     unique_resource_t(const unique_resource_t &)            = delete;
@@ -37,6 +38,12 @@ public:
     {
         this->swap(other);
         return *this;
+    }
+
+    ~unique_resource_t()
+    {
+        if(execute_)
+            deleter_(resource_);
     }
 
     void swap(unique_resource_t &other) noexcept

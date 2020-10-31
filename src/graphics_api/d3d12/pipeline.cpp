@@ -1,5 +1,7 @@
 #ifdef AGZ_ENABLE_D3D12
 
+#include <d3dx12.h>
+
 #include <agz/utility/graphics_api/d3d12/pipeline.h>
 
 AGZ_D3D12_BEGIN
@@ -27,8 +29,8 @@ namespace
     D3D12_DEPTH_STENCIL_DESC defaultDepthStencilDesc() noexcept
     {
         return D3D12_DEPTH_STENCIL_DESC{
-            .DepthEnable      = true,
-            .DepthWriteMask   = D3D12_DEPTH_WRITE_MASK_ALL,
+            .DepthEnable      = false,
+            .DepthWriteMask   = D3D12_DEPTH_WRITE_MASK_ZERO,
             .DepthFunc        = D3D12_COMPARISON_FUNC_LESS,
             .StencilEnable    = false,
             .StencilReadMask  = 0xff,
@@ -53,19 +55,19 @@ namespace
 PipelineBuilder::PipelineBuilder(ID3D12Device *device)
     : device_(device), desc_{}
 {
-    desc_.BlendState.IndependentBlendEnable = true;
+    desc_.BlendState                        = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    //desc_.BlendState.IndependentBlendEnable = true;
     desc_.SampleMask                        = 0xffffffff;
-    desc_.RasterizerState                   = defaultRasterizerDesc();
+    desc_.RasterizerState                   = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     desc_.DepthStencilState                 = defaultDepthStencilDesc();
-    desc_.IBStripCutValue                   = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
     desc_.PrimitiveTopologyType             = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     desc_.NumRenderTargets                  = 0;
     desc_.DSVFormat                         = DXGI_FORMAT_UNKNOWN;
     desc_.SampleDesc                        = { 1, 0 };
     desc_.Flags                             = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-    for(auto &b : desc_.BlendState.RenderTarget)
-        b.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+    //for(auto &b : desc_.BlendState.RenderTarget)
+    //    b.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 }
 
 void PipelineBuilder::addInputElement(const D3D12_INPUT_ELEMENT_DESC &elem)

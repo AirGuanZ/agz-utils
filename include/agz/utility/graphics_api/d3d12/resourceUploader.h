@@ -22,6 +22,15 @@ public:
         const void *data,
         size_t      dataBytes = 0);
 
+    template<typename Vertex>
+    void upload(
+        VertexBuffer<Vertex> &buffer,
+        const Vertex         *data,
+        size_t                vertexCount = 0)
+    {
+        this->upload(buffer.getBuffer(), data, sizeof(Vertex) * vertexCount);
+    }
+
     // submit all accumulated tasks to gpu
     void submit();
 

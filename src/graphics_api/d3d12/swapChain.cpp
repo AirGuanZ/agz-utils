@@ -198,8 +198,8 @@ void SwapChain::setImageSize(int width, int height) noexcept
 {
     imageSize_ = { width, height };
 
-    defaultViewport_.Width    = static_cast<float>(width);
-    defaultViewport_.TopLeftY = static_cast<float>(height);
+    defaultViewport_.Width  = static_cast<float>(width);
+    defaultViewport_.Height = static_cast<float>(height);
 
     defaultRect_.right  = width;
     defaultRect_.bottom = height;

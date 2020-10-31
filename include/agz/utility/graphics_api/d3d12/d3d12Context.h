@@ -19,7 +19,7 @@ public:
 
     ~D3D12Context();
 
-    void startFrame(bool waitForFocus = true);
+    void startFrame(bool imgui = false, bool waitForFocus = true);
 
     void endFrame();
 
@@ -69,6 +69,8 @@ public:
     ID3D12CommandQueue *getComputeQueue()  noexcept;
 
     ResourceManager createResourceManager() const;
+
+    ComPtr<ID3D12CommandQueue> createCopyQueue() const;
 
     // swap chain
 

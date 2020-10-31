@@ -29,6 +29,8 @@ public:
 
     ResourceManager createResourceManager() const { return ResourceManager(device_.Get(), adapter_.Get()); }
 
+    ComPtr<ID3D12CommandQueue> createCopyQueue() const;
+
 private:
 
     ComPtr<IDXGIFactory> factory_;

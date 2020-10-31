@@ -68,6 +68,7 @@
 #include "./graphics_api/d3d12/resourceManager.h"
 #include "./graphics_api/d3d12/resourceUploader.h"
 #include "./graphics_api/d3d12/rootSignature.h"
+#include "./graphics_api/d3d12/shaderCompiler.h"
 #include "./graphics_api/d3d12/swapChain.h"
 #include "./graphics_api/d3d12/window.h"
 

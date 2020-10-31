@@ -95,6 +95,22 @@ void Device::waitForIdle()
         queueWaiter_->waitIdle(computeQueue_.Get());
 }
 
+ComPtr<ID3D12CommandQueue> Device::createCopyQueue() const
+{
+    D3D12_COMMAND_QUEUE_DESC desc;
+    desc.Type     = D3D12_COMMAND_LIST_TYPE_COPY;
+    desc.Flags    = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    desc.NodeMask = 0;
+    desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+
+    ComPtr<ID3D12CommandQueue> ret;
+    AGZ_D3D12_CHECK_HR(
+        device_->CreateCommandQueue(
+            &desc, IID_PPV_ARGS(ret.GetAddressOf())));
+
+    return ret;
+}
+
 AGZ_D3D12_END
 
 #endif // #ifdef AGZ_ENABLE_D3D12

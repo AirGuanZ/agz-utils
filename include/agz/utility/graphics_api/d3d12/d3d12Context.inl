@@ -20,14 +20,16 @@ inline D3D12Context::~D3D12Context()
     device_.waitForIdle();
 }
 
-inline void D3D12Context::startFrame(bool waitForFocus)
+inline void D3D12Context::startFrame(bool imgui, bool waitForFocus)
 {
     window_.doEvents();
     if(waitForFocus)
         window_.waitForFocus();
 
     frameFence_.startFrame(swapChain_.getImageIndex());
-    imgui_.newFrame();
+
+    if(imgui)
+        imgui_.newFrame();
 }
 
 inline void D3D12Context::endFrame()
@@ -128,6 +130,11 @@ inline ID3D12CommandQueue *D3D12Context::getComputeQueue() noexcept
 inline ResourceManager D3D12Context::createResourceManager() const
 {
     return device_.createResourceManager();
+}
+
+inline ComPtr<ID3D12CommandQueue> D3D12Context::createCopyQueue() const
+{
+    return device_.createCopyQueue();
 }
 
 inline DXGI_FORMAT D3D12Context::getFramebufferFormat() const noexcept

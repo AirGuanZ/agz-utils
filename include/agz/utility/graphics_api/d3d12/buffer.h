@@ -74,6 +74,8 @@ public:
 
     size_t getByteSize() const noexcept;
 
+    UINT getVertexCount() const noexcept;
+
     D3D12_VERTEX_BUFFER_VIEW getView() const noexcept;
 
     Buffer &getBuffer() noexcept;

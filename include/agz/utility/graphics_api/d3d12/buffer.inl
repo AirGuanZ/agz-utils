@@ -70,6 +70,12 @@ size_t VertexBuffer<Vertex>::getByteSize() const noexcept
 }
 
 template<typename Vertex>
+UINT VertexBuffer<Vertex>::getVertexCount() const noexcept
+{
+    return static_cast<UINT>(vertexCount_);
+}
+
+template<typename Vertex>
 D3D12_VERTEX_BUFFER_VIEW VertexBuffer<Vertex>::getView() const noexcept
 {
     return D3D12_VERTEX_BUFFER_VIEW{
