@@ -24,6 +24,7 @@ void Pass::addResourceStateTransition(
 }
 
 void Pass::execute(
+    int                        frameIndex,
     ID3D12GraphicsCommandList *cmdList,
     ID3D12Resource    * const *rscs) const
 {
@@ -52,7 +53,7 @@ void Pass::execute(
             static_cast<UINT>(beforeBarriers.size()), beforeBarriers.data());
     }
 
-    PassContext passContext(cmdList, rscs);
+    PassContext passContext(frameIndex, cmdList, rscs);
     (*callback_)(passContext);
 
     if(!afterBarriers.empty())
@@ -68,11 +69,12 @@ void Section::addPass(Pass pass)
 }
 
 void Section::execute(
+    int                        frameIndex,
     ID3D12GraphicsCommandList *cmdList,
     ID3D12Resource     *const *rscs) const
 {
     for(auto &p : passes_)
-        p.execute(cmdList, rscs);
+        p.execute(frameIndex, cmdList, rscs);
 }
 
 RenderGraph::RenderGraph(RenderGraph &&other) noexcept
@@ -141,6 +143,12 @@ void RenderGraph::runAsync(int frameIndex)
 void RenderGraph::sync()
 {
     sync_->latch.wait();
+}
+
+void RenderGraph::run(int frameIndex)
+{
+    runAsync(frameIndex);
+    sync();
 }
 
 void RenderGraph::setExternalResource(int index, ComPtr<ID3D12Resource> rsc)
@@ -230,7 +238,7 @@ void RenderGraph::workingFunc(int threadIndex)
             cmdList->Reset(cmdAlloc.compute.Get(), nullptr);
         }
 
-        s.section.execute(cmdList, rawRscs_.data());
+        s.section.execute(frameIndex, cmdList, rawRscs_.data());
 
         cmdList->Close();
         increaseNumOfFinishedDependency(&s);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <agz/utility/graphics_api/d3d12/device.h>
+#include <agz/utility/graphics_api/d3d12/descriptorAllocator.h>
 #include <agz/utility/graphics_api/d3d12/frameFence.h>
 #include <agz/utility/graphics_api/d3d12/imguiIntegration.h>
 #include <agz/utility/graphics_api/d3d12/swapChain.h>
@@ -15,6 +16,7 @@ public:
     D3D12Context(
         const WindowDesc    &windowDesc,
         const SwapChainDesc &swapChainDesc,
+        uint32_t             GPUDescHeapSize    = 1024,
         bool                 enableComputeQueue = false);
 
     ~D3D12Context();
@@ -101,23 +103,39 @@ public:
     const D3D12_RECT &getDefaultScissorRect() const noexcept;
     
     AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(swapChain_, SwapChainPreResizeEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(swapChain_, SwapChainPostResizeEvent)
+        AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(swapChain_, SwapChainPostResizeEvent)
+
+    // gpu heap
+
+    ID3D12DescriptorHeap *getGPUDescHeap() const noexcept;
+
+    Descriptor allocStatic();
+
+    void freeStatic(Descriptor descriptor);
+
+    DescriptorRange allocStaticRange(uint32_t count);
+
+    void freeRangeStatic(const DescriptorRange &range);
+
+    DescriptorRange allocTransientRange(uint32_t size);
+
+    TransientDescriptorAllocator createTransientAllocator(
+        uint32_t initialSize = 64, float sizeIncFactor = 1.5f);
 
     // imgui
 
     void renderImGui(ID3D12GraphicsCommandList *cmdList);
 
-    ID3D12DescriptorHeap *getImGuiGPUHeap() noexcept;
-
 private:
 
     // warning: check d3d12Context.inl before changing the order of decls
 
-    Window           window_;
-    Device           device_;
-    SwapChain        swapChain_;
-    ImGuiIntegration imgui_;
-    FrameFence       frameFence_;
+    Window              window_;
+    Device              device_;
+    SwapChain           swapChain_;
+    DescriptorAllocator descAlloc_;
+    ImGuiIntegration    imgui_;
+    FrameFence          frameFence_;
 };
 
 AGZ_D3D12_END

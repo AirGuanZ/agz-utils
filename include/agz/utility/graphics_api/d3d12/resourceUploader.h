@@ -8,6 +8,12 @@ class ResourceUploader : public misc::uncopyable_t
 {
 public:
 
+    struct Texture2DInitData
+    {
+        const void *data = nullptr;
+        size_t rowBytes  = 0;
+    };
+
     ResourceUploader(
         ComPtr<ID3D12Device>       device,
         ComPtr<ID3D12CommandQueue> copyCmdQueue,
@@ -30,6 +36,10 @@ public:
     {
         this->upload(buffer.getBuffer(), data, sizeof(Vertex) * vertexCount);
     }
+
+    void uploadTexture2D(
+        ID3D12Resource          *rsc,
+        const Texture2DInitData *data);
 
     // submit all accumulated tasks to gpu
     void submit();

@@ -55,6 +55,7 @@
 #include "./graphics_api/d3d12/buffer.h"
 #include "./graphics_api/d3d12/d3d12Context.h"
 #include "./graphics_api/d3d12/debug.h"
+#include "./graphics_api/d3d12/descriptorAllocator.h"
 #include "./graphics_api/d3d12/descriptorHeap.h"
 #include "./graphics_api/d3d12/descriptorHeapRaw.h"
 #include "./graphics_api/d3d12/device.h"

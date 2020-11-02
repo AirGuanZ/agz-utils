@@ -67,7 +67,6 @@ int ExternalResource::getIndex() const noexcept
 
 Vertex::Vertex(std::string name, int index)
     : name_(std::move(name)), index_(index),
-      cmdListType_(D3D12_COMMAND_LIST_TYPE_DIRECT),
       threadIndex_(0),
       queueIndex_(0)
 {
@@ -136,11 +135,19 @@ ExternalResource *RenderGraphBuilder::addExternalResource(std::string name)
     return &rscs_.back()->as<ExternalResource>();
 }
 
-Vertex *RenderGraphBuilder::addVertex(std::string name)
+Vertex *RenderGraphBuilder::addVertex(
+    std::string name,
+    int         threadIndex,
+    int         queueIndex)
 {
     const int index = static_cast<int>(vtxs_.size());
     vtxs_.push_back(std::make_unique<Vertex>(std::move(name), index));
-    return vtxs_.back().get();
+
+    auto ret = vtxs_.back().get();
+    ret->setThread(threadIndex);
+    ret->setQueue(queueIndex);
+
+    return ret;
 }
 
 void RenderGraphBuilder::addArc(Vertex *head, Vertex *tail)
@@ -151,11 +158,44 @@ void RenderGraphBuilder::addArc(Vertex *head, Vertex *tail)
 
 std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
     ID3D12Device                                     *device,
-    std::initializer_list<ComPtr<ID3D12CommandQueue>> cmdQueues,
+    std::vector<ComPtr<ID3D12CommandQueue>>           cmdQueues,
     ResourceManager                                  &rscMgr) const
 {
-    std::vector<PassRecord> passRecords(vtxs_.size());
+    // build mapping from vertex to command list type
 
+    std::vector<D3D12_COMMAND_QUEUE_DESC> cmdQueueDescs(cmdQueues.size());
+    for(size_t i = 0; i < cmdQueues.size(); ++i)
+        cmdQueueDescs[i] = cmdQueues[i]->GetDesc();
+
+    auto vtx2CmdListType = [&](const Vertex *vtx)
+    {
+        return cmdQueueDescs[vtx->queueIndex_].Type;
+    };
+
+    // check thread/queue indices
+
+    for(auto &v : vtxs_)
+    {
+        if(v->queueIndex_ >= queueCount_)
+        {
+            throw D3D12Exception(
+                "'" + v->name_ + "'.queueIndex exceeds graph limits. "
+                "max: " + std::to_string(queueCount_ - 1) + "; "
+                "actial: " + std::to_string(v->queueIndex_));
+        }
+
+        if(v->threadIndex_ >= threadCount_)
+        {
+            throw D3D12Exception(
+                "'" + v->name_ + "'.threadIndex exceeds graph limits. "
+                "max: " + std::to_string(threadCount_ - 1) + "; "
+                "actial: " + std::to_string(v->threadIndex_));
+        }
+    }
+
+    // sort all passes
+
+    std::vector<PassRecord> passRecords(vtxs_.size());
     const auto linearPasses = topologySortPasses();
 
     // assign passes to threads
@@ -184,7 +224,7 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
                 ResourceRecord::Usage{
                     .pass        = passIdx,
                     .state       = r.state,
-                    .cmdListType = vtx->cmdListType_
+                    .cmdListType = vtx2CmdListType(vtx)
                 });
         }
     }
@@ -393,7 +433,7 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
             // need graphics/compute command allocator?
 
             const D3D12_COMMAND_LIST_TYPE cmdListType =
-                vtxs_[sectionRecord.passes.front()]->cmdListType_;
+                vtx2CmdListType(vtxs_[sectionRecord.passes.front()].get());
 
             if(cmdListType == D3D12_COMMAND_LIST_TYPE_DIRECT)
                 hasGraphicsSection = true;
@@ -483,7 +523,7 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
             for(auto &cmdList : section.cmdListPerFrame)
             {
                 const D3D12_COMMAND_LIST_TYPE cmdListType =
-                    vtxs_[sectionRecord.passes.front()]->cmdListType_;
+                    vtx2CmdListType(vtxs_[sectionRecord.passes.front()].get());
 
                 auto cmdAlloc =
                     cmdListType == D3D12_COMMAND_LIST_TYPE_DIRECT ?
@@ -551,7 +591,7 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
 
     // command queues
 
-    renderGraph->cmdQueues_ = cmdQueues;
+    renderGraph->cmdQueues_ = std::move(cmdQueues);
 
     // sync
 

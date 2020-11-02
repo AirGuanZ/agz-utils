@@ -5,11 +5,14 @@ AGZ_D3D12_BEGIN
 inline D3D12Context::D3D12Context(
     const WindowDesc    &windowDesc,
     const SwapChainDesc &swapChainDesc,
+    uint32_t             GPUDescHeapSize,
     bool                 enableComputeQueue)
     : window_(windowDesc),
       device_(true, enableComputeQueue),
       swapChain_(swapChainDesc, window_, device_),
-      imgui_(window_, swapChain_, device_),
+      descAlloc_(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, true,
+                 GPUDescHeapSize, swapChainDesc.imageCount),
+      imgui_(window_, swapChain_, device_, descAlloc_.allocStatic()),
       frameFence_(device_, device_.getGraphicsQueue(), swapChainDesc.imageCount)
 {
     
@@ -27,6 +30,7 @@ inline void D3D12Context::startFrame(bool imgui, bool waitForFocus)
         window_.waitForFocus();
 
     frameFence_.startFrame(swapChain_.getImageIndex());
+    descAlloc_.startFrame(swapChain_.getImageIndex());
 
     if(imgui)
         imgui_.newFrame();
@@ -202,14 +206,45 @@ inline const D3D12_RECT &D3D12Context::getDefaultScissorRect() const noexcept
     return swapChain_.getDefaultScissorRect();
 }
 
+inline Descriptor D3D12Context::allocStatic()
+{
+    return descAlloc_.allocStatic();
+}
+
+inline void D3D12Context::freeStatic(Descriptor descriptor)
+{
+    descAlloc_.freeStatic(descriptor);
+}
+
+inline DescriptorRange D3D12Context::allocStaticRange(uint32_t count)
+{
+    return descAlloc_.allocStaticRange(count);
+}
+
+inline void D3D12Context::freeRangeStatic(const DescriptorRange &range)
+{
+    descAlloc_.freeRangeStatic(range);
+}
+
+inline DescriptorRange D3D12Context::allocTransientRange(uint32_t size)
+{
+    return descAlloc_.allocTransientRange(size);
+}
+
+inline TransientDescriptorAllocator D3D12Context::createTransientAllocator(
+    uint32_t initialSize, float sizeIncFactor)
+{
+    return descAlloc_.createTransientAllocator(initialSize, sizeIncFactor);
+}
+
+inline ID3D12DescriptorHeap *D3D12Context::getGPUDescHeap() const noexcept
+{
+    return descAlloc_.getHeap();
+}
+
 inline void D3D12Context::renderImGui(ID3D12GraphicsCommandList *cmdList)
 {
     imgui_.render(cmdList);
-}
-
-inline ID3D12DescriptorHeap *D3D12Context::getImGuiGPUHeap() noexcept
-{
-    return imgui_.getGPUHeap();
 }
 
 AGZ_D3D12_END

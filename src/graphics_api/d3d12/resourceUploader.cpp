@@ -80,6 +80,76 @@ void ResourceUploader::upload(
     uploadRscs_[cmdListIdx_].back().rsc = std::move(upload);
 }
 
+void ResourceUploader::uploadTexture2D(
+    ID3D12Resource          *rsc,
+    const Texture2DInitData *data)
+{
+    const D3D12_RESOURCE_DESC rscDesc = rsc->GetDesc();
+    assert(rscDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D);
+
+    // texel size
+
+    UINT texelBytes;
+    switch(rscDesc.Format)
+    {
+    case DXGI_FORMAT_R8G8B8A8_UNORM:     texelBytes = 4; break;
+    case DXGI_FORMAT_R32G32B32_FLOAT:    texelBytes = 12; break;
+    case DXGI_FORMAT_R32G32B32A32_FLOAT: texelBytes = 16; break;
+    default:
+        throw D3D12Exception("resource uploader: unsupported texel format");
+    }
+
+    // construct D3D12_SUBRESOURCE_DATAs
+
+    const UINT arraySize   = rscDesc.DepthOrArraySize;
+    const UINT mipmapCount = rscDesc.MipLevels;
+    const UINT width       = static_cast<UINT>(rscDesc.Width);
+    const UINT height      = static_cast<UINT>(rscDesc.Height);
+
+    std::vector<D3D12_SUBRESOURCE_DATA> subrscData;
+    subrscData.reserve(arraySize * mipmapCount);
+
+    for(UINT arrIdx = 0; arrIdx < arraySize; ++arrIdx)
+    {
+        for(UINT mipIdx = 0; mipIdx < mipmapCount; ++mipIdx)
+        {
+            const UINT subrscIdx = arrIdx * mipmapCount + mipIdx;
+            const auto &iData = data[subrscIdx];
+
+            const UINT mipWidth  = (std::max<UINT>)(1, width >> mipIdx);
+            const UINT mipHeight = (std::max<UINT>)(1, height >> mipIdx);
+
+            const UINT rowBytes = (std::max)(
+                static_cast<UINT>(iData.rowBytes),
+                mipWidth * texelBytes);
+
+            subrscData.push_back(D3D12_SUBRESOURCE_DATA{
+                .pData      = iData.data,
+                .RowPitch   = static_cast<LONG_PTR>(rowBytes),
+                .SlicePitch = static_cast<LONG_PTR>(rowBytes * mipHeight)
+            });
+        }
+    }
+
+    // upload
+
+    const UINT64 uploadBufSize = GetRequiredIntermediateSize(
+        rsc, 0, arraySize * mipmapCount);
+
+    auto upload = rscMgr_.create(
+        D3D12_HEAP_TYPE_UPLOAD,
+        CD3DX12_RESOURCE_DESC::Buffer(uploadBufSize),
+        D3D12_RESOURCE_STATE_GENERIC_READ);
+
+    UpdateSubresources(
+        cmdLists_[cmdListIdx_].cmdList.Get(),
+        rsc, upload->resource.Get(),
+        0, 0, arraySize * mipmapCount, subrscData.data());
+
+    uploadRscs_[cmdListIdx_].emplace_back();
+    uploadRscs_[cmdListIdx_].back().rsc = std::move(upload);
+}
+
 void ResourceUploader::submit()
 {
     // submit

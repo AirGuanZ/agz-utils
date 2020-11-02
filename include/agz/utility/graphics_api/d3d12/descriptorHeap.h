@@ -29,6 +29,8 @@ public:
     operator D3D12_CPU_DESCRIPTOR_HANDLE() const noexcept { return getCPUHandle(); }
 
     operator D3D12_GPU_DESCRIPTOR_HANDLE() const noexcept { return getGPUHandle(); }
+
+    operator bool() const noexcept { return cpu_.ptr != 0; }
 };
 
 class DescriptorRange

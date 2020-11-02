@@ -1,6 +1,6 @@
 #pragma once
 
-#include <agz/utility/graphics_api/d3d12/descriptorHeapRaw.h>
+#include <agz/utility/graphics_api/d3d12/descriptorHeap.h>
 
 AGZ_D3D12_BEGIN
 
@@ -13,7 +13,10 @@ class ImGuiIntegration : public misc::uncopyable_t
 public:
 
     explicit ImGuiIntegration(
-        Window &window, SwapChain &swapChain, Device &device);
+        Window    &window,
+        SwapChain &swapChain,
+        Device    &device,
+        Descriptor SRVDesc);
 
     ~ImGuiIntegration();
 
@@ -21,13 +24,11 @@ public:
 
     void render(ID3D12GraphicsCommandList *cmdList);
 
-    ID3D12DescriptorHeap *getGPUHeap() noexcept;
-
 private:
 
     class ImGuiInputDispatcher;
 
-    RawDescriptorHeap srvHeap_;
+    Descriptor SRVDesc_;
 
     std::unique_ptr<ImGuiInputDispatcher> inputDispatcher_;
 };

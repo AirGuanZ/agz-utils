@@ -101,8 +101,6 @@ private:
     std::string name_;
     int         index_;
 
-    D3D12_COMMAND_LIST_TYPE cmdListType_;
-
     int threadIndex_;
     int queueIndex_;
 
@@ -130,14 +128,14 @@ public:
 
     ExternalResource *addExternalResource(std::string name);
 
-    Vertex *addVertex(std::string name);
+    Vertex *addVertex(std::string name, int threadIndex = 0, int queueIndex = 0);
 
     void addArc(Vertex *head, Vertex *tail);
 
     std::unique_ptr<RenderGraph> build(
-        ID3D12Device                                     *device,
-        std::initializer_list<ComPtr<ID3D12CommandQueue>> cmdQueues,
-        ResourceManager                                  &rscMgr) const;
+        ID3D12Device                           *device,
+        std::vector<ComPtr<ID3D12CommandQueue>> cmdQueues,
+        ResourceManager                        &rscMgr) const;
     
 private:
 

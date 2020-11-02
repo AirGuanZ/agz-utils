@@ -12,13 +12,6 @@ class ResourceManager : public misc::uncopyable_t
 {
 public:
 
-    enum BufferUsage
-    {
-        Default,
-        Static,
-        Dynamic
-    };
-
     ResourceManager();
 
     ResourceManager(ID3D12Device *device, IDXGIAdapter *adapter);

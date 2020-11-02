@@ -70,10 +70,9 @@ public:
 };
 
 ImGuiIntegration::ImGuiIntegration(
-    Window &window, SwapChain &swapChain, Device &device)
+    Window &window, SwapChain &swapChain, Device &device, Descriptor SRVDesc)
 {
-    srvHeap_ = RawDescriptorHeap(
-        device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, true);
+    SRVDesc_ = SRVDesc;
 
     ImGui::CreateContext();
     ImGui_ImplWin32_Init(window.getWindowHandle());
@@ -81,9 +80,9 @@ ImGuiIntegration::ImGuiIntegration(
         device,
         swapChain.getImageCount(),
         swapChain.getImageFormat(),
-        srvHeap_.getHeap(),
-        srvHeap_.getCPUHandle(0),
-        srvHeap_.getGPUHandle(0));
+        nullptr,
+        SRVDesc_,
+        SRVDesc_);
     ImGui::StyleColorsLight();
 
     inputDispatcher_ = std::make_unique<ImGuiInputDispatcher>();
@@ -108,11 +107,6 @@ void ImGuiIntegration::render(ID3D12GraphicsCommandList *cmdList)
 {
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
-}
-
-ID3D12DescriptorHeap *ImGuiIntegration::getGPUHeap() noexcept
-{
-    return srvHeap_.getHeap();
 }
 
 AGZ_D3D12_END

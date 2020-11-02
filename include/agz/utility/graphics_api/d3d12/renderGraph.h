@@ -15,9 +15,12 @@ class PassContext
 public:
 
     PassContext(
+        int                        frameIndex,
         ID3D12GraphicsCommandList *cmdList,
         ID3D12Resource *const     *rscs) noexcept
-        : cmdList_(cmdList), rscs_(rscs) { }
+        : frameIndex_(frameIndex), cmdList_(cmdList), rscs_(rscs) { }
+
+    int getFrameIndex() const noexcept { return frameIndex_; }
 
     ID3D12GraphicsCommandList *getCommandList() noexcept { return cmdList_; }
 
@@ -26,6 +29,8 @@ public:
     ID3D12GraphicsCommandList *operator->() noexcept { return cmdList_; }
 
 private:
+
+    int frameIndex_;
 
     ID3D12GraphicsCommandList *cmdList_;
 
@@ -53,6 +58,7 @@ public:
         D3D12_RESOURCE_STATES end);
 
     void execute(
+        int                        frameIndex,
         ID3D12GraphicsCommandList *cmdList,
         ID3D12Resource    * const *rscs) const;
 
@@ -87,6 +93,7 @@ public:
     void addPass(Pass pass);
 
     void execute(
+        int                        frameIndex,
         ID3D12GraphicsCommandList *cmdList,
         ID3D12Resource     *const *rscs) const;
 
@@ -112,6 +119,8 @@ public:
     void runAsync(int frameIndex);
 
     void sync();
+
+    void run(int frameIndex);
 
     void setExternalResource(int index, ComPtr<ID3D12Resource> rsc);
 
