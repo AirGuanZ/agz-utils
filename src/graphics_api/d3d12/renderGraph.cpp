@@ -2,7 +2,7 @@
 
 #include <d3dx12.h>
 
-#include <agz/utility/graphics_api/d3d12/renderGraph.h>
+#include <agz/utility/graphics_api/d3d12/renderGraphBuilder.h>
 
 AGZ_D3D12_BEGIN
 
@@ -149,6 +149,12 @@ void RenderGraph::run(int frameIndex)
 {
     runAsync(frameIndex);
     sync();
+}
+
+void RenderGraph::setExternalResource(
+    const rg::Resource *rscNode, ComPtr<ID3D12Resource> rsc)
+{
+    setExternalResource(rscNode->getIndex(), std::move(rsc));
 }
 
 void RenderGraph::setExternalResource(int index, ComPtr<ID3D12Resource> rsc)

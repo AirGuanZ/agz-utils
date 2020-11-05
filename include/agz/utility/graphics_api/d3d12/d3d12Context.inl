@@ -237,6 +237,11 @@ inline TransientDescriptorAllocator D3D12Context::createTransientAllocator(
     return descAlloc_.createTransientAllocator(initialSize, sizeIncFactor);
 }
 
+inline DescriptorAllocator &D3D12Context::getDescriptorAllocator() noexcept
+{
+    return descAlloc_;
+}
+
 inline ID3D12DescriptorHeap *D3D12Context::getGPUDescHeap() const noexcept
 {
     return descAlloc_.getHeap();

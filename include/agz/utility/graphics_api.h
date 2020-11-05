@@ -65,6 +65,7 @@
 #include "./graphics_api/d3d12/pipeline.h"
 #include "./graphics_api/d3d12/queueWaiter.h"
 #include "./graphics_api/d3d12/renderGraph.h"
+#include "./graphics_api/d3d12/renderGraph2.h"
 #include "./graphics_api/d3d12/renderGraphBuilder.h"
 #include "./graphics_api/d3d12/resourceManager.h"
 #include "./graphics_api/d3d12/resourceUploader.h"

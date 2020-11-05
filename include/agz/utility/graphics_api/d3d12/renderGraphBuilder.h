@@ -9,7 +9,35 @@ AGZ_D3D12_BEGIN
 namespace rg
 {
 
-class InternalResource : public misc::uncopyable_t
+class InternalResource;
+class ExternalResource;
+
+class Resource
+{
+protected:
+
+    std::string name_;
+
+    int index_;
+
+public:
+
+    Resource(std::string name, int index) noexcept;
+
+    virtual ~Resource() = default;
+
+    int getIndex() const noexcept;
+
+    virtual const InternalResource *asInternal() const noexcept;
+
+    virtual const ExternalResource *asExternal() const noexcept;
+
+    virtual InternalResource *asInternal() noexcept;
+
+    virtual ExternalResource *asExternal() noexcept;
+};
+
+class InternalResource : public Resource
 {
 public:
 
@@ -23,14 +51,13 @@ public:
 
     void setHeapType(D3D12_HEAP_TYPE heapType);
 
-    int getIndex() const noexcept;
+    const InternalResource *asInternal() const noexcept override;
+
+    InternalResource *asInternal() noexcept override;
 
 private:
 
     friend class RenderGraphBuilder;
-
-    std::string name_;
-    int         index_;
 
     D3D12_HEAP_TYPE heapType_;
 
@@ -42,7 +69,7 @@ private:
     D3D12_RESOURCE_STATES initialState_;
 };
 
-class ExternalResource : public misc::uncopyable_t
+class ExternalResource : public Resource
 {
 public:
 
@@ -52,14 +79,13 @@ public:
 
     void setFinalState(D3D12_RESOURCE_STATES state);
 
-    int getIndex() const noexcept;
+    const ExternalResource *asExternal() const noexcept override;
+
+    ExternalResource *asExternal() noexcept override;
 
 private:
 
     friend class RenderGraphBuilder;
-
-    std::string name_;
-    int         index_;
 
     D3D12_RESOURCE_STATES initialState_;
     D3D12_RESOURCE_STATES finalState_;
@@ -75,9 +101,7 @@ public:
 
     virtual ~Vertex() = default;
 
-    void useResource(InternalResource *rsc, D3D12_RESOURCE_STATES state);
-
-    void useResource(ExternalResource *rsc, D3D12_RESOURCE_STATES state);
+    void useResource(Resource *rsc, D3D12_RESOURCE_STATES state);
 
     void setQueue(int index);
 
@@ -91,10 +115,7 @@ private:
 
     struct ResourceUsage
     {
-        misc::variant_t<
-            InternalResource*,
-            ExternalResource*> rsc;
-
+        Resource             *rsc;
         D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
     };
 

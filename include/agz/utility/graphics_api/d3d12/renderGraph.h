@@ -10,6 +10,8 @@ AGZ_D3D12_BEGIN
 namespace rg
 {
 
+class Resource;
+
 class PassContext
 {
 public:
@@ -121,6 +123,8 @@ public:
     void sync();
 
     void run(int frameIndex);
+
+    void setExternalResource(const Resource *rscNode, ComPtr<ID3D12Resource> rsc);
 
     void setExternalResource(int index, ComPtr<ID3D12Resource> rsc);
 

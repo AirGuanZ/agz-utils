@@ -107,6 +107,8 @@ public:
 
     // gpu heap
 
+    DescriptorAllocator &getDescriptorAllocator() noexcept;
+
     ID3D12DescriptorHeap *getGPUDescHeap() const noexcept;
 
     Descriptor allocStatic();

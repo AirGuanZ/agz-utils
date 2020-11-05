@@ -7,8 +7,39 @@ AGZ_D3D12_BEGIN
 namespace rg
 {
 
+Resource::Resource(std::string name, int index) noexcept
+    : name_(std::move(name)), index_(index)
+{
+    
+}
+
+int Resource::getIndex() const noexcept
+{
+    return index_;
+}
+
+const InternalResource *Resource::asInternal() const noexcept
+{
+    return nullptr;
+}
+
+InternalResource *Resource::asInternal() noexcept
+{
+    return nullptr;
+}
+
+const ExternalResource *Resource::asExternal() const noexcept
+{
+    return nullptr;
+}
+
+ExternalResource *Resource::asExternal() noexcept
+{
+    return nullptr;
+}
+
 InternalResource::InternalResource(std::string name, int index)
-    : name_(std::move(name)), index_(index),
+    : Resource(std::move(name), index),
       heapType_(D3D12_HEAP_TYPE_DEFAULT), desc_{},
       clear_(false), clearValue_{},
       initialState_(D3D12_RESOURCE_STATE_COMMON)
@@ -37,13 +68,18 @@ void InternalResource::setHeapType(D3D12_HEAP_TYPE heapType)
     heapType_ = heapType;
 }
 
-int InternalResource::getIndex() const noexcept
+const InternalResource *InternalResource::asInternal() const noexcept
 {
-    return index_;
+    return this;
+}
+
+InternalResource *InternalResource::asInternal() noexcept
+{
+    return this;
 }
 
 ExternalResource::ExternalResource(std::string name, int index)
-    : name_(std::move(name)), index_(index),
+    : Resource(std::move(name), index),
       initialState_(D3D12_RESOURCE_STATE_COMMON),
       finalState_  (D3D12_RESOURCE_STATE_COMMON)
 {
@@ -60,9 +96,14 @@ void ExternalResource::setFinalState(D3D12_RESOURCE_STATES state)
     finalState_ = state;
 }
 
-int ExternalResource::getIndex() const noexcept
+const ExternalResource *ExternalResource::asExternal() const noexcept
 {
-    return index_;
+    return this;
+}
+
+ExternalResource *ExternalResource::asExternal() noexcept
+{
+    return this;
 }
 
 Vertex::Vertex(std::string name, int index)
@@ -73,12 +114,7 @@ Vertex::Vertex(std::string name, int index)
     
 }
 
-void Vertex::useResource(ExternalResource *rsc, D3D12_RESOURCE_STATES state)
-{
-    rscUsages_.push_back({ rsc, state });
-}
-
-void Vertex::useResource(InternalResource *rsc, D3D12_RESOURCE_STATES state)
+void Vertex::useResource(Resource *rsc, D3D12_RESOURCE_STATES state)
 {
     rscUsages_.push_back({ rsc, state });
 }
@@ -215,10 +251,7 @@ std::unique_ptr<RenderGraph> RenderGraphBuilder::build(
         const Vertex *vtx = vtxs_[passIdx].get();
         for(auto &r : vtx->rscUsages_)
         {
-            const int rscIdx = match_variant(
-                r.rsc,
-                [&](const InternalResource *rsc) { return rsc->index_; },
-                [&](const ExternalResource *rsc) { return rsc->index_; });
+            const int rscIdx = r.rsc->getIndex();
 
             resource2Usages[rscIdx].usages.push_back(
                 ResourceRecord::Usage{
