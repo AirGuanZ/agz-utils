@@ -52,7 +52,8 @@ D3D12_CPU_DESCRIPTOR_HANDLE RawDescriptorHeap::getCPUHandle(
 
 D3D12_GPU_DESCRIPTOR_HANDLE RawDescriptorHeap::getGPUHandle(int index) const noexcept
 {
-    assert(gpuStart_.ptr);
+    if(!gpuStart_.ptr)
+        return {};
     auto ret = gpuStart_;
     return ret.Offset(index, descIncSize_);
 }

@@ -330,13 +330,16 @@ class RenderGraph : public misc::uncopyable_t
 public:
 
     RenderGraph(
-        ID3D12Device           *device,
-        ResourceManager        &rscMgr,
-        DescriptorAllocatorSet &descAlloc);
+        ID3D12Device        *device,
+        ResourceManager     &rscMgr,
+        DescriptorAllocator &viewDescAlloc,
+        DescriptorAllocator &samplerAlloc);
 
     ~RenderGraph();
 
     // compile
+
+    void setRTVAndDSVHeapSize(size_t RTVSize, size_t DSVSize);
 
     void setThreadCount(int count);
 
@@ -379,7 +382,15 @@ private:
 
     ID3D12Device           *device_;
     ResourceManager        &rscMgr_;
-    DescriptorAllocatorSet  descAlloc_;
+
+    DescriptorAllocator &viewDescAlloc_;
+    DescriptorAllocator &samplerAlloc_;
+
+    size_t RTVAllocSize_;
+    size_t DSVAllocSize_;
+
+    std::unique_ptr<DescriptorAllocator> RTVAlloc_;
+    std::unique_ptr<DescriptorAllocator> DSVAlloc_;
 
     // compile
     
@@ -459,13 +470,13 @@ private:
 
     struct RuntimeInternalResource
     {
-        int index;
+        int index = 0;
         UniqueResource resource;
     };
 
     struct RuntimeExternalResource
     {
-        int index;
+        int index = 0;
         ComPtr<ID3D12Resource> resource;
     };
 

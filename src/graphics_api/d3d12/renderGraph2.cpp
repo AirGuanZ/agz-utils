@@ -247,7 +247,7 @@ Pass::Pass(
       callback_(std::move(callback)),
       resourceUsages_(std::move(usages))
 {
-    
+    resourceRecords_.resize(graph_->getResourceCount());
 }
 
 Pass::Pass(Pass &&other) noexcept
@@ -280,8 +280,8 @@ void Pass::execute(
 {
     // records
 
-    resourceRecords_.clear();
-    resourceRecords_.resize(graph_->getResourceCount());
+    assert(
+        static_cast<int>(resourceRecords_.size()) == graph_->getResourceCount());
 
     for(auto &usage : resourceUsages_)
     {
@@ -469,10 +469,13 @@ D3D12_COMMAND_LIST_TYPE Section::getCommandListType() const noexcept
 }
 
 RenderGraph::RenderGraph(
-    ID3D12Device           *device,
-    ResourceManager        &rscMgr,
-    DescriptorAllocatorSet &descAlloc)
-    : device_(device), rscMgr_(rscMgr), descAlloc_(descAlloc),
+    ID3D12Device        *device,
+    ResourceManager     &rscMgr,
+    DescriptorAllocator &viewDescAlloc,
+    DescriptorAllocator &samplerAlloc)
+    : device_(device), rscMgr_(rscMgr),
+      viewDescAlloc_(viewDescAlloc), samplerAlloc_(samplerAlloc),
+      RTVAllocSize_(200), DSVAllocSize_(200),
       threadCount_(0), queueCount_(0), frameCount_(0),
       frameIndex_(0), threadTrigger_(-1), fenceValue_(0)
 {
@@ -485,6 +488,12 @@ RenderGraph::~RenderGraph()
     cond_.notify_all();
     for(auto &t : threads_)
         t.join();
+}
+
+void RenderGraph::setRTVAndDSVHeapSize(size_t RTVSize, size_t DSVSize)
+{
+    RTVAllocSize_ = RTVSize;
+    DSVAllocSize_ = DSVSize;
 }
 
 void RenderGraph::setThreadCount(int count)
@@ -569,6 +578,9 @@ void RenderGraph::compile()
     for(auto &t : threads_)
         t.join();
     threads_.clear();
+
+    RTVAlloc_.reset();
+    DSVAlloc_.reset();
 
     frameIndex_    = 0;
     threadTrigger_ = -1;
@@ -802,6 +814,16 @@ void RenderGraph::compile()
         }
     }
 
+    // rtv & dsv
+
+    RTVAlloc_ = std::make_unique<DescriptorAllocator>(
+        device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, false,
+        static_cast<int>(RTVAllocSize_), frameCount_);
+
+    DSVAlloc_ = std::make_unique<DescriptorAllocator>(
+        device_, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, false,
+        static_cast<int>(DSVAllocSize_), frameCount_);
+
     // threads
 
     for(int i = 0; i < threadCount_; ++i)
@@ -845,6 +867,9 @@ void RenderGraph::runAsync(int frameIndex)
 
     ++fenceValue_;
 
+    RTVAlloc_->startFrame(frameIndex);
+    DSVAlloc_->startFrame(frameIndex);
+
     for(auto &d : perThread_)
     {
         for(size_t i = 0; i < d.sectionCount; ++i)
@@ -877,10 +902,10 @@ void RenderGraph::run(int frameIndex)
 void RenderGraph::workingFunc(int threadIndex)
 {
     TransientDescriptorAllocatorSet descAlloc;
-    descAlloc.CBV_SRV_UAV = descAlloc_.CBV_SRV_UAV->createTransientAllocator(32);
-    descAlloc.Sampler     = descAlloc_.Sampler->createTransientAllocator(16);
-    descAlloc.RTV         = descAlloc_.RTV->createTransientAllocator(8);
-    descAlloc.DSV         = descAlloc_.DSV->createTransientAllocator(8);
+    descAlloc.CBV_SRV_UAV = viewDescAlloc_.createTransientAllocator(32);
+    descAlloc.Sampler     = samplerAlloc_.createTransientAllocator(16);
+    descAlloc.RTV         = RTVAlloc_->createTransientAllocator(8);
+    descAlloc.DSV         = DSVAlloc_->createTransientAllocator(8);
 
     const int frameIndex = frameIndex_;
 
