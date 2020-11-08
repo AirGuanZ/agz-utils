@@ -43,10 +43,6 @@ public:
 
     const ComPtr<ID3D12Resource> &getImage() const noexcept;
 
-    D3D12_CPU_DESCRIPTOR_HANDLE getRenderTargetView() const noexcept;
-
-    UINT getImageDescSize() const noexcept;
-
     void swapBuffers();
 
     int getWidth() const noexcept;
@@ -84,8 +80,6 @@ private:
 
     std::vector<ComPtr<ID3D12Resource>> images_;
     int imageIndex_;
-
-    RawDescriptorHeap RTVHeap_;
 
     Int2 imageSize_;
 

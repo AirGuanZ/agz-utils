@@ -84,10 +84,6 @@ public:
 
     const ComPtr<ID3D12Resource> &getFramebuffer() const noexcept;
 
-    D3D12_CPU_DESCRIPTOR_HANDLE getRenderTargetView() const noexcept;
-
-    UINT getRenderTargetViewDescSize() const noexcept;
-
     void swapFramebuffers();
 
     int getFramebufferWidth() const noexcept;

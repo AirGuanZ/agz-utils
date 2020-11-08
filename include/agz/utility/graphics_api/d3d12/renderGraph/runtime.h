@@ -10,8 +10,11 @@ AGZ_D3D12_RENDERGRAPH_BEGIN
 
 struct DescriptorSlot
 {
-    int          resourceIndex = 0;
-    bool         isDirty       = false;
+    int resourceIndex = 0;
+
+    // does this descriptor need to be reallocated and recreated
+    bool isDirty = false;
+
     ResourceView view;
     Descriptor   descriptor;
 };

@@ -98,10 +98,10 @@ void Section::increaseFinishedDependencies(
     {
         ID3D12CommandList *rawCmdList = perFrameCmdList_[frameIndex].Get();
         queues[queue_]->ExecuteCommandLists(1, &rawCmdList);
-    }
 
-    for(auto o : out_)
-        o->increaseFinishedDependencies(frameIndex, queues);
+        for(auto o : out_)
+            o->increaseFinishedDependencies(frameIndex, queues);
+    }
 }
 
 AGZ_D3D12_RENDERGRAPH_END

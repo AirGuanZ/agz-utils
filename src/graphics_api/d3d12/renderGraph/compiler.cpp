@@ -1,6 +1,7 @@
 #ifdef AGZ_ENABLE_D3D12
 
 #include <agz/utility/graphics_api/d3d12/renderGraph/compiler.h>
+#include <agz/utility/graphics_api/d3d12/renderGraph/viewComparer.h>
 
 AGZ_D3D12_RENDERGRAPH_BEGIN
 
@@ -471,9 +472,62 @@ void Compiler::generateResourceTransitions(Temps &temps)
 
 void Compiler::generateDescriptorRecords(Temps &temps)
 {
-    // IMPROVE: merge same descs
+    struct DescriptorKey
+    {
+        int          thread;
+        int          resource;
+        ResourceView view;
 
-    int descriptorSlotCount = 0;
+        bool operator<(const DescriptorKey &other) const noexcept
+        {
+            if(thread < other.thread)     return true;
+            if(thread > other.thread)     return false;
+            if(resource < other.resource) return true;
+            if(resource > other.resource) return false;
+            return ResourceViewComparer()(view, other.view);
+        }
+    };
+
+    std::map<DescriptorKey, int> descriptorSlotCache;
+
+    auto allocateDescriptorSlot = [&](const DescriptorKey &key)
+    {
+        const auto it = descriptorSlotCache.find(key);
+        if(it != descriptorSlotCache.end())
+            return it->second;
+
+        const int newSlot = static_cast<int>(descriptorSlotCache.size());
+        descriptorSlotCache.insert({ key, newSlot });
+
+        match_variant(
+            key.view,
+            [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &)
+        {
+            temps.threads[key.thread].GPUDescRecords.push_back(
+                { resources_[key.resource].get(), key.view, newSlot });
+        },
+            [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &)
+        {
+            temps.threads[key.thread].GPUDescRecords.push_back(
+                { resources_[key.resource].get(), key.view, newSlot });
+        },
+            [&](const D3D12_RENDER_TARGET_VIEW_DESC &)
+        {
+            temps.threads[key.thread].RTVRecords.push_back(
+                { resources_[key.resource].get(), key.view, newSlot });
+        },
+            [&](const D3D12_DEPTH_STENCIL_VIEW_DESC &)
+        {
+            temps.threads[key.thread].DSVRecords.push_back(
+                { resources_[key.resource].get(), key.view, newSlot });
+        },
+            [&](const std::monostate &)
+        {
+            misc::unreachable();
+        });
+
+        return newSlot;
+    };
 
     for(auto &vtx : vertices_)
     {
@@ -481,43 +535,14 @@ void Compiler::generateDescriptorRecords(Temps &temps)
 
         for(auto &usage : vtx->resourceUsages_)
         {
-            auto &thread = temps.threads[vtx->thread_];
+            if(usage.view.is<std::monostate>())
+                continue;
 
-            match_variant(
-                usage.view,
-                [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &)
-            {
-                pass.contextUsages.push_back(
-                    { usage.resource->getIndex(), descriptorSlotCount });
+            const int slot = allocateDescriptorSlot(
+                { vtx->thread_, usage.resource->getIndex(), usage.view });
 
-                thread.GPUDescRecords.push_back(
-                    { usage.resource, usage.view, descriptorSlotCount++ });
-            },
-                [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &)
-            {
-                pass.contextUsages.push_back(
-                    { usage.resource->getIndex(), descriptorSlotCount });
-
-                thread.GPUDescRecords.push_back(
-                    { usage.resource, usage.view, descriptorSlotCount++ });
-            },
-                [&](const D3D12_RENDER_TARGET_VIEW_DESC &)
-            {
-                pass.contextUsages.push_back(
-                    { usage.resource->getIndex(), descriptorSlotCount });
-
-                thread.RTVRecords.push_back(
-                    { usage.resource, usage.view, descriptorSlotCount++ });
-            },
-                [&](const D3D12_DEPTH_STENCIL_VIEW_DESC &)
-            {
-                pass.contextUsages.push_back(
-                    { usage.resource->getIndex(), descriptorSlotCount });
-
-                thread.DSVRecords.push_back(
-                    { usage.resource, usage.view, descriptorSlotCount++ });
-            },
-                [](const std::monostate &) {});
+            pass.contextUsages.push_back(
+                { usage.resource->getIndex(), slot });
         }
     }
 }
@@ -670,7 +695,7 @@ void Compiler::fillRuntimeDescriptors(
                 .resourceIndex = dr.resource->getIndex(),
                 .isDirty       = true,
                 .view          = dr.view,
-                .descriptor    = threadData.GPUDescQueue.alloc()
+                .descriptor    = {}
             };
             threadData.descriptorSlots.push_back(dr.desceiptorSlot);
         }
@@ -691,7 +716,7 @@ void Compiler::fillRuntimeDescriptors(
                 .resourceIndex = dr.resource->getIndex(),
                 .isDirty       = true,
                 .view          = dr.view,
-                .descriptor    = threadData.RTVDescQueue.alloc()
+                .descriptor    = {}
             };
             threadData.descriptorSlots.push_back(dr.desceiptorSlot);
         }
@@ -712,7 +737,7 @@ void Compiler::fillRuntimeDescriptors(
                 .resourceIndex = dr.resource->getIndex(),
                 .isDirty       = true,
                 .view          = dr.view,
-                .descriptor    = threadData.DSVDescQueue.alloc()
+                .descriptor    = {}
             };
             threadData.descriptorSlots.push_back(dr.desceiptorSlot);
         }

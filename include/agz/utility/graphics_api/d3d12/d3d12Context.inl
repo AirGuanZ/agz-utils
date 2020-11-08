@@ -161,16 +161,6 @@ inline const ComPtr<ID3D12Resource> &D3D12Context::getFramebuffer() const noexce
     return swapChain_.getImage();
 }
 
-inline D3D12_CPU_DESCRIPTOR_HANDLE D3D12Context::getRenderTargetView() const noexcept
-{
-    return swapChain_.getRenderTargetView();
-}
-
-inline UINT D3D12Context::getRenderTargetViewDescSize() const noexcept
-{
-    return swapChain_.getImageDescSize();
-}
-
 inline void D3D12Context::swapFramebuffers()
 {
     swapChain_.swapBuffers();

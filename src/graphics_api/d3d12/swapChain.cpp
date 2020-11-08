@@ -51,10 +51,6 @@ SwapChain::SwapChain(
 
     imageIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
-    RTVHeap_ = RawDescriptorHeap(
-        device.getDevice(), desc.imageCount,
-        D3D12_DESCRIPTOR_HEAP_TYPE_RTV, false);
-
     images_.resize(desc.imageCount);
 
     for(int i = 0; i < desc.imageCount; ++i)
@@ -63,9 +59,6 @@ SwapChain::SwapChain(
             "failed to get swap chain buffer",
             swapChain_->GetBuffer(
                 i, IID_PPV_ARGS(images_[i].GetAddressOf())));
-
-        device.getDevice()->CreateRenderTargetView(
-            images_[i].Get(), nullptr, RTVHeap_.getCPUHandle(i));
     }
 
     defaultViewport_.TopLeftX = 0;
@@ -111,16 +104,6 @@ int SwapChain::getImageIndex() const noexcept
 const ComPtr<ID3D12Resource> &SwapChain::getImage() const noexcept
 {
     return images_[imageIndex_];
-}
-
-D3D12_CPU_DESCRIPTOR_HANDLE SwapChain::getRenderTargetView() const noexcept
-{
-    return RTVHeap_.getCPUHandle(imageIndex_);
-}
-
-UINT SwapChain::getImageDescSize() const noexcept
-{
-    return RTVHeap_.getDescSize();
 }
 
 void SwapChain::swapBuffers()
@@ -178,18 +161,16 @@ void SwapChain::_resize(int width, int height)
         imageSize_.x, imageSize_.y, imageFormat_,
         DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
-    imageIndex_ = static_cast<int>(swapChain_->GetCurrentBackBufferIndex());
-
-    for(UINT i = 0; i < images_.size(); ++i)
+    for(size_t i = 0; i < images_.size(); ++i)
     {
         AGZ_D3D12_CHECK_HR_MSG(
             "failed to get swap chain buffer",
             swapChain_->GetBuffer(
-                i, IID_PPV_ARGS(images_[i].GetAddressOf())));
-
-        device_->getDevice()->CreateRenderTargetView(
-            images_[i].Get(), nullptr, RTVHeap_.getCPUHandle(i));
+                static_cast<UINT>(i),
+                IID_PPV_ARGS(images_[i].GetAddressOf())));
     }
+
+    imageIndex_ = static_cast<int>(swapChain_->GetCurrentBackBufferIndex());
 
     eventSender_.send(SwapChainPostResizeEvent{ width, height });
 }
