@@ -22,54 +22,69 @@ void RootSignatureBuilder::addParameter(const D3D12_ROOT_PARAMETER &parameter)
     parameters_.push_back(parameter);
 }
 
-void RootSignatureBuilder::addParameter(const D3D12_ROOT_DESCRIPTOR_TABLE &table)
+void RootSignatureBuilder::addParameter(
+    const D3D12_ROOT_DESCRIPTOR_TABLE &table,
+    D3D12_SHADER_VISIBILITY            vis)
 {
     addParameter(D3D12_ROOT_PARAMETER{
-        .ParameterType   = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
-        .DescriptorTable = table
+        .ParameterType    = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
+        .DescriptorTable  = table,
+        .ShaderVisibility = vis
     });
 }
 
-void RootSignatureBuilder::addParameter(const D3D12_ROOT_CONSTANTS &consts)
+void RootSignatureBuilder::addParameter(
+    const D3D12_ROOT_CONSTANTS &consts,
+    D3D12_SHADER_VISIBILITY     vis)
 {
     addParameter(D3D12_ROOT_PARAMETER{
-        .ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
-        .Constants     = consts
+        .ParameterType    = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
+        .Constants        = consts,
+        .ShaderVisibility = vis
     });
 }
 
-void RootSignatureBuilder::addParameterCBV(const ShaderRegister &reg)
+void RootSignatureBuilder::addParameterCBV(
+    const ShaderRegister   &reg,
+    D3D12_SHADER_VISIBILITY vis)
 {
     const D3D12_ROOT_PARAMETER param = {
         .ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV,
         .Descriptor    = D3D12_ROOT_DESCRIPTOR{
             .ShaderRegister = reg.registerIndex,
             .RegisterSpace  = reg.registerSpace
-        }
+        },
+        .ShaderVisibility = vis
     };
     addParameter(param);
 }
 
-void RootSignatureBuilder::addParameterSRV(const ShaderRegister &reg)
+void RootSignatureBuilder::addParameterSRV(
+    const ShaderRegister   &reg,
+    D3D12_SHADER_VISIBILITY vis)
 {
     const D3D12_ROOT_PARAMETER param = {
         .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
         .Descriptor    = D3D12_ROOT_DESCRIPTOR{
             .ShaderRegister = reg.registerIndex,
             .RegisterSpace  = reg.registerSpace
-        }
+        },
+        .ShaderVisibility = vis
     };
     addParameter(param);
 }
 
-void RootSignatureBuilder::addParameterUAV(const ShaderRegister &reg)
+void RootSignatureBuilder::addParameterUAV(
+    const ShaderRegister   &reg,
+    D3D12_SHADER_VISIBILITY vis)
 {
     const D3D12_ROOT_PARAMETER param = {
         .ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV,
         .Descriptor    = D3D12_ROOT_DESCRIPTOR{
             .ShaderRegister = reg.registerIndex,
             .RegisterSpace  = reg.registerSpace
-        }
+        },
+        .ShaderVisibility = vis
     };
     addParameter(param);
 }

@@ -174,11 +174,11 @@ D3D12_CONSTANT_BUFFER_VIEW_DESC ConstantBuffer<Struct>::getView(size_t index) co
 }
 
 template<typename Struct>
-void ConstantBuffer<Struct>::updateData(size_t index, const Struct *data)
+void ConstantBuffer<Struct>::updateData(size_t index, const Struct &data)
 {
     const size_t PADDED_SIZE = padTo256(sizeof(Struct));
     const size_t offset = PADDED_SIZE * index;
-    buffer_.updateData(offset, sizeof(Struct), data);
+    buffer_.updateData(offset, sizeof(Struct), &data);
 }
 
 template<typename Struct>

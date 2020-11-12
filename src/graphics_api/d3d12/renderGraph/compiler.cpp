@@ -6,7 +6,7 @@
 AGZ_D3D12_RENDERGRAPH_BEGIN
 
 Resource::Resource(std::string name, int index) noexcept
-    : name_(std::move(name)), index_(index)
+    : name_(std::move(name)), index_(index), desc_{}
 {
     
 }
@@ -51,18 +51,28 @@ const InternalResource *Resource::asInternal() const noexcept
     return nullptr;
 }
 
+void Resource::setDescription(const D3D12_RESOURCE_DESC &desc) noexcept
+{
+    desc_ = desc;
+}
+
+const D3D12_RESOURCE_DESC *Resource::getDescription() const noexcept
+{
+    return &desc_;
+}
+
+D3D12_RESOURCE_DESC *Resource::getDescription() noexcept
+{
+    return &desc_;
+}
+
 InternalResource::InternalResource(std::string name, int index) noexcept
     : Resource(std::move(name), index),
       heapType_(D3D12_HEAP_TYPE_DEFAULT),
-      desc_{}, clear_(false), clearValue_{},
+      clear_(false), clearValue_{},
       initialState_(D3D12_RESOURCE_STATE_COMMON)
 {
     
-}
-
-void InternalResource::setResourceDescription(const D3D12_RESOURCE_DESC &desc)
-{
-    desc_ = desc;
 }
 
 void InternalResource::setClearValue(const D3D12_CLEAR_VALUE &clearValue)
@@ -562,13 +572,13 @@ void Compiler::fillRuntimeResources(
             if(internal->clear_)
             {
                 actualResource = rscMgr.create(
-                    internal->heapType_, internal->desc_,
+                    internal->heapType_, *internal->getDescription(),
                     internal->initialState_, internal->clearValue_);
             }
             else
             {
                 actualResource = rscMgr.create(
-                    internal->heapType_, internal->desc_,
+                    internal->heapType_, *internal->getDescription(),
                     internal->initialState_);
             }
 
@@ -644,9 +654,9 @@ void Compiler::fillRuntimeDescriptors(
 
     // allocate raw desc ranges
 
+    runtime.GPUDescAlloc_ = &GPUDescAlloc;
     if(GPUDescCount)
     {
-        runtime.GPUDescAlloc_ = &GPUDescAlloc;
         runtime.GPUDescRange_ = GPUDescAlloc.allocStaticRange(
             GPUDescCount * frameCount_);
     }

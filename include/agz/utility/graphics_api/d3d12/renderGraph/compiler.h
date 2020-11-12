@@ -30,10 +30,18 @@ public:
 
     virtual const InternalResource *asInternal() const noexcept;
 
+    void setDescription(const D3D12_RESOURCE_DESC &desc) noexcept;
+
+    const D3D12_RESOURCE_DESC *getDescription() const noexcept;
+
+    D3D12_RESOURCE_DESC *getDescription() noexcept;
+
 private:
 
     std::string name_;
     int         index_;
+
+    D3D12_RESOURCE_DESC desc_;
 };
 
 class InternalResource : public Resource
@@ -41,8 +49,6 @@ class InternalResource : public Resource
 public:
 
     InternalResource(std::string name, int index) noexcept;
-
-    void setResourceDescription(const D3D12_RESOURCE_DESC &desc);
 
     void setClearValue(const D3D12_CLEAR_VALUE &clearValue);
 
@@ -60,7 +66,6 @@ private:
 
     D3D12_HEAP_TYPE heapType_;
 
-    D3D12_RESOURCE_DESC desc_;
     bool                clear_;
     D3D12_CLEAR_VALUE   clearValue_;
 

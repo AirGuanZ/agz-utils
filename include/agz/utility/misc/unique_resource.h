@@ -91,6 +91,21 @@ public:
     operator*() const {
         return *resource_;
     }
+
+    std::shared_ptr<R> to_shared()
+    {
+        R *r = new R(std::move(resource_));
+        try
+        {
+            return std::shared_ptr<R>(r, std::move(deleter_));
+        }
+        catch(...)
+        {
+            resource_ = std::move(*r);
+            delete r;
+            throw;
+        }
+    }
 };
 
 } // namespace agz::misc

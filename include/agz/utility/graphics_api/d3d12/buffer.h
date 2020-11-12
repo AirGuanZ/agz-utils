@@ -117,7 +117,7 @@ public:
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC getView(size_t index) const noexcept;
 
-    void updateData(size_t index, const Struct *data);
+    void updateData(size_t index, const Struct &data);
 
 private:
 

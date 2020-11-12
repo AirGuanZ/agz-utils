@@ -49,7 +49,12 @@ ResourceUploader::ResourceUploader(
 
 ResourceUploader::~ResourceUploader()
 {
-    sync();
+    submitAndSync();
+}
+
+ID3D12Device *ResourceUploader::getDevice() const noexcept
+{
+    return device_.Get();
 }
 
 void ResourceUploader::upload(
@@ -185,6 +190,12 @@ void ResourceUploader::sync(size_t index)
     auto &c = cmdLists_[index];
     fence_->SetEventOnCompletion(c.expectedFenceValue_, nullptr);
     uploadRscs_[index].clear();
+}
+
+void ResourceUploader::submitAndSync()
+{
+    submit();
+    sync();
 }
 
 AGZ_D3D12_END

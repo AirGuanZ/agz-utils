@@ -63,7 +63,9 @@ void Section::execute(
     int                         frameIndex,
     UINT64                      fenceValue,
     ID3D12CommandAllocator     *cmdAlloc,
-    ComPtr<ID3D12CommandQueue> *queues)
+    ComPtr<ID3D12CommandQueue> *queues,
+    ID3D12DescriptorHeap      **GPUHeaps,
+    int                         heapCount)
 {
     auto queue = queues[queue_].Get();
 
@@ -79,6 +81,9 @@ void Section::execute(
     }
     else
         cmdList->Reset(cmdAlloc, nullptr);
+
+    if(heapCount)
+        cmdList->SetDescriptorHeaps(static_cast<UINT>(heapCount), GPUHeaps);
 
     for(auto &p : passes_)
         p.execute(frameIndex, cmdList.Get());

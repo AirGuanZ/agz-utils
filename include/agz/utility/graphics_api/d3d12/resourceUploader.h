@@ -22,6 +22,8 @@ public:
 
     ~ResourceUploader();
 
+    ID3D12Device *getDevice() const noexcept;
+
     // dataBytes is 0 by default, which means buffer.GetBytes()
     void upload(
         Buffer     &buffer,
@@ -46,6 +48,8 @@ public:
 
     // wait for all tasks to be finished
     void sync();
+
+    void submitAndSync();
 
 private:
 

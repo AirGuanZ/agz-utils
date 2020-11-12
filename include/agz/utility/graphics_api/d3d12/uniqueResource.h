@@ -30,4 +30,6 @@ namespace detail
 using UniqueResource = misc::unique_resource_t<
     detail::Resource, detail::ResourceDeleter>;
 
+using SharedResource = std::shared_ptr<detail::Resource>;
+
 AGZ_D3D12_END

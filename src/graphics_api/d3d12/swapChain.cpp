@@ -45,7 +45,7 @@ SwapChain::SwapChain(
     swapChain_.Attach(static_cast<IDXGISwapChain3 *>(tSwapChain));
 
     AGZ_SCOPE_GUARD({
-        if(desc.fullscreen)
+        if(window.isFullscreen())
             swapChain_->SetFullscreenState(true, nullptr);
     });
 

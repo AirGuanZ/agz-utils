@@ -2,6 +2,7 @@
 
 #include <agz/utility/graphics_api/d3d12/renderGraph/compiler.h>
 #include <agz/utility/graphics_api/d3d12/renderGraph/runtime.h>
+#include <agz/utility/system.h>
 
 AGZ_D3D12_RENDERGRAPH_BEGIN
 
@@ -68,6 +69,15 @@ void Runtime::iterationFunc(int threadIndex)
 
     // execute sections
 
+    ID3D12DescriptorHeap *heaps[2] = { GPUDescAlloc_->getHeap(), nullptr };
+
+    int heapCount = 1;
+    if(samplerHeap_)
+    {
+        heaps[1] = samplerHeap_.Get();
+        heapCount = 2;
+    }
+
     for(size_t si = 0; si < threadData.sectionCount; ++si)
     {
         auto &section = threadData.sections[si];
@@ -79,7 +89,8 @@ void Runtime::iterationFunc(int threadIndex)
 
         assert(tCmdAlloc);
         section.execute(
-            frameIndex_, fenceValue_, tCmdAlloc, queues_.data());
+            frameIndex_, fenceValue_, tCmdAlloc,
+            queues_.data(), heaps, heapCount);
     }
 }
 
@@ -126,9 +137,42 @@ ID3D12Resource *Runtime::getRawResource(int index) noexcept
     });
 }
 
+void Runtime::setSamplerHeap(ComPtr<ID3D12DescriptorHeap> heap)
+{
+    samplerHeap_ = std::move(heap);
+}
+
 void Runtime::setExternalResource(
     ExternalResource *node, ComPtr<ID3D12Resource> rsc)
 {
+    AGZ_WHEN_DEBUG({
+        auto toTie = [](const D3D12_RESOURCE_DESC &L)
+        {
+            return std::tie(
+                L.Dimension,
+                L.Alignment,
+                L.Width,
+                L.Height,
+                L.DepthOrArraySize,
+                L.MipLevels,
+                L.Format,
+                L.SampleDesc.Count,
+                L.SampleDesc.Quality,
+                L.Layout,
+                L.Flags);
+        };
+
+        auto isEqual = [&toTie](
+            const D3D12_RESOURCE_DESC &L,
+            const D3D12_RESOURCE_DESC &R)
+        {
+            return toTie(L) == toTie(R);
+        };
+
+        auto desc = node->getDescription();
+        assert(desc->Width <= 0 || isEqual(*desc, rsc->GetDesc()));
+    });
+
     auto &external = resources_[node->getIndex()].as<RuntimeExternalResource>();
     external.resource = std::move(rsc);
     for(auto ds : external.descriptorSlots)
@@ -169,10 +213,15 @@ void Runtime::reset()
 
     if(GPUDescAlloc_)
     {
-        GPUDescAlloc_->freeRangeStatic(GPUDescRange_);
+        if(GPUDescRange_.getCount())
+        {
+            GPUDescAlloc_->freeRangeStatic(GPUDescRange_);
+            GPUDescRange_ = {};
+        }
         GPUDescAlloc_ = nullptr;
-        GPUDescRange_ = {};
     }
+
+    samplerHeap_.Reset();
 
     RTVDescriptorHeap_.destroy();
     DSVDescriptorHeap_.destroy();

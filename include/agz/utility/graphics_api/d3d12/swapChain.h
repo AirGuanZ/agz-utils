@@ -18,7 +18,6 @@ using SwapChainPostResizeHandler = event::functional_receiver_t<SwapChainPostRes
 
 struct SwapChainDesc
 {
-    bool        fullscreen  = false;
     bool        vsync       = true;
     int         imageCount  = 2;
     DXGI_FORMAT imageFormat = DXGI_FORMAT_R8G8B8A8_UNORM;

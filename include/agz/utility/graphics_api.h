@@ -64,14 +64,15 @@
 #include "./graphics_api/d3d12/frameFence.h"
 #include "./graphics_api/d3d12/imguiIntegration.h"
 #include "./graphics_api/d3d12/input.h"
+#include "./graphics_api/d3d12/mipmapGenerator.h"
 #include "./graphics_api/d3d12/pipeline.h"
 #include "./graphics_api/d3d12/queueWaiter.h"
-#include "./graphics_api/d3d12/renderGraph2.h"
 #include "./graphics_api/d3d12/resourceManager.h"
 #include "./graphics_api/d3d12/resourceUploader.h"
 #include "./graphics_api/d3d12/rootSignature.h"
 #include "./graphics_api/d3d12/shaderCompiler.h"
 #include "./graphics_api/d3d12/swapChain.h"
+#include "./graphics_api/d3d12/textureLoader.h"
 #include "./graphics_api/d3d12/window.h"
 
 #endif // #ifdef AGZ_ENABLE_D3D12

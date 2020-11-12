@@ -41,6 +41,8 @@ struct Window::Data
 {
     // win32 window
 
+    bool fullscreen = false;
+
     DWORD style = 0;
 
     std::wstring className;
@@ -78,6 +80,11 @@ Window::~Window()
 HWND Window::getWindowHandle() noexcept
 {
     return data_->hWnd;
+}
+
+bool Window::isFullscreen() const noexcept
+{
+    return data_->fullscreen;
 }
 
 void Window::doEvents()
@@ -248,20 +255,24 @@ void Window::initWin32Window(const WindowDesc &desc)
 
     // window style & rect
 
-    data_->style = detail::getWindowStyle(desc);
+    data_->fullscreen = desc.fullscreen;
+    data_->style      = detail::getWindowStyle(desc);
 
     RECT workAreaRect;
     SystemParametersInfoW(SPI_GETWORKAREA, 0, &workAreaRect, 0);
     const int workAreaW = workAreaRect.right  - workAreaRect.left;
     const int workAreaH = workAreaRect.bottom - workAreaRect.top;
 
-    const int clientW = desc.clientSize.x;
-    const int clientH = desc.clientSize.y;
+    const int scrW = GetSystemMetrics(SM_CXSCREEN);
+    const int scrH = GetSystemMetrics(SM_CYSCREEN);
+
+    const int clientW = desc.fullscreen ? scrW : desc.clientSize.x;
+    const int clientH = desc.fullscreen ? scrH : desc.clientSize.y;
 
     const Int2 winSize = detail::clientSizeToWindowSize(
         data_->style, { clientW, clientH });
 
-    Int2 winPos = {
+    const Int2 winPos = {
         workAreaRect.left + (workAreaW - winSize.x) / 2,
         workAreaRect.top  + (workAreaH - winSize.y) / 2
     };

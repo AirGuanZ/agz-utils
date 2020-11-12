@@ -20,15 +20,25 @@ public:
 
     void addParameter(const D3D12_ROOT_PARAMETER &parameter);
 
-    void addParameter(const D3D12_ROOT_DESCRIPTOR_TABLE &table);
+    void addParameter(
+        const D3D12_ROOT_DESCRIPTOR_TABLE &table,
+        D3D12_SHADER_VISIBILITY            vis = D3D12_SHADER_VISIBILITY_ALL);
 
-    void addParameter(const D3D12_ROOT_CONSTANTS &consts);
+    void addParameter(
+        const D3D12_ROOT_CONSTANTS &consts,
+        D3D12_SHADER_VISIBILITY     vis = D3D12_SHADER_VISIBILITY_ALL);
 
-    void addParameterCBV(const ShaderRegister &reg);
+    void addParameterCBV(
+        const ShaderRegister   &reg,
+        D3D12_SHADER_VISIBILITY vis = D3D12_SHADER_VISIBILITY_ALL);
 
-    void addParameterSRV(const ShaderRegister &reg);
+    void addParameterSRV(
+        const ShaderRegister   &reg,
+        D3D12_SHADER_VISIBILITY vis = D3D12_SHADER_VISIBILITY_ALL);
 
-    void addParameterUAV(const ShaderRegister &reg);
+    void addParameterUAV(
+        const ShaderRegister   &reg,
+        D3D12_SHADER_VISIBILITY vis = D3D12_SHADER_VISIBILITY_ALL);
 
     void addStaticSampler(const D3D12_STATIC_SAMPLER_DESC &staticSampler);
 

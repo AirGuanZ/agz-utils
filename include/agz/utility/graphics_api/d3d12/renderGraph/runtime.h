@@ -35,6 +35,8 @@ public:
 
     ID3D12Resource *getRawResource(int index) noexcept;
 
+    void setSamplerHeap(ComPtr<ID3D12DescriptorHeap> heap);
+
     void setExternalResource(
         ExternalResource *node, ComPtr<ID3D12Resource> rsc);
 
@@ -115,6 +117,8 @@ private:
 
     DescriptorAllocator *GPUDescAlloc_ = nullptr;
     DescriptorRange      GPUDescRange_;
+
+    ComPtr<ID3D12DescriptorHeap> samplerHeap_;
 
     DescriptorHeap RTVDescriptorHeap_;
     DescriptorHeap DSVDescriptorHeap_;

@@ -26,6 +26,7 @@ struct WindowDesc
     Int2         clientSize = { 640, 480 };
     std::wstring title      = L"Window";
     bool         resizable  = true;
+    bool         fullscreen = false;
 };
 
 class Window
@@ -39,6 +40,8 @@ public:
     // win32
 
     HWND getWindowHandle() noexcept;
+
+    bool isFullscreen() const noexcept;
 
     void doEvents();
 
