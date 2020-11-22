@@ -69,6 +69,12 @@ public:
     }
 };
 
+ImGuiIntegration::ImGuiIntegration()
+    : SRVDesc_{}
+{
+    
+}
+
 ImGuiIntegration::ImGuiIntegration(
     Window &window, SwapChain &swapChain, Device &device, Descriptor SRVDesc)
 {
@@ -94,6 +100,86 @@ ImGuiIntegration::~ImGuiIntegration()
     ImGui_ImplDX12_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext(ImGui::GetCurrentContext());
+}
+
+void ImGuiIntegration::initialize(
+    Window    &window,
+    SwapChain &swapChain,
+    Device    &device,
+    Descriptor SRVDesc)
+{
+    destroy();
+
+    SRVDesc_ = SRVDesc;
+
+    ImGui::CreateContext();
+    ImGui_ImplWin32_Init(window.getWindowHandle());
+    ImGui_ImplDX12_Init(
+        device,
+        swapChain.getImageCount(),
+        swapChain.getImageFormat(),
+        nullptr,
+        SRVDesc_,
+        SRVDesc_);
+    ImGui::StyleColorsLight();
+
+    inputDispatcher_ = std::make_unique<ImGuiInputDispatcher>();
+    inputDispatcher_->attachTo(*window.getInput());
+}
+
+bool ImGuiIntegration::isAvailable() const noexcept
+{
+    return SRVDesc_;
+}
+
+void ImGuiIntegration::destroy()
+{
+    if(!isAvailable())
+        return;
+
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext(ImGui::GetCurrentContext());
+
+    SRVDesc_ = {};
+    inputDispatcher_.reset();
+}
+
+rg::Vertex *ImGuiIntegration::addToRenderGraph(
+    rg::Graph    &graph,
+    rg::Resource *renderTarget,
+    int           thread,
+    int           queue)
+{
+    auto *RTDesc = renderTarget->getDescription();
+
+    D3D12_RENDER_TARGET_VIEW_DESC RTVDesc;
+    RTVDesc.Format = DXGI_FORMAT_UNKNOWN;
+
+    if(RTDesc->SampleDesc.Count > 1)
+    {
+        RTVDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
+        RTVDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
+    }
+    else
+    {
+        RTVDesc.ViewDimension        = D3D12_RTV_DIMENSION_TEXTURE2D;
+        RTVDesc.Texture2D.MipSlice   = 0;
+        RTVDesc.Texture2D.PlaneSlice = 0;
+    }
+
+    auto pass = graph.addVertex("render imgui", thread, queue);
+    pass->useResource(
+        renderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET, RTVDesc);
+
+    pass->setCallback([this, renderTarget](rg::PassContext &ctx)
+    {
+        auto rawRTV = ctx.getDescriptor(renderTarget).getCPUHandle();
+        ctx->OMSetRenderTargets(1, &rawRTV, false, nullptr);
+        render(ctx.getCommandList());
+    });
+
+    return pass;
 }
 
 void ImGuiIntegration::newFrame()

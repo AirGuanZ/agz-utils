@@ -17,11 +17,12 @@ public:
         const WindowDesc    &windowDesc,
         const SwapChainDesc &swapChainDesc,
         uint32_t             GPUDescHeapSize    = 1024,
+        bool                 enableImGui        = true,
         bool                 enableComputeQueue = false);
 
     ~D3D12Context();
 
-    void startFrame(bool imgui = false, bool waitForFocus = true);
+    void startFrame(bool waitForFocus = true);
 
     void endFrame();
 
@@ -123,6 +124,12 @@ public:
     // imgui
 
     void renderImGui(ID3D12GraphicsCommandList *cmdList);
+
+    rg::Vertex *addImGuiToRenderGraph(
+        rg::Graph    &graph,
+        rg::Resource *renderTarget,
+        int           thread = 0,
+        int           queue  = 0);
 
 private:
 

@@ -60,6 +60,8 @@ public:
     self_t &operator/=(T rhs) noexcept;
 
 #include "../impl/swizzle_vec2.inl"
+
+    bool operator<(const tvec2 &rhs) const noexcept;
 };
 
 template<typename T> tvec2<T> operator-(const tvec2<T> &vec) noexcept;

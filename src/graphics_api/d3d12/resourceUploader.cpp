@@ -97,7 +97,9 @@ void ResourceUploader::uploadTexture2D(
     UINT texelBytes;
     switch(rscDesc.Format)
     {
-    case DXGI_FORMAT_R8G8B8A8_UNORM:     texelBytes = 4; break;
+    case DXGI_FORMAT_R8_UNORM:           texelBytes = 1;  break;
+    case DXGI_FORMAT_R8G8B8A8_UNORM:     texelBytes = 4;  break;
+    case DXGI_FORMAT_R32_FLOAT:          texelBytes = 4;  break;
     case DXGI_FORMAT_R32G32B32_FLOAT:    texelBytes = 12; break;
     case DXGI_FORMAT_R32G32B32A32_FLOAT: texelBytes = 16; break;
     default:

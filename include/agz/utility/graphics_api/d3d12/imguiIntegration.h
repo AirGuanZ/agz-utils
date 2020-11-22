@@ -1,5 +1,6 @@
 #pragma once
 
+#include <agz/utility/graphics_api/d3d12/renderGraph/graph.h>
 #include <agz/utility/graphics_api/d3d12/descriptorHeap.h>
 
 AGZ_D3D12_BEGIN
@@ -12,6 +13,8 @@ class ImGuiIntegration : public misc::uncopyable_t
 {
 public:
 
+    ImGuiIntegration();
+
     explicit ImGuiIntegration(
         Window    &window,
         SwapChain &swapChain,
@@ -19,6 +22,22 @@ public:
         Descriptor SRVDesc);
 
     ~ImGuiIntegration();
+
+    void initialize(
+        Window    &window,
+        SwapChain &swapChain,
+        Device    &device,
+        Descriptor SRVDesc);
+
+    bool isAvailable() const noexcept;
+
+    void destroy();
+
+    rg::Vertex *addToRenderGraph(
+        rg::Graph    &graph,
+        rg::Resource *renderTarget,
+        int           thread = 0,
+        int           queue  = 0);
 
     void newFrame();
 

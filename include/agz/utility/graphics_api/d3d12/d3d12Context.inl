@@ -6,16 +6,20 @@ inline D3D12Context::D3D12Context(
     const WindowDesc    &windowDesc,
     const SwapChainDesc &swapChainDesc,
     uint32_t             GPUDescHeapSize,
+    bool                 enableImGui,
     bool                 enableComputeQueue)
     : window_(windowDesc),
       device_(true, enableComputeQueue),
       swapChain_(swapChainDesc, window_, device_),
       descAlloc_(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, true,
                  GPUDescHeapSize, swapChainDesc.imageCount),
-      imgui_(window_, swapChain_, device_, descAlloc_.allocStatic()),
       frameFence_(device_, device_.getGraphicsQueue(), swapChainDesc.imageCount)
 {
-    
+    if(enableImGui)
+    {
+        imgui_.initialize(
+            window_, swapChain_, device_, descAlloc_.allocStatic());
+    }
 }
 
 inline D3D12Context::~D3D12Context()
@@ -23,7 +27,7 @@ inline D3D12Context::~D3D12Context()
     device_.waitForIdle();
 }
 
-inline void D3D12Context::startFrame(bool imgui, bool waitForFocus)
+inline void D3D12Context::startFrame(bool waitForFocus)
 {
     window_.doEvents();
     if(waitForFocus)
@@ -32,7 +36,7 @@ inline void D3D12Context::startFrame(bool imgui, bool waitForFocus)
     frameFence_.startFrame(swapChain_.getImageIndex());
     descAlloc_.startFrame(swapChain_.getImageIndex());
 
-    if(imgui)
+    if(imgui_.isAvailable())
         imgui_.newFrame();
 }
 
@@ -240,6 +244,15 @@ inline ID3D12DescriptorHeap *D3D12Context::getGPUDescHeap() const noexcept
 inline void D3D12Context::renderImGui(ID3D12GraphicsCommandList *cmdList)
 {
     imgui_.render(cmdList);
+}
+
+inline rg::Vertex *D3D12Context::addImGuiToRenderGraph(
+    rg::Graph    &graph,
+    rg::Resource *renderTarget,
+    int           thread,
+    int           queue)
+{
+    return imgui_.addToRenderGraph(graph, renderTarget, thread, queue);
 }
 
 AGZ_D3D12_END

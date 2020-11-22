@@ -12,9 +12,9 @@ AGZ_D3D12_RENDERGRAPH_BEGIN
 
 class Compiler;
 class ExternalResource;
+class Graph;
 class InternalResource;
 class PassContext;
-class RenderGraph;
 class Resource;
 class Runtime;
 
