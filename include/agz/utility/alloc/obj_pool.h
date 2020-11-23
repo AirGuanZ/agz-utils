@@ -61,6 +61,31 @@ public:
         
     }
 
+    ~obj_pool_t()
+    {
+        for(auto c : chunks_)
+            ::agz::alloc::aligned_free(c);
+    }
+
+    obj_pool_t(obj_pool_t &&other) noexcept
+        : obj_pool_t(1)
+    {
+        this->swap(other);
+    }
+
+    obj_pool_t &operator=(obj_pool_t &&other) noexcept
+    {
+        this->swap(other);
+        return *this;
+    }
+
+    void swap(obj_pool_t &other) noexcept
+    {
+        chunks_.swap(other.chunks_);
+        std::swap(freelist_, other.freelist_);
+        std::swap(chunk_size_, other.chunk_size_);
+    }
+
     template<typename...Args>
     T *create(Args &&...args)
     {
