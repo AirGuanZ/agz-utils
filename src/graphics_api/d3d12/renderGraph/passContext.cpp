@@ -34,12 +34,12 @@ ID3D12GraphicsCommandList *PassContext::operator->() noexcept
     return cmdList_;
 }
 
-ID3D12Resource *PassContext::getRawResource(Resource *resource) noexcept
+ID3D12Resource *PassContext::getRawResource(const Resource *resource) noexcept
 {
     return runtime_->getRawResource(resource->getIndex());
 }
 
-Descriptor PassContext::getDescriptor(Resource *resource)
+Descriptor PassContext::getDescriptor(const Resource *resource)
 {
     const auto it = resources_.find(resource->getIndex());
     if(it == resources_.end())

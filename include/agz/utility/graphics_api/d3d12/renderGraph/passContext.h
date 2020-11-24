@@ -26,9 +26,9 @@ public:
 
     ID3D12GraphicsCommandList *operator->() noexcept;
 
-    ID3D12Resource *getRawResource(Resource *resource) noexcept;
+    ID3D12Resource *getRawResource(const Resource *resource) noexcept;
 
-    Descriptor getDescriptor(Resource *resource);
+    Descriptor getDescriptor(const Resource *resource);
 
 private:
 

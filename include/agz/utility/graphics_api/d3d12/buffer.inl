@@ -97,6 +97,105 @@ const Buffer &VertexBuffer<Vertex>::getBuffer() const noexcept
     return buffer_;
 }
 
+template<typename Index>
+IndexBuffer<Index>::IndexBuffer(IndexBuffer &&other) noexcept
+    : IndexBuffer()
+{
+    this->swap(other);
+}
+
+template<typename Index>
+IndexBuffer<Index> &IndexBuffer<Index>::operator=(IndexBuffer &&other) noexcept
+{
+    this->swap(other);
+    return *this;
+}
+
+template<typename Index>
+void IndexBuffer<Index>::swap(IndexBuffer &other) noexcept
+{
+    buffer_.swap(other.buffer_);
+    std::swap(count_, other.count_);
+}
+
+template<typename Index>
+bool IndexBuffer<Index>::isAvailable() const noexcept
+{
+    return buffer_.isAvailable();
+}
+
+template<typename Index>
+void IndexBuffer<Index>::destroy()
+{
+    buffer_.destroy();
+    count_ = 0;
+}
+
+template<typename Index>
+void IndexBuffer<Index>::initializeDefault(
+    ResourceManager      &rscMgr,
+    size_t                indexCount,
+    D3D12_RESOURCE_STATES initState)
+{
+    count_ = 0;
+    buffer_.initializeDefault(rscMgr, sizeof(Index) * indexCount, initState);
+    count_ = indexCount;
+}
+
+template<typename Index>
+void IndexBuffer<Index>::initializeUpload(
+    ResourceManager &rscMgr,
+    size_t           indexCount)
+{
+    count_ = 0;
+    buffer_.initializeUpload(rscMgr, indexCount);
+    count_ = indexCount;
+}
+
+template<typename Index>
+ID3D12Resource *IndexBuffer<Index>::getResource() const noexcept
+{
+    return buffer_.getResource();
+}
+
+template<typename Index>
+size_t IndexBuffer<Index>::getByteSize() const noexcept
+{
+    return buffer_.getByteSize();
+}
+
+template<typename Index>
+UINT IndexBuffer<Index>::getIndexCount() const noexcept
+{
+    return static_cast<UINT>(count_);
+}
+
+template<typename Index>
+D3D12_INDEX_BUFFER_VIEW IndexBuffer<Index>::getView() const noexcept
+{
+    const DXGI_FORMAT format =
+        std::is_same_v<Index, uint16_t> ?
+        DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+
+    return D3D12_INDEX_BUFFER_VIEW{
+        .BufferLocation = buffer_.getResource()->GetGPUVirtualAddress(),
+        .SizeInBytes    = static_cast<UINT>(getByteSize()),
+        .Format         = format
+    };
+}
+
+template<typename Index>
+Buffer &IndexBuffer<Index>::getBuffer() noexcept
+{
+    return buffer_;
+}
+
+template<typename Index>
+const Buffer &IndexBuffer<Index>::getBuffer() const noexcept
+{
+    return buffer_;
+}
+
 template<typename Struct>
 ConstantBuffer<Struct>::ConstantBuffer(ConstantBuffer &&other) noexcept
     : ConstantBuffer()

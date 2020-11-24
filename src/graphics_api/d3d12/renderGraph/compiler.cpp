@@ -161,7 +161,7 @@ void Vertex::setCallback(PassCallback callback)
 }
 
 void Vertex::useResource(
-    Resource *resource, D3D12_RESOURCE_STATES state, ResourceView view)
+    const Resource *resource, D3D12_RESOURCE_STATES state, ResourceView view)
 {
     resourceUsages_.push_back({ resource, state, view });
 }
@@ -227,6 +227,24 @@ void Compiler::compile(
     std::vector<ComPtr<ID3D12CommandQueue>> queues,
     Runtime                                &runtime)
 {
+    if(frameCount_ <= 0)
+    {
+        throw D3D12Exception(
+            "invalid frame count value: " + std::to_string(frameCount_));
+    }
+
+    if(queueCount_ <= 0)
+    {
+        throw D3D12Exception(
+            "invalid queue count value: " + std::to_string(queueCount_));
+    }
+
+    if(threadCount_ <= 0)
+    {
+        throw D3D12Exception(
+            "invalid thread count value: " + std::to_string(threadCount_));
+    }
+
     auto temps = assignSectionsToThreads();
 
     generateSectionDependencies(device, temps);
@@ -356,7 +374,8 @@ Compiler::Temps Compiler::assignSectionsToThreads() const
     return result;
 }
 
-void Compiler::generateSectionDependencies(ID3D12Device *device, Temps &temps) const
+void Compiler::generateSectionDependencies(
+    ID3D12Device *device, Temps &temps) const
 {
     for(int ti = 0; ti < threadCount_; ++ti)
     {
@@ -484,9 +503,9 @@ void Compiler::generateDescriptorRecords(Temps &temps)
 {
     struct DescriptorKey
     {
-        int          thread;
-        int          resource;
-        ResourceView view;
+        int          thread   = 0;
+        int          resource = 0;
+        ResourceView view     = {};
 
         bool operator<(const DescriptorKey &other) const noexcept
         {

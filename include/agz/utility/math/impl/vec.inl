@@ -79,7 +79,7 @@ typename tvec<T, D>::self_t tvec<T, D>::clamp_low(T min_v) const noexcept
 {
     self_t ret(UNINIT);
     for(int i = 0; i != D; ++i)
-        ret[i] = std::max(data[i], min_v);
+        ret[i] = (std::max)(data[i], min_v);
     return ret;
 }
 
@@ -88,7 +88,7 @@ typename tvec<T, D>::self_t tvec<T, D>::clamp_high(T max_v) const noexcept
 {
     self_t ret(UNINIT);
     for(int i = 0; i != D; ++i)
-        ret[i] = std::min(data[i], max_v);
+        ret[i] = (std::min)(data[i], max_v);
     return ret;
 }
 

@@ -111,7 +111,7 @@ public:
     void setCallback(PassCallback callback);
 
     void useResource(
-        Resource             *resource,
+        const Resource       *resource,
         D3D12_RESOURCE_STATES state,
         ResourceView          view = {});
 
@@ -121,7 +121,7 @@ private:
 
     struct ResourceUsage
     {
-        Resource             *resource = nullptr;
+        const Resource       *resource = nullptr;
         D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
         ResourceView          view = {};
     };

@@ -88,6 +88,54 @@ private:
     size_t vertexCount_ = 0;
 };
 
+template<typename Index>
+class IndexBuffer : public misc::uncopyable_t
+{
+public:
+
+    IndexBuffer() = default;
+
+    IndexBuffer(IndexBuffer &&other) noexcept;
+
+    IndexBuffer &operator=(IndexBuffer &&other) noexcept;
+
+    void swap(IndexBuffer &other) noexcept;
+
+    bool isAvailable() const noexcept;
+
+    void destroy();
+
+    void initializeDefault(
+        ResourceManager      &rscMgr,
+        size_t                indexCount,
+        D3D12_RESOURCE_STATES initState);
+
+    void initializeUpload(
+        ResourceManager &rscMgr,
+        size_t           indexCount);
+
+    ID3D12Resource *getResource() const noexcept;
+
+    size_t getByteSize() const noexcept;
+
+    UINT getIndexCount() const noexcept;
+
+    D3D12_INDEX_BUFFER_VIEW getView() const noexcept;
+
+    Buffer &getBuffer() noexcept;
+
+    const Buffer &getBuffer() const noexcept;
+
+private:
+
+    static_assert(
+        std::is_same_v<Index, uint16_t> ||
+        std::is_same_v<Index, uint32_t>);
+
+    Buffer buffer_;
+    size_t count_ = 0;
+};
+
 template<typename Struct>
 class ConstantBuffer : public misc::uncopyable_t
 {

@@ -48,15 +48,15 @@ typename tcolor2<T>::self_t tcolor2<T>::clamp(T min_v, T max_v) const noexcept
 template<typename T>
 typename tcolor2<T>::self_t tcolor2<T>::clamp_low(T min_v) const noexcept
 {
-    return self_t(std::max(c, min_v),
-                  std::max(a, min_v));
+    return self_t((std::max)(c, min_v),
+                  (std::max)(a, min_v));
 }
 
 template<typename T>
 typename tcolor2<T>::self_t tcolor2<T>::clamp_high(T max_v) const noexcept
 {
-    return self_t(std::min(c, max_v),
-                  std::min(a, max_v));
+    return self_t((std::min)(c, max_v),
+                  (std::min)(a, max_v));
 }
 
 template<typename T>

@@ -57,19 +57,19 @@ typename tcolor4<T>::self_t tcolor4<T>::clamp(T min_v, T max_v) const noexcept
 template<typename T>
 typename tcolor4<T>::self_t tcolor4<T>::clamp_low(T min_v) const noexcept
 {
-    return self_t(std::max(r, min_v),
-                  std::max(g, min_v),
-                  std::max(b, min_v),
-                  std::max(a, min_v));
+    return self_t((std::max)(r, min_v),
+                  (std::max)(g, min_v),
+                  (std::max)(b, min_v),
+                  (std::max)(a, min_v));
 }
 
 template<typename T>
 typename tcolor4<T>::self_t tcolor4<T>::clamp_high(T max_v) const noexcept
 {
-    return self_t(std::min(r, max_v),
-                  std::min(g, max_v),
-                  std::min(b, max_v),
-                  std::min(a, max_v));
+    return self_t((std::min)(r, max_v),
+                  (std::min)(g, max_v),
+                  (std::min)(b, max_v),
+                  (std::min)(a, max_v));
 }
 
 template<typename T>

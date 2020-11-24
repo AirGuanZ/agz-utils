@@ -93,20 +93,20 @@ template<typename T>
 typename tvec4<T>::self_t tvec4<T>::clamp_low(T min_v) const noexcept
 {
     return self_t(
-        std::max(x, min_v),
-        std::max(y, min_v),
-        std::max(z, min_v),
-        std::max(w, min_v));
+        (std::max)(x, min_v),
+        (std::max)(y, min_v),
+        (std::max)(z, min_v),
+        (std::max)(w, min_v));
 }
 
 template<typename T>
 typename tvec4<T>::self_t tvec4<T>::clamp_high(T max_v) const noexcept
 {
     return self_t(
-        std::min(x, max_v),
-        std::min(y, max_v),
-        std::min(z, max_v),
-        std::min(w, max_v));
+        (std::min)(x, max_v),
+        (std::min)(y, max_v),
+        (std::min)(z, max_v),
+        (std::min)(w, max_v));
 }
 
 template<typename T>
