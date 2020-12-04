@@ -4,6 +4,8 @@
 
 AGZ_D3D12_RENDERGRAPH_BEGIN
 
+using RawGraphicsCommandList = ID3D12GraphicsCommandList4;
+
 class PassContext : public misc::uncopyable_t
 {
 public:
@@ -17,14 +19,14 @@ public:
     PassContext(
         Runtime                            *runtime,
         int                                 frameIndex,
-        ID3D12GraphicsCommandList          *cmdList,
+        RawGraphicsCommandList             *cmdList,
         const std::map<int, ResourceUsage> &resourceUsages) noexcept;
 
     int getFrameIndex() const noexcept;
 
-    ID3D12GraphicsCommandList *getCommandList() noexcept;
+    RawGraphicsCommandList *getCommandList() noexcept;
 
-    ID3D12GraphicsCommandList *operator->() noexcept;
+    RawGraphicsCommandList *operator->() noexcept;
 
     ID3D12Resource *getRawResource(const Resource *resource) noexcept;
 
@@ -34,7 +36,7 @@ private:
 
     Runtime                            *runtime_;
     int                                 frameIndex_;
-    ID3D12GraphicsCommandList          *cmdList_;
+    RawGraphicsCommandList             *cmdList_;
     const std::map<int, ResourceUsage> &resources_;
 };
 

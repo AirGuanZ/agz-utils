@@ -130,6 +130,19 @@ private:
     mem_func_ptr_t m_;
 };
 
+#define AGZ_DECL_EVENT_SENDER_HANDLER(EventSender, EventName)                   \
+    void attach(agz::event::receiver_t<EventName> *handler)                     \
+        { EventSender.attach(handler); }                                        \
+    void attach(std::shared_ptr<agz::event::receiver_t<EventName>> handler)     \
+        { EventSender.attach(std::move(handler)); }                             \
+    void attach(std::function<void(const EventName&)> f)                        \
+        { this->attach(std::make_shared<                                        \
+            agz::event::functional_receiver_t<EventName>>(std::move(f))); }     \
+    void detach(agz::event::receiver_t<EventName> *handler)                     \
+        { EventSender.detach(handler); }                                        \
+    void detach(std::shared_ptr<agz::event::receiver_t<EventName>> handler)     \
+        { EventSender.detach(handler); }
+
 template<typename Event>
 receiver_t<Event>::~receiver_t()
 {

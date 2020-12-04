@@ -4,6 +4,7 @@
 #include <agz/utility/graphics_api/d3d12/descriptorAllocator.h>
 #include <agz/utility/graphics_api/d3d12/frameFence.h>
 #include <agz/utility/graphics_api/d3d12/imguiIntegration.h>
+#include <agz/utility/graphics_api/d3d12/resourceManager.h>
 #include <agz/utility/graphics_api/d3d12/swapChain.h>
 #include <agz/utility/graphics_api/d3d12/window.h>
 
@@ -50,10 +51,10 @@ public:
 
     void setCloseFlag(bool closeFlag) noexcept;
 
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(window_, WindowCloseEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(window_, WindowGetFocusEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(window_, WindowLostFocusEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(window_, WindowResizeEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(window_, WindowCloseEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(window_, WindowGetFocusEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(window_, WindowLostFocusEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(window_, WindowResizeEvent)
 
     // device
 
@@ -64,8 +65,6 @@ public:
     IDXGIAdapter *getAdapter() noexcept;
 
     ID3D12Device *getDevice() noexcept;
-
-    operator ID3D12Device *() noexcept;
 
     ID3D12CommandQueue *getGraphicsQueue() noexcept;
 
@@ -99,8 +98,8 @@ public:
 
     const D3D12_RECT &getDefaultScissorRect() const noexcept;
     
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(swapChain_, SwapChainPreResizeEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(swapChain_, SwapChainPostResizeEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(swapChain_, SwapChainPreResizeEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(swapChain_, SwapChainPostResizeEvent)
 
     // gpu heap
 
@@ -131,6 +130,27 @@ public:
         int           thread = 0,
         int           queue  = 0);
 
+    // rsc mgr
+
+    ResourceManager &getResourceManager();
+
+    UniqueResource create(
+        D3D12_HEAP_TYPE            heapType,
+        const D3D12_RESOURCE_DESC &desc,
+        D3D12_RESOURCE_STATES      initialState);
+
+    UniqueResource create(
+        D3D12_HEAP_TYPE            heapType,
+        const D3D12_RESOURCE_DESC &desc,
+        D3D12_RESOURCE_STATES      initialState,
+        const D3D12_CLEAR_VALUE   &clearValue);
+
+    Buffer createDefaultBuffer(
+        size_t                byteSize,
+        D3D12_RESOURCE_STATES initState);
+
+    Buffer createUploadBuffer(size_t byteSize);
+
 private:
 
     // warning: check d3d12Context.inl before changing the order of decls
@@ -141,6 +161,7 @@ private:
     DescriptorAllocator descAlloc_;
     ImGuiIntegration    imgui_;
     FrameFence          frameFence_;
+    ResourceManager     rscMgr_;
 };
 
 inline D3D12Context::D3D12Context(
@@ -154,7 +175,8 @@ inline D3D12Context::D3D12Context(
       swapChain_(swapChainDesc, window_, device_),
       descAlloc_(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, true,
                  GPUDescHeapSize, swapChainDesc.imageCount),
-      frameFence_(device_, device_.getGraphicsQueue(), swapChainDesc.imageCount)
+      frameFence_(device_, device_.getGraphicsQueue(), swapChainDesc.imageCount),
+      rscMgr_(device_, device_.getAdapter())
 {
     if(enableImGui)
     {
@@ -259,11 +281,6 @@ inline IDXGIAdapter *D3D12Context::getAdapter() noexcept
 inline ID3D12Device *D3D12Context::getDevice() noexcept
 {
     return device_.getDevice();
-}
-
-inline D3D12Context::operator struct ID3D12Device*() noexcept
-{
-    return device_;
 }
 
 inline ID3D12CommandQueue *D3D12Context::getGraphicsQueue() noexcept
@@ -394,6 +411,40 @@ inline rg::Vertex *D3D12Context::addImGuiToRenderGraph(
     int           queue)
 {
     return imgui_.addToRenderGraph(graph, renderTarget, thread, queue);
+}
+
+inline ResourceManager &D3D12Context::getResourceManager()
+{
+    return rscMgr_;
+}
+
+inline UniqueResource D3D12Context::create(
+    D3D12_HEAP_TYPE            heapType,
+    const D3D12_RESOURCE_DESC &desc,
+    D3D12_RESOURCE_STATES      initialState)
+{
+    return rscMgr_.create(heapType, desc, initialState);
+}
+
+inline UniqueResource D3D12Context::create(
+    D3D12_HEAP_TYPE            heapType,
+    const D3D12_RESOURCE_DESC &desc,
+    D3D12_RESOURCE_STATES      initialState,
+    const D3D12_CLEAR_VALUE   &clearValue)
+{
+    return rscMgr_.create(heapType, desc, initialState, clearValue);
+}
+
+inline Buffer D3D12Context::createDefaultBuffer(
+    size_t                byteSize,
+    D3D12_RESOURCE_STATES initState)
+{
+    return rscMgr_.createDefaultBuffer(byteSize, initState);
+}
+
+inline Buffer D3D12Context::createUploadBuffer(size_t byteSize)
+{
+    return rscMgr_.createUploadBuffer(byteSize);
 }
 
 AGZ_D3D12_END

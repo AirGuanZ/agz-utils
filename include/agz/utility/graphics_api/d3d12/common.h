@@ -63,22 +63,12 @@ constexpr ShaderRegister u3 = { 0, 3 };
 constexpr ShaderRegister u4 = { 0, 4 };
 constexpr ShaderRegister u5 = { 0, 5 };
 
-#define AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(EventSender, EventName)             \
-    void attach(event::receiver_t<EventName> *handler)                          \
-        { EventSender.attach(handler); }                                        \
-    void attach(std::shared_ptr<event::receiver_t<EventName>> handler)          \
-        { EventSender.attach(std::move(handler)); }                                        \
-    void detach(event::receiver_t<EventName> *handler)                          \
-        { EventSender.detach(handler); }                                        \
-    void detach(std::shared_ptr<event::receiver_t<EventName>> handler)          \
-        { EventSender.detach(handler); }
-
 #define AGZ_D3D12_CHECK_HR(X)                                                   \
     do {                                                                        \
         const HRESULT autoname_hr = X;                                          \
         if(!SUCCEEDED(autoname_hr))                                             \
         {                                                                       \
-            throw D3D12Exception(                                               \
+            throw ::agz::d3d12::D3D12Exception(                                 \
                     std::string("errcode = ")                                   \
                     + std::to_string(autoname_hr) + "."                         \
                     + std::system_category().message(autoname_hr));             \
@@ -90,7 +80,7 @@ constexpr ShaderRegister u5 = { 0, 5 };
         const HRESULT autoname_hr = X;                                          \
         if(!SUCCEEDED(autoname_hr))                                             \
         {                                                                       \
-            throw D3D12Exception((E) + std::string(".errcode = ")               \
+            throw ::agz::d3d12::D3D12Exception((E) + std::string(".errcode = ") \
                     + std::to_string(autoname_hr) + "."                         \
                     + std::system_category().message(autoname_hr));             \
         }                                                                       \

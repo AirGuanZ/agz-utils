@@ -69,10 +69,10 @@ public:
 
     // event handler
 
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowCloseEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowGetFocusEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowLostFocusEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowResizeEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowCloseEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowGetFocusEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowLostFocusEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, WindowResizeEvent)
     
     // internal use
 
