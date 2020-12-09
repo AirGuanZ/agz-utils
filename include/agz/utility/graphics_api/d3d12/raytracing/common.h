@@ -7,10 +7,10 @@
 
 AGZ_D3D12_RT_BEGIN
 
-ComPtr<ID3D12Device4> getDXRDevice(
+ComPtr<ID3D12Device5> getDXRDevice(
     ID3D12Device *device);
 
-ComPtr<ID3D12Device4> getDXRDevice(
+ComPtr<ID3D12Device5> getDXRDevice(
     const ComPtr<ID3D12Device> &device);
 
 ComPtr<ID3D12GraphicsCommandList4> getDXRCommandList(

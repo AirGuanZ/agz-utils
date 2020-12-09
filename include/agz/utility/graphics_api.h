@@ -52,9 +52,12 @@
 #include "./graphics_api/imgui/imgui.h"
 #include "./graphics_api/imgui/imfilebrowser.h"
 
+#include "./graphics_api/d3d12/raytracing/shaderTable.h"
+
 #include "./graphics_api/d3d12/renderGraph/graph.h"
 
 #include "./graphics_api/d3d12/buffer.h"
+#include "./graphics_api/d3d12/commandList.h"
 #include "./graphics_api/d3d12/d3d12Context.h"
 #include "./graphics_api/d3d12/debug.h"
 #include "./graphics_api/d3d12/descriptorAllocator.h"

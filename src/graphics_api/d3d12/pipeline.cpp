@@ -8,24 +8,6 @@ AGZ_D3D12_BEGIN
 
 namespace
 {
-
-    D3D12_RASTERIZER_DESC defaultRasterizerDesc() noexcept
-    {
-        return D3D12_RASTERIZER_DESC{
-            .FillMode              = D3D12_FILL_MODE_SOLID,
-            .CullMode              = D3D12_CULL_MODE_BACK,
-            .FrontCounterClockwise = false,
-            .DepthBias             = 0,
-            .DepthBiasClamp        = 0,
-            .SlopeScaledDepthBias  = 0,
-            .DepthClipEnable       = true,
-            .MultisampleEnable     = false,
-            .AntialiasedLineEnable = false,
-            .ForcedSampleCount     = 0,
-            .ConservativeRaster    = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF
-        };
-    }
-
     D3D12_DEPTH_STENCIL_DESC defaultDepthStencilDesc() noexcept
     {
         return D3D12_DEPTH_STENCIL_DESC{
@@ -87,14 +69,14 @@ void PipelineBuilder::setRootSignature(ComPtr<ID3D12RootSignature> rootSignature
     rootSignature_ = std::move(rootSignature);
 }
 
-void PipelineBuilder::setVertexShader(ComPtr<ID3D10Blob> byteCode)
+void PipelineBuilder::setVertexShader(ComPtr<ID3DBlob> byteCode)
 {
     sharedVertexShaderByteCode_ = std::move(byteCode);
     desc_.VS.pShaderBytecode    = sharedVertexShaderByteCode_->GetBufferPointer();
     desc_.VS.BytecodeLength     = sharedVertexShaderByteCode_->GetBufferSize();
 }
 
-void PipelineBuilder::setPixelShader(ComPtr<ID3D10Blob> byteCode)
+void PipelineBuilder::setPixelShader(ComPtr<ID3DBlob> byteCode)
 {
     sharedPixelShaderByteCode_ = std::move(byteCode);
     desc_.PS.pShaderBytecode    = sharedPixelShaderByteCode_->GetBufferPointer();

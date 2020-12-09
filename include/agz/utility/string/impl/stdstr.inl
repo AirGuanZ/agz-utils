@@ -339,4 +339,10 @@ inline std::wstring u8_to_wstr(const std::string &str)
     return converter.from_bytes(str);
 }
 
+inline std::string wstr_to_u8(const std::wstring &str)
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    return converter.to_bytes(str);
+}
+
 } // namespace agz::stdstr

@@ -4,16 +4,16 @@
 
 AGZ_D3D12_RT_BEGIN
 
-ComPtr<ID3D12Device4> getDXRDevice(ID3D12Device *device)
+ComPtr<ID3D12Device5> getDXRDevice(ID3D12Device *device)
 {
-    ComPtr<ID3D12Device4> result;
+    ComPtr<ID3D12Device5> result;
     AGZ_D3D12_CHECK_HR_MSG(
         "failed to get DXR device from D3D12 device",
         device->QueryInterface(result.GetAddressOf()));
     return result;
 }
 
-ComPtr<ID3D12Device4> getDXRDevice(const ComPtr<ID3D12Device> &device)
+ComPtr<ID3D12Device5> getDXRDevice(const ComPtr<ID3D12Device> &device)
 {
     return getDXRDevice(device.Get());
 }
