@@ -3,7 +3,7 @@
 #include "../../misc/type_list.h"
 #include "vec.h"
 
-namespace agz::math {
+AGZ_MATH_BEGIN
     
 template<typename P, int D>
 class tensor_t;
@@ -74,4 +74,4 @@ public:
     auto &_get_base() const noexcept { return base_; }
 };
 
-} // namespace agz::math
+AGZ_MATH_END

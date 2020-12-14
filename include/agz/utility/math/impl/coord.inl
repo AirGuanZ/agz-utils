@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace agz::math {
+AGZ_MATH_BEGIN
 
 template<typename T>
 tcoord3<T>::tcoord3() noexcept
@@ -130,4 +130,4 @@ bool tcoord3<T>::in_positive_z_hemisphere(const vec_t &v) const noexcept
     return dot(v, z) > 0;
 }
 
-} // namespace agz::math
+AGZ_MATH_END

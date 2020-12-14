@@ -5,11 +5,13 @@
 #include <cmath>
 #include <numeric>
 
-namespace agz::math::distribution
+AGZ_MATH_BEGIN
+
+namespace distribution
 {
     
 template<typename T, typename F, typename>
-T uniform_integer(T beg, T end, F u)
+AGZ_MATH_API T uniform_integer(T beg, T end, F u)
 {
     assert(beg < end);
     assert(0 <= u && u <= 1);
@@ -165,9 +167,9 @@ T alias_sampler_t<F, T>::sample(F u1, F u2) const noexcept
 }
 
 template<typename F>
-std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept
+AGZ_MATH_API std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept
 {
-    static_assert(std::is_floating_point_v<F>);
+    static_assert(std::is_floating_point_v<F>, "");
 
     const F z = 1 - 2 * u1;
     const F phi = 2 * PI<F> * u2;
@@ -178,9 +180,9 @@ std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept
 }
 
 template<typename F>
-std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept
+AGZ_MATH_API std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept
 {
-    static_assert(std::is_floating_point_v<F>);
+    static_assert(std::is_floating_point_v<F>, "");
 
     const F z = u1;
     const F phi = 2 * PI<F> * u2;
@@ -192,7 +194,8 @@ std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept
 }
 
 template<typename F>
-std::pair<tvec3<F>, F> uniform_on_cone(F max_cos_theta, F u1, F u2) noexcept
+AGZ_MATH_API std::pair<tvec3<F>, F> uniform_on_cone(
+    F max_cos_theta, F u1, F u2) noexcept
 {
     const F cos_theta = (1 - u1) + u1 * max_cos_theta;
     const F sin_theta = std::sqrt((std::max)(F(0), 1 - cos_theta * cos_theta));
@@ -205,13 +208,13 @@ std::pair<tvec3<F>, F> uniform_on_cone(F max_cos_theta, F u1, F u2) noexcept
 }
 
 template<typename F>
-F uniform_on_cone_pdf(F max_cos_theta) noexcept
+AGZ_MATH_API F uniform_on_cone_pdf(F max_cos_theta) noexcept
 {
     return 1 / (2 * PI<F> * (1 - max_cos_theta));
 }
 
 template<typename F>
-std::pair<tvec3<F>, F> zweighted_on_hemisphere(F u1, F u2) noexcept
+AGZ_MATH_API std::pair<tvec3<F>, F> zweighted_on_hemisphere(F u1, F u2) noexcept
 {
     tvec2<F> sam;
     u1 = 2 * u1 - 1;
@@ -237,20 +240,20 @@ std::pair<tvec3<F>, F> zweighted_on_hemisphere(F u1, F u2) noexcept
 }
 
 template<typename F>
-F zweighted_on_hemisphere_pdf(F z) noexcept
+AGZ_MATH_API F zweighted_on_hemisphere_pdf(F z) noexcept
 {
     return z > 0 ? z * invPI<F> : 0;
 }
 
 template<typename F>
-tvec2<F> uniform_on_triangle(F u1, F u2) noexcept
+AGZ_MATH_API tvec2<F> uniform_on_triangle(F u1, F u2) noexcept
 {
     const F t = std::sqrt(u1);
     return { 1 - t, t * u2 };
 }
 
 template<typename F>
-tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept
+AGZ_MATH_API tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept
 {
     const F phi = 2 * PI<F> * u1;
     const F r   = std::sqrt(u2);
@@ -258,7 +261,7 @@ tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept
 }
 
 template<typename F, typename I>
-std::pair<I, F> extract_uniform_int(F u, I begin, I end)
+AGZ_MATH_API std::pair<I, F> extract_uniform_int(F u, I begin, I end)
 {
     assert(begin < end);
 
@@ -269,7 +272,8 @@ std::pair<I, F> extract_uniform_int(F u, I begin, I end)
 }
 
 template<typename F>
-F sample_inv_cdf_table(F u, const F *inv_cdf, size_t tab_size) noexcept
+AGZ_MATH_API F sample_inv_cdf_table(
+    F u, const F *inv_cdf, size_t tab_size) noexcept
 {
     assert(tab_size >= 2);
     const F global = u * (tab_size - 1);
@@ -279,4 +283,6 @@ F sample_inv_cdf_table(F u, const F *inv_cdf, size_t tab_size) noexcept
     return inv_cdf[low] * (1 - local) + inv_cdf[low + 1] * local;
 }
 
-} // namespace agz::math::distribution
+} // namespace distribution
+
+AGZ_MATH_END

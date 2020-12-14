@@ -2,8 +2,11 @@
 
 #include <functional>
 
-namespace agz::misc
-{
+#ifndef __CUDACC__
+
+namespace agz {
+namespace misc {
+
     
 inline size_t hash_combine(size_t a, size_t b)
 {
@@ -41,4 +44,6 @@ size_t hash(const A &a, const Others&...others)
     return hash_impl::hash(std::hash<A>()(a), others...);
 }
 
-} // namespace agz::misc
+} } // namespace agz::misc
+
+#endif // #ifndef __CUDACC__

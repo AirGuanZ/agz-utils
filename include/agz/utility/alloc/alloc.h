@@ -10,8 +10,7 @@
 #include <cstdlib>
 #endif
 
-namespace agz::alloc
-{
+namespace agz::alloc {
 
 namespace impl
 {

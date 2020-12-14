@@ -2,7 +2,7 @@
 
 #include "../decl/func.h"
 
-namespace agz::math {
+AGZ_MATH_BEGIN
 
 template<typename T>
 tcolor4<T>::tcolor4() noexcept
@@ -315,4 +315,4 @@ tcolor4<T> from_color4b(const color4b &c) noexcept
     return c.map([](unsigned char s) { return s / T(255); });
 }
 
-} // namespace agz::math
+AGZ_MATH_END

@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-namespace agz::math {
+AGZ_MATH_BEGIN
 
 template<typename T>
-tmat4_c<T>::tmat4_c(
+AGZ_MATH_API tmat4_c<T>::tmat4_c(
     const tvec4<T> &c0, const tvec4<T> &c1,
     const tvec4<T> &c2, const tvec4<T> &c3) noexcept
     : data{ c0, c1, c2, c3 }
@@ -12,24 +12,25 @@ tmat4_c<T>::tmat4_c(
 }
 
 template<typename T>
-tmat4_c<T>::tmat4_c() noexcept
+AGZ_MATH_API tmat4_c<T>::tmat4_c() noexcept
     : tmat4_c(identity())
 {
     
 }
 
 template <typename T>
-tmat4_c<T>::tmat4_c(uninitialized_t) noexcept
+AGZ_MATH_API tmat4_c<T>::tmat4_c(uninitialized_t) noexcept
     : data{ col_t(UNINIT), col_t(UNINIT), col_t(UNINIT), col_t(UNINIT) }
 {
     
 }
 
 template<typename T>
-tmat4_c<T>::tmat4_c(T m00, T m01, T m02, T m03,
-                    T m10, T m11, T m12, T m13,
-                    T m20, T m21, T m22, T m23,
-                    T m30, T m31, T m32, T m33) noexcept
+AGZ_MATH_API tmat4_c<T>::tmat4_c(
+    T m00, T m01, T m02, T m03,
+    T m10, T m11, T m12, T m13,
+    T m20, T m21, T m22, T m23,
+    T m30, T m31, T m32, T m33) noexcept
     : data{ { m00, m10, m20, m30 },
             { m01, m11, m21, m31 },
             { m02, m12, m22, m32 },
@@ -39,10 +40,11 @@ tmat4_c<T>::tmat4_c(T m00, T m01, T m02, T m03,
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::from_rows(const row_t &r0,
-                                                  const row_t &r1,
-                                                  const row_t &r2,
-                                                  const row_t &r3) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::from_rows(
+    const row_t &r0,
+    const row_t &r1,
+    const row_t &r2,
+    const row_t &r3) noexcept
 {
     return self_t(r0.x, r0.y, r0.z, r0.w,
                   r1.x, r1.y, r1.z, r1.w,
@@ -51,16 +53,17 @@ typename tmat4_c<T>::self_t tmat4_c<T>::from_rows(const row_t &r0,
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::from_cols(const col_t &c0,
-                                                  const col_t &c1,
-                                                  const col_t &c2,
-                                                  const col_t &c3) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::from_cols(
+    const col_t &c0,
+    const col_t &c1,
+    const col_t &c2,
+    const col_t &c3) noexcept
 {
     return self_t(c0, c1, c2, c3);
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::diag(T val) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::diag(T val) noexcept
 {
     return self_t(val, 0,   0,   0,
                   0,   val, 0,   0,
@@ -69,7 +72,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::diag(T val) noexcept
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::all(T val) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::all(T val) noexcept
 {
     return self_t(val, val, val, val,
                   val, val, val, val,
@@ -78,71 +81,74 @@ typename tmat4_c<T>::self_t tmat4_c<T>::all(T val) noexcept
 }
 
 template<typename T>
-const typename tmat4_c<T>::self_t& tmat4_c<T>::zero() noexcept
+AGZ_MATH_API const typename tmat4_c<T>::self_t& tmat4_c<T>::zero() noexcept
 {
     static const self_t ret = self_t::all(0);
     return ret;
 }
 
 template<typename T>
-const typename tmat4_c<T>::self_t& tmat4_c<T>::one() noexcept
+AGZ_MATH_API const typename tmat4_c<T>::self_t& tmat4_c<T>::one() noexcept
 {
     static const self_t ret = self_t::all(1);
     return ret;
 }
 
 template<typename T>
-const typename tmat4_c<T>::self_t& tmat4_c<T>::identity() noexcept
+AGZ_MATH_API const typename tmat4_c<T>::self_t& tmat4_c<T>::identity() noexcept
 {
     static const self_t ret = self_t::diag(1);
     return ret;
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::inv_from_adj(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::inv_from_adj(
     const self_t &adj) const noexcept
 {
     return adj / dot(data[0], adj.get_row(0));
 }
 
 template<typename T>
-typename tmat4_c<T>::col_t& tmat4_c<T>::operator[](size_t idx) noexcept
+AGZ_MATH_API typename tmat4_c<T>::col_t& tmat4_c<T>::operator[](
+    size_t idx) noexcept
 {
     return data[idx];
 }
 
 template<typename T>
-const typename tmat4_c<T>::col_t& tmat4_c<T>::operator[](size_t idx) const noexcept
+AGZ_MATH_API const typename tmat4_c<T>::col_t& tmat4_c<T>::operator[](
+    size_t idx) const noexcept
 {
     return data[idx];
 }
 
 template<typename T>
-T &tmat4_c<T>::operator()(size_t row, size_t col) noexcept
+AGZ_MATH_API T &tmat4_c<T>::operator()(size_t row, size_t col) noexcept
 {
     return data[col][row];
 }
 
 template<typename T>
-const T &tmat4_c<T>::operator()(size_t row, size_t col) const noexcept
+AGZ_MATH_API const T &tmat4_c<T>::operator()(
+    size_t row, size_t col) const noexcept
 {
     return data[col][row];
 }
 
 template<typename T>
-const tvec4<T> &tmat4_c<T>::get_col(size_t idx) const noexcept
+AGZ_MATH_API const tvec4<T> &tmat4_c<T>::get_col(size_t idx) const noexcept
 {
     return data[idx];
 }
 
 template<typename T>
-tvec4<T> tmat4_c<T>::get_row(size_t idx) const noexcept
+AGZ_MATH_API tvec4<T> tmat4_c<T>::get_row(size_t idx) const noexcept
 {
     return tvec4<T>(data[0][idx], data[1][idx], data[2][idx], data[3][idx]);
 }
 
 template<typename T>
-auto tmat4_c<T>::det() const noexcept
+AGZ_MATH_API auto tmat4_c<T>::det() const noexcept
 {
     return determinant(data[0][0], data[1][0], data[2][0], data[3][0],
                        data[0][1], data[1][1], data[2][1], data[3][1],
@@ -151,37 +157,37 @@ auto tmat4_c<T>::det() const noexcept
 }
 
 template<typename T>
-auto tmat4_c<T>::determinant() const noexcept
+AGZ_MATH_API auto tmat4_c<T>::determinant() const noexcept
 {
     return det();
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::inv() const noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::inv() const noexcept
 {
     return inv_from_adj(adj());
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::inverse() const noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::inverse() const noexcept
 {
     return inv();
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::t() const noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::t() const noexcept
 {
     return self_t::from_rows(data[0], data[1], data[2], data[3]);
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::transpose() const noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::transpose() const noexcept
 {
     return t();
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::adj() const noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::adj() const noexcept
 {
     T blk00 = data[2][2] * data[3][3] - data[3][2] * data[2][3];
     T blk02 = data[1][2] * data[3][3] - data[3][2] * data[1][3];
@@ -231,43 +237,47 @@ typename tmat4_c<T>::self_t tmat4_c<T>::adj() const noexcept
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::adjoint() const noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::adjoint() const noexcept
 {
     return adj();
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t &tmat4_c<T>::operator+=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t &tmat4_c<T>::operator+=(
+    const self_t &rhs) noexcept
 {
     return *this = *this + rhs;
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t &tmat4_c<T>::operator-=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t &tmat4_c<T>::operator-=(
+    const self_t &rhs) noexcept
 {
     return *this = *this - rhs;
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t &tmat4_c<T>::operator*=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t &tmat4_c<T>::operator*=(
+    const self_t &rhs) noexcept
 {
     return *this = *this * rhs;
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t &tmat4_c<T>::operator*=(T rhs) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t &tmat4_c<T>::operator*=(T rhs) noexcept
 {
     return *this = *this * rhs;
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t &tmat4_c<T>::operator/=(T rhs) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t &tmat4_c<T>::operator/=(T rhs) noexcept
 {
     return *this = *this / rhs;
 }
 
 template<typename T>
-tmat4_c<T> operator+(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
+AGZ_MATH_API tmat4_c<T> operator+(
+    const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
 {
     return tmat4_c<T>::from_cols(lhs[0] + rhs[0],
                                  lhs[1] + rhs[1],
@@ -276,7 +286,8 @@ tmat4_c<T> operator+(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
 }
 
 template<typename T>
-tmat4_c<T> operator-(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
+AGZ_MATH_API tmat4_c<T> operator-(
+    const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
 {
     return tmat4_c<T>::from_cols(lhs[0] - rhs[0],
                                  lhs[1] - rhs[1],
@@ -285,7 +296,8 @@ tmat4_c<T> operator-(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
 }
 
 template<typename T>
-tmat4_c<T> operator*(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
+AGZ_MATH_API tmat4_c<T> operator*(
+    const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
 {
     tmat4_c<T> ret(UNINIT);
     for(int c = 0; c != 4; ++c)
@@ -297,7 +309,8 @@ tmat4_c<T> operator*(const tmat4_c<T> &lhs, const tmat4_c<T> &rhs) noexcept
 }
 
 template<typename T>
-tvec4<T> operator*(const tmat4_c<T> &lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API tvec4<T> operator*(
+    const tmat4_c<T> &lhs, const tvec4<T> &rhs) noexcept
 {
     tvec4<T> col0_rhs = rhs[0] * lhs.data[0];
     tvec4<T> col1_rhs = rhs[1] * lhs.data[1];
@@ -307,7 +320,8 @@ tvec4<T> operator*(const tmat4_c<T> &lhs, const tvec4<T> &rhs) noexcept
 }
 
 template<typename T>
-tvec4<T> operator*(const tvec4<T> &lhs, const tmat4_c<T> &rhs) noexcept
+AGZ_MATH_API tvec4<T> operator*(
+    const tvec4<T> &lhs, const tmat4_c<T> &rhs) noexcept
 {
     return tvec4<T>(dot(lhs, rhs.get_col(0)),
                     dot(lhs, rhs.get_col(1)),
@@ -315,32 +329,35 @@ tvec4<T> operator*(const tvec4<T> &lhs, const tmat4_c<T> &rhs) noexcept
                     dot(lhs, rhs.get_col(3)));
 }
 
-template<typename T> tmat4_c<T> operator*(const tmat4_c<T> &lhs, T rhs) noexcept
+template<typename T>
+AGZ_MATH_API tmat4_c<T> operator*(const tmat4_c<T> &lhs, T rhs) noexcept
 {
     return tmat4_c<T>::from_cols(
         lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs, lhs[3] * rhs);
 }
 
-template<typename T> tmat4_c<T> operator/(const tmat4_c<T> &lhs, T rhs) noexcept
+template<typename T>
+AGZ_MATH_API tmat4_c<T> operator/(const tmat4_c<T> &lhs, T rhs) noexcept
 {
     return tmat4_c<T>::from_cols(
         lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs, lhs[3] / rhs);
 }
 
-template<typename T> tmat4_c<T> operator*(T lhs, const tmat4_c<T> &rhs) noexcept
+template<typename T>
+AGZ_MATH_API tmat4_c<T> operator*(T lhs, const tmat4_c<T> &rhs) noexcept
 {
     return rhs * lhs;
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(
     const tvec3<T> &offset) noexcept
 {
     return left_transform::translate(offset.x, offset.y, offset.z);
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(
     T x, T y, T z) noexcept
 {
     return self_t(
@@ -351,7 +368,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::translate(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate(
     const tvec3<T> &_axis, T rad) noexcept
 {
     const auto axis = _axis.normalize();
@@ -383,7 +400,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_x(T rad) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_x(
+    T rad) noexcept
 {
     const auto S = std::sin(rad), C = std::cos(rad);
     return self_t(
@@ -394,7 +412,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_x(T rad) noexcept
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_y(T rad) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_y(
+    T rad) noexcept
 {
     const auto S = std::sin(rad), C = std::cos(rad);
     return self_t(
@@ -405,7 +424,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_y(T rad) noexcept
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_z(T rad) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_z(
+    T rad) noexcept
 {
     const auto S = std::sin(rad), C = std::cos(rad);
     return self_t(
@@ -416,14 +436,14 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::rotate_z(T rad) noexcept
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(
     const tvec3<T> &ratio) noexcept
 {
     return scale(ratio.x, ratio.y, ratio.z);
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(
     T x, T y, T z) noexcept
 {
     return self_t(
@@ -434,7 +454,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::scale(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::perspective(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::perspective(
     T fov_y_rad, T w_over_h, T near_plane, T far_plane) noexcept
 {
     const T inv_dis = T(1) / (far_plane - near_plane);
@@ -448,7 +468,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::perspective(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::look_at(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::look_at(
     const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept
 {
     auto D = (dst - eye).normalize();
@@ -461,14 +481,14 @@ typename tmat4_c<T>::self_t tmat4_c<T>::left_transform::look_at(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(
     const tvec3<T> &offset) noexcept
 {
     return right_transform::translate(offset.x, offset.y, offset.z);
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(
     T x, T y, T z) noexcept
 {
     return self_t(1, 0, 0, 0,
@@ -478,7 +498,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::translate(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate(
     const tvec3<T> &_axis, T rad) noexcept
 {
     const auto axis = _axis.normalize();
@@ -510,7 +530,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_x(T rad) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_x(
+    T rad) noexcept
 {
     const auto S = std::sin(rad), C = std::cos(rad);
     return self_t(1, 0, 0, 0,
@@ -520,7 +541,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_x(T rad) noexcep
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_y(T rad) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_y(
+    T rad) noexcept
 {
     const auto S = std::sin(rad), C = std::cos(rad);
     return self_t(C, 0, -S, 0,
@@ -530,7 +552,8 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_y(T rad) noexcep
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_z(T rad) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_z(
+    T rad) noexcept
 {
     const auto S = std::sin(rad), C = std::cos(rad);
     return self_t(C, S, 0, 0,
@@ -540,14 +563,15 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::rotate_z(T rad) noexcep
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::scale(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::scale(
     const tvec3<T> &ratio) noexcept
 {
     return right_transform::scale(ratio.x, ratio.y, ratio.z);
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::scale(T x, T y, T z) noexcept
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::scale(
+    T x, T y, T z) noexcept
 {
     return self_t(x, 0, 0, 0,
                   0, y, 0, 0,
@@ -556,7 +580,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::scale(T x, T y, T z) no
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::perspective(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::perspective(
     T fov_y_rad, T w_over_h, T near_plane, T far_plane) noexcept
 {
     T inv_dis = T(1) / (far_plane - near_plane);
@@ -570,7 +594,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::perspective(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::orthographic(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::orthographic(
     T left, T right, T top, T bottom, T near_z, T far_z) noexcept
 {
     T dx = 2 / (right - left);
@@ -583,7 +607,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::orthographic(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::look_at(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::look_at(
     const tvec3<T> &eye, const tvec3<T> &dst, const tvec3<T> &up) noexcept
 {
     auto D = (dst - eye).normalize();
@@ -596,7 +620,7 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::look_at(
 }
 
 template<typename T>
-typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::from_quaternion(
+AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::from_quaternion(
     const tquaternion_t<T> &q) noexcept
 {
     T x = q.x, y = q.y, z = q.z, w = q.w;
@@ -615,4 +639,4 @@ typename tmat4_c<T>::self_t tmat4_c<T>::right_transform::from_quaternion(
                   0,    0,    0,    1).transpose();
 }
 
-} // namespace agz::math
+AGZ_MATH_END

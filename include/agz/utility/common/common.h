@@ -7,8 +7,9 @@ namespace agz
     
 /** @brief 作为构造函数类型参数，表示不对成员进行初始化的标志类型 */
 struct uninitialized_t { };
-/** @brief 不初始化标志类型的值 */
-inline uninitialized_t UNINIT;
+
+/** @brief 不初始化标志类型的值，为兼容cuda不使用inline */
+extern uninitialized_t UNINIT;
 
 /** @brief remove reference/const/volatile */
 template<typename T>

@@ -2,13 +2,12 @@
 
 #include "./vec3.h"
 
-namespace agz::math
-{
+AGZ_MATH_BEGIN
 
 template<typename T>
 class tquaternion_t
 {
-    static_assert(std::is_floating_point_v<T>);
+    static_assert(std::is_floating_point_v<T>, "");
 
 public:
 
@@ -16,23 +15,23 @@ public:
 
     T w, x, y, z;
 
-    tquaternion_t() noexcept;
+    AGZ_MATH_API tquaternion_t() noexcept;
 
-    tquaternion_t(T w, T x, T y, T z) noexcept;
+    AGZ_MATH_API tquaternion_t(T w, T x, T y, T z) noexcept;
 
-    tquaternion_t(const tvec3<T> &axis, T rad) noexcept;
+    AGZ_MATH_API tquaternion_t(const tvec3<T> &axis, T rad) noexcept;
 
-    self_t normalize() const noexcept;
+    AGZ_MATH_API self_t normalize() const noexcept;
 
-    self_t conjugate() const noexcept;
+    AGZ_MATH_API self_t conjugate() const noexcept;
 
-    tvec3<T> apply_to_vector(const tvec3<T> &rhs) const noexcept;
+    AGZ_MATH_API tvec3<T> apply_to_vector(const tvec3<T> &rhs) const noexcept;
 
-    self_t operator*(const self_t &rhs) const noexcept;
+    AGZ_MATH_API self_t operator*(const self_t &rhs) const noexcept;
 };
 
 template<typename T>
-tquaternion_t<T> slerp(
+AGZ_MATH_API tquaternion_t<T> slerp(
     const tquaternion_t<T> &lhs, const tquaternion_t<T> &rhs, T interp_factor);
 
-} // namespace agz::math
+AGZ_MATH_END

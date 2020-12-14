@@ -5,8 +5,7 @@
 #include "common.h"
 #include "vec.h"
 
-namespace agz::math
-{
+AGZ_MATH_BEGIN
 
 namespace spherical_harmonics
 {
@@ -62,4 +61,4 @@ namespace spherical_harmonics
 
 } // namespace spherical_harmonics
 
-} // namespace agz::math
+AGZ_MATH_END

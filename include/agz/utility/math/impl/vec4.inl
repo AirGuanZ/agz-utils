@@ -4,83 +4,84 @@
 
 #include "../decl/common.h"
 
-namespace agz::math {
+AGZ_MATH_BEGIN
 
 template<typename T>
-tvec4<T>::tvec4() noexcept
+AGZ_MATH_API tvec4<T>::tvec4() noexcept
     : tvec4(T(0))
 {
 
 }
 
 template<typename T>
-tvec4<T>::tvec4(T x, T y, T z, T w) noexcept
+AGZ_MATH_API tvec4<T>::tvec4(T x, T y, T z, T w) noexcept
     : x(x), y(y), z(z), w(w)
 {
 
 }
 
 template<typename T>
-tvec4<T>::tvec4(const tvec3<T> &xyz, T w) noexcept
+AGZ_MATH_API tvec4<T>::tvec4(const tvec3<T> &xyz, T w) noexcept
     : x(xyz.x), y(xyz.y), z(xyz.z), w(w)
 {
     
 }
 
 template<typename T>
-tvec4<T>::tvec4(T val) noexcept
+AGZ_MATH_API tvec4<T>::tvec4(T val) noexcept
     : tvec4(val, val, val, val)
 {
 
 }
 
 template<typename T>
-tvec4<T>::tvec4(const tvec<T, 4> &v) noexcept
+AGZ_MATH_API tvec4<T>::tvec4(const tvec<T, 4> &v) noexcept
     : x(v[0]), y(v[1]), z(v[2]), w(v[3])
 {
 
 }
 
 template<typename T>
-tvec4<T>::tvec4(uninitialized_t) noexcept
+AGZ_MATH_API tvec4<T>::tvec4(uninitialized_t) noexcept
 {
 
 }
 
 template<typename T>
-tvec4<T>::tvec4(const tcolor4<T> &c) noexcept
+AGZ_MATH_API tvec4<T>::tvec4(const tcolor4<T> &c) noexcept
     : tvec4(c.r, c.g, c.b, c.a)
 {
 
 }
 
 template<typename T>
-bool tvec4<T>::is_zero() const noexcept
+AGZ_MATH_API bool tvec4<T>::is_zero() const noexcept
 {
     return !x && !y && !z && !w;
 }
 
 template<typename T>
-auto tvec4<T>::length() const noexcept
+AGZ_MATH_API auto tvec4<T>::length() const noexcept
 {
     return std::sqrt(length_square());
 }
 
 template<typename T>
-auto tvec4<T>::length_square() const noexcept
+AGZ_MATH_API auto tvec4<T>::length_square() const noexcept
 {
     return x * x + y * y + z * z + w * w;
 }
 
 template<typename T>
-typename tvec4<T>::self_t tvec4<T>::normalize() const noexcept
+AGZ_MATH_API typename tvec4<T>::self_t tvec4<T>::normalize() const noexcept
 {
-    static_assert(std::is_floating_point_v<T>);
+    static_assert(std::is_floating_point_v<T>, "");
     return *this / length();
 }
 
 template<typename T>
-typename tvec4<T>::self_t tvec4<T>::clamp(T min_v, T max_v) const noexcept
+AGZ_MATH_API typename tvec4<T>::self_t tvec4<T>::clamp(
+    T min_v, T max_v) const noexcept
 {
     return self_t(
         ::agz::math::clamp(x, min_v, max_v),
@@ -90,7 +91,8 @@ typename tvec4<T>::self_t tvec4<T>::clamp(T min_v, T max_v) const noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t tvec4<T>::clamp_low(T min_v) const noexcept
+AGZ_MATH_API typename tvec4<T>::self_t tvec4<T>::clamp_low(
+    T min_v) const noexcept
 {
     return self_t(
         (std::max)(x, min_v),
@@ -100,7 +102,8 @@ typename tvec4<T>::self_t tvec4<T>::clamp_low(T min_v) const noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t tvec4<T>::clamp_high(T max_v) const noexcept
+AGZ_MATH_API typename tvec4<T>::self_t tvec4<T>::clamp_high(
+    T max_v) const noexcept
 {
     return self_t(
         (std::min)(x, max_v),
@@ -110,7 +113,7 @@ typename tvec4<T>::self_t tvec4<T>::clamp_high(T max_v) const noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t tvec4<T>::saturate() const noexcept
+AGZ_MATH_API typename tvec4<T>::self_t tvec4<T>::saturate() const noexcept
 {
     return self_t(
         ::agz::math::saturate(x),
@@ -120,57 +123,58 @@ typename tvec4<T>::self_t tvec4<T>::saturate() const noexcept
 }
 
 template<typename T>
-auto tvec4<T>::sum() const noexcept
+AGZ_MATH_API auto tvec4<T>::sum() const noexcept
 {
     return x + y + z + w;
 }
 
 template<typename T>
-auto tvec4<T>::product() const noexcept
+AGZ_MATH_API auto tvec4<T>::product() const noexcept
 {
     return x * y * z * w;
 }
 
 template<typename T>
-T tvec4<T>::max_elem() const noexcept
+AGZ_MATH_API T tvec4<T>::max_elem() const noexcept
 {
     return (std::max)({ x, y, z, w });
 }
 
 template<typename T>
-T tvec4<T>::min_elem() const noexcept
+AGZ_MATH_API T tvec4<T>::min_elem() const noexcept
 {
     return (std::min)({ x, y, z, w });
 }
 
 template<typename T>
 template<typename F>
-auto tvec4<T>::map(F &&f) const noexcept
+AGZ_MATH_API auto tvec4<T>::map(F &&f) const noexcept
 {
     using ret_elem_t = rm_rcv_t<decltype(f(x))>;
     return tvec4<ret_elem_t>(f(x), f(y), f(z), f(w));
 }
 
 template<typename T>
-bool tvec4<T>::operator!() const noexcept
+AGZ_MATH_API bool tvec4<T>::operator!() const noexcept
 {
     return is_zero();
 }
 
 template<typename T>
-T &tvec4<T>::operator[](size_t idx) noexcept
+AGZ_MATH_API T &tvec4<T>::operator[](size_t idx) noexcept
 {
     return *(&x + idx);
 }
 
 template<typename T>
-const T &tvec4<T>::operator[](size_t idx) const noexcept
+AGZ_MATH_API const T &tvec4<T>::operator[](size_t idx) const noexcept
 {
     return *(&x + idx);
 }
 
 template<typename T>
-typename tvec4<T>::self_t &tvec4<T>::operator+=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tvec4<T>::self_t &tvec4<T>::operator+=(
+    const self_t &rhs) noexcept
 {
     x += rhs.x;
     y += rhs.y;
@@ -180,7 +184,8 @@ typename tvec4<T>::self_t &tvec4<T>::operator+=(const self_t &rhs) noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t &tvec4<T>::operator-=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tvec4<T>::self_t &tvec4<T>::operator-=(
+    const self_t &rhs) noexcept
 {
     x -= rhs.x;
     y -= rhs.y;
@@ -190,7 +195,8 @@ typename tvec4<T>::self_t &tvec4<T>::operator-=(const self_t &rhs) noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t &tvec4<T>::operator*=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tvec4<T>::self_t &tvec4<T>::operator*=(
+    const self_t &rhs) noexcept
 {
     x *= rhs.x;
     y *= rhs.y;
@@ -200,7 +206,8 @@ typename tvec4<T>::self_t &tvec4<T>::operator*=(const self_t &rhs) noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t &tvec4<T>::operator/=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tvec4<T>::self_t &tvec4<T>::operator/=(
+    const self_t &rhs) noexcept
 {
     x /= rhs.x;
     y /= rhs.y;
@@ -210,7 +217,7 @@ typename tvec4<T>::self_t &tvec4<T>::operator/=(const self_t &rhs) noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t &tvec4<T>::operator+=(T rhs) noexcept
+AGZ_MATH_API typename tvec4<T>::self_t &tvec4<T>::operator+=(T rhs) noexcept
 {
     x += rhs;
     y += rhs;
@@ -220,7 +227,7 @@ typename tvec4<T>::self_t &tvec4<T>::operator+=(T rhs) noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t &tvec4<T>::operator-=(T rhs) noexcept
+AGZ_MATH_API typename tvec4<T>::self_t &tvec4<T>::operator-=(T rhs) noexcept
 {
     x -= rhs;
     y -= rhs;
@@ -230,7 +237,7 @@ typename tvec4<T>::self_t &tvec4<T>::operator-=(T rhs) noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t &tvec4<T>::operator*=(T rhs) noexcept
+AGZ_MATH_API typename tvec4<T>::self_t &tvec4<T>::operator*=(T rhs) noexcept
 {
     x *= rhs;
     y *= rhs;
@@ -240,7 +247,7 @@ typename tvec4<T>::self_t &tvec4<T>::operator*=(T rhs) noexcept
 }
 
 template<typename T>
-typename tvec4<T>::self_t &tvec4<T>::operator/=(T rhs) noexcept
+AGZ_MATH_API typename tvec4<T>::self_t &tvec4<T>::operator/=(T rhs) noexcept
 {
     x /= rhs;
     y /= rhs;
@@ -250,91 +257,95 @@ typename tvec4<T>::self_t &tvec4<T>::operator/=(T rhs) noexcept
 }
 
 template<typename T>
-tvec4<T> operator-(const tvec4<T> &vec) noexcept
+AGZ_MATH_API tvec4<T> operator-(const tvec4<T> &vec) noexcept
 {
     return tvec4<T>(-vec.x, -vec.y, -vec.z, -vec.w);
 }
 
 template<typename T>
-tvec4<T> operator+(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API tvec4<T> operator+(
+    const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 {
     return tvec4<T>(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w + rhs.w);
 }
 
 template<typename T>
-tvec4<T> operator-(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API tvec4<T> operator-(
+    const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 {
     return tvec4<T>(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w);
 }
 
 template<typename T>
-tvec4<T> operator*(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API tvec4<T> operator*(
+    const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 {
     return tvec4<T>(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w);
 }
 
 template<typename T>
-tvec4<T> operator/(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API tvec4<T> operator/(
+    const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 {
     return tvec4<T>(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.w / rhs.w);
 }
 
 template<typename T>
-tvec4<T> operator+(const tvec4<T> &lhs, T rhs) noexcept
+AGZ_MATH_API tvec4<T> operator+(const tvec4<T> &lhs, T rhs) noexcept
 {
     return tvec4<T>(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs, lhs.w + rhs);
 }
 
 template<typename T>
-tvec4<T> operator-(const tvec4<T> &lhs, T rhs) noexcept
+AGZ_MATH_API tvec4<T> operator-(const tvec4<T> &lhs, T rhs) noexcept
 {
     return tvec4<T>(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs, lhs.w - rhs);
 }
 
 template<typename T>
-tvec4<T> operator*(const tvec4<T> &lhs, T rhs) noexcept
+AGZ_MATH_API tvec4<T> operator*(const tvec4<T> &lhs, T rhs) noexcept
 {
     return tvec4<T>(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs);
 }
 
 template<typename T>
-tvec4<T> operator/(const tvec4<T> &lhs, T rhs) noexcept
+AGZ_MATH_API tvec4<T> operator/(const tvec4<T> &lhs, T rhs) noexcept
 {
     return tvec4<T>(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs, lhs.w / rhs);
 }
 
 template<typename T>
-tvec4<T> operator+(T lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API tvec4<T> operator+(T lhs, const tvec4<T> &rhs) noexcept
 {
     return rhs + lhs;
 }
 
 template<typename T>
-tvec4<T> operator*(T lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API tvec4<T> operator*(T lhs, const tvec4<T> &rhs) noexcept
 {
     return rhs * lhs;
 }
 
 template<typename T>
-bool operator==(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API bool operator==(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 {
     return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z && lhs.w == rhs.w;
 }
 
 template<typename T>
-bool operator!=(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API bool operator!=(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 {
     return lhs.x != rhs.x || lhs.y != rhs.y || lhs.z != rhs.z || lhs.w != rhs.w;
 }
 
 template<typename T>
-auto dot(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API auto dot(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 {
     return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;;
 }
 
 template<typename T>
-auto cos(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
+AGZ_MATH_API auto cos(const tvec4<T> &lhs, const tvec4<T> &rhs) noexcept
 {
     return dot(lhs, rhs) / (lhs.length() * rhs.length());
 }
@@ -346,4 +357,4 @@ std::ostream &operator<<(std::ostream &out, const tvec4<T> &vec)
                << vec.y << ", " << vec.z << ", " << vec.w << ")";
 }
 
-} // namespace agz::math
+AGZ_MATH_END

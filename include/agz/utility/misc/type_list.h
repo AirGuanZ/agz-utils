@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-namespace agz::misc
-{
-    
+namespace agz {
+namespace misc {
+
 namespace type_list_impl
 {
     
@@ -39,7 +39,7 @@ namespace type_list_impl
         return std::is_same_v<T, T1> ? true : find_in<T, Ts...>();
     }
 
-} // namespace type_list_impl
+}  // namespace type_list_impl
 
 /**
  * @brief 类型列表
@@ -63,4 +63,4 @@ public:
         type_list_impl::find_in<T, Ts...>();
 };
 
-} // namespace misc
+} } // namespace misc
