@@ -80,6 +80,8 @@ AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::all(T val) noexcept
                   val, val, val, val);
 }
 
+#ifndef __CUDACC__
+
 template<typename T>
 AGZ_MATH_API const typename tmat4_c<T>::self_t& tmat4_c<T>::zero() noexcept
 {
@@ -100,6 +102,28 @@ AGZ_MATH_API const typename tmat4_c<T>::self_t& tmat4_c<T>::identity() noexcept
     static const self_t ret = self_t::diag(1);
     return ret;
 }
+
+#else // #ifndef __CUDACC__
+
+template<typename T>
+AGZ_MATH_API const typename tmat4_c<T>::self_t tmat4_c<T>::zero() noexcept
+{
+    return self_t::all(0);
+}
+
+template<typename T>
+AGZ_MATH_API const typename tmat4_c<T>::self_t tmat4_c<T>::one() noexcept
+{
+    return self_t::all(1);
+}
+
+template<typename T>
+AGZ_MATH_API const typename tmat4_c<T>::self_t tmat4_c<T>::identity() noexcept
+{
+    return self_t::diag(1);
+}
+
+#endif // #ifndef __CUDACC__
 
 template<typename T>
 AGZ_MATH_API typename tmat4_c<T>::self_t tmat4_c<T>::inv_from_adj(

@@ -72,6 +72,8 @@ AGZ_MATH_API typename tmat3_c<T>::self_t tmat3_c<T>::all(T val) noexcept
                   val, val, val);
 }
 
+#ifndef __CUDACC__
+
 template<typename T>
 AGZ_MATH_API const typename tmat3_c<T>::self_t& tmat3_c<T>::zero() noexcept
 {
@@ -92,6 +94,28 @@ AGZ_MATH_API const typename tmat3_c<T>::self_t& tmat3_c<T>::identity() noexcept
     static const self_t ret = diag(1);
     return ret;
 }
+
+#else // #ifndef __CUDACC__
+
+template<typename T>
+AGZ_MATH_API const typename tmat3_c<T>::self_t tmat3_c<T>::zero() noexcept
+{
+    return all(0);
+}
+
+template<typename T>
+AGZ_MATH_API const typename tmat3_c<T>::self_t tmat3_c<T>::one() noexcept
+{
+    return all(1);
+}
+
+template<typename T>
+AGZ_MATH_API const typename tmat3_c<T>::self_t tmat3_c<T>::identity() noexcept
+{
+    return diag(1);
+}
+
+#endif // #ifndef __CUDACC__
 
 template<typename T>
 AGZ_MATH_API typename tmat3_c<T>::self_t tmat3_c<T>::translate(

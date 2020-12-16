@@ -53,9 +53,15 @@ public:
 
     AGZ_MATH_API static self_t all(T val) noexcept;
 
+#ifndef __CUDACC__
     AGZ_MATH_API static const self_t &zero()     noexcept;
     AGZ_MATH_API static const self_t &one()      noexcept;
     AGZ_MATH_API static const self_t &identity() noexcept;
+#else
+    AGZ_MATH_API static const self_t zero()     noexcept;
+    AGZ_MATH_API static const self_t one()      noexcept;
+    AGZ_MATH_API static const self_t identity() noexcept;
+#endif
 
     AGZ_MATH_API self_t inv_from_adj(const self_t &adj) const noexcept;
 
