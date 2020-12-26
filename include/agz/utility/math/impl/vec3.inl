@@ -305,9 +305,7 @@ bool operator!=(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept
 template<typename T>
 bool operator<(const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept
 {
-    return lhs.x < rhs.x ||
-           (lhs.x == rhs.x && lhs.y < rhs.y) ||
-           (lhs.x == rhs.x && lhs.y == rhs.y && lhs.z < rhs.z);
+    return std::tie(lhs.x, lhs.y, lhs.z) < std::tie(rhs.x, rhs.y, rhs.z);
 }
 
 template<typename T>
