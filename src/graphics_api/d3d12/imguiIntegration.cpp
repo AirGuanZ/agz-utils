@@ -97,9 +97,7 @@ ImGuiIntegration::ImGuiIntegration(
 
 ImGuiIntegration::~ImGuiIntegration()
 {
-    ImGui_ImplDX12_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext(ImGui::GetCurrentContext());
+    destroy();
 }
 
 void ImGuiIntegration::initialize(
@@ -151,6 +149,12 @@ rg::Vertex *ImGuiIntegration::addToRenderGraph(
     int           thread,
     int           queue)
 {
+    if(!isAvailable())
+    {
+        throw D3D12Exception(
+            "try to add uninitialized imgui integration to render graph");
+    }
+
     auto *RTDesc = renderTarget->getDescription();
 
     D3D12_RENDER_TARGET_VIEW_DESC RTVDesc;

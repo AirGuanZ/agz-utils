@@ -31,6 +31,8 @@ public:
 
     ID3D12Resource *getResource() const noexcept;
 
+    D3D12_GPU_VIRTUAL_ADDRESS getGPUVirtualAddress() const noexcept;
+
     size_t getByteSize() const noexcept;
 
     void swap(Buffer &other) noexcept;

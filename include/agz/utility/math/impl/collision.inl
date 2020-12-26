@@ -1,13 +1,12 @@
 ﻿#pragma once
 
-namespace agz::math
-{
+AGZ_MATH_BEGIN
 
 namespace collision_impl
 {
 
     template<typename F>
-    F square_dist_between_pnt_aabb(
+    AGZ_MATH_API F square_dist_between_pnt_aabb(
         const tvec3<F> &p, const tvec3<F> &low, const tvec3<F> &high)
     {
         F ret = 0;
@@ -25,12 +24,12 @@ namespace collision_impl
 } // namespace collision_impl
 
 template<typename F>
-std::pair<tvec3<F>, F> compute_bounding_sphere(
+AGZ_MATH_API std::pair<tvec3<F>, F> compute_bounding_sphere(
     const tvec3<F> *vertices, size_t vertex_count)
 {
     // use native algo
 
-    static_assert(std::is_floating_point_v<F>);
+    static_assert(std::is_floating_point_v<F>, "");
 
     tvec3<F> center;
     const F ratio = F(1) / vertex_count;
@@ -45,11 +44,11 @@ std::pair<tvec3<F>, F> compute_bounding_sphere(
 }
 
 template<typename F>
-bool test_sphere_aabb_collision(
+AGZ_MATH_API bool test_sphere_aabb_collision(
     const tvec3<F> &o, F r, const tvec3<F> &low, const tvec3<F> &high)
 {
     return collision_impl::square_dist_between_pnt_aabb(o, low, high) <= r * r;
 }
 
-} // namespace agz::math
+AGZ_MATH_END
 

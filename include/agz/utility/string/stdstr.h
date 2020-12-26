@@ -165,6 +165,11 @@ inline std::string align_right(
  */
 inline std::wstring u8_to_wstr(const std::string &str);
 
+/**
+ * @brief 将宽字符串转为utf-8编码的std::string
+ */
+inline std::string wstr_to_u8(const std::wstring &str);
+
 } // namespace agz::stdstr
 
 #include "impl/stdstr.inl"

@@ -9,7 +9,7 @@ AGZ_D3D12_RENDERGRAPH_BEGIN
 PassContext::PassContext(
     Runtime                            *runtime,
     int                                 frameIndex,
-    ID3D12GraphicsCommandList          *cmdList,
+    RawGraphicsCommandList             *cmdList,
     const std::map<int, ResourceUsage> &resourceUsages) noexcept
     : runtime_(runtime),
       frameIndex_(frameIndex),
@@ -24,12 +24,12 @@ int PassContext::getFrameIndex() const noexcept
     return frameIndex_;
 }
 
-ID3D12GraphicsCommandList *PassContext::getCommandList() noexcept
+RawGraphicsCommandList *PassContext::getCommandList() noexcept
 {
     return cmdList_;
 }
 
-ID3D12GraphicsCommandList *PassContext::operator->() noexcept
+RawGraphicsCommandList *PassContext::operator->() noexcept
 {
     return cmdList_;
 }

@@ -105,16 +105,16 @@ public:
 
     void clearState();
 
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, KeyDownEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, KeyUpEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, CharInputEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, RawKeyDownEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, RawKeyUpEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, KeyDownEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, KeyUpEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, CharInputEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, RawKeyDownEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, RawKeyUpEvent)
 
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, MouseButtonDownEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, MouseButtonUpEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, CursorMoveEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, WheelScrollEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, MouseButtonDownEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, MouseButtonUpEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, CursorMoveEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, WheelScrollEvent)
 
     void _startUpdatingKeyboard();
 

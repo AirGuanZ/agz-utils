@@ -10,8 +10,7 @@
 #include "./color3.h"
 #include "./color4.h"
 
-namespace agz::math
-{
+AGZ_MATH_BEGIN
 
 /**
  * @brief 将a以b为单位向上取整
@@ -111,7 +110,7 @@ auto exp(const tcolor4<T> &v) noexcept
 template<typename T>
 std::pair<T, T> minmax(T a, T b) noexcept
 {
-    return a < b ? std::pair{ a, b } : std::pair{ b, a };
+    return a < b ? std::pair<T, T>{ a, b } : std::pair<T, T>{ b, a };
 }
 
 template<typename T>
@@ -176,4 +175,4 @@ const T &min3(const T &a, const T &b, const T &c)
     return (std::min)(a, (std::min)(b, c));
 }
 
-} // namespace agz::math
+AGZ_MATH_END

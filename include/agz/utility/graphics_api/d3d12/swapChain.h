@@ -56,8 +56,8 @@ public:
 
     const D3D12_RECT &getDefaultScissorRect() const noexcept;
 
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, SwapChainPreResizeEvent)
-    AGZ_D3D12_DECL_EVENT_SENDER_HANDLER(eventSender_, SwapChainPostResizeEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, SwapChainPreResizeEvent)
+    AGZ_DECL_EVENT_SENDER_HANDLER(eventSender_, SwapChainPostResizeEvent)
 
 private:
 

@@ -19,8 +19,8 @@ Pass::Pass(
 }
 
 void Pass::execute(
-    int                           frameIndex,
-    ID3D12GraphicsCommandList    *cmdList) const
+    int                     frameIndex,
+    RawGraphicsCommandList *cmdList) const
 {
     beforeBarriers_.clear();
     afterBarriers_.clear();

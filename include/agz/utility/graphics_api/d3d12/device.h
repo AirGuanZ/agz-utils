@@ -1,5 +1,6 @@
 #pragma once
 
+#include <agz/utility/graphics_api/d3d12/raytracing/common.h>
 #include <agz/utility/graphics_api/d3d12/queueWaiter.h>
 #include <agz/utility/graphics_api/d3d12/resourceManager.h>
 

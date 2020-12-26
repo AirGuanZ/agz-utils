@@ -47,7 +47,7 @@ private:
     int           queue_  = 0;
 
     D3D12_COMMAND_LIST_TYPE cmdListType_ = D3D12_COMMAND_LIST_TYPE_DIRECT;
-    std::vector<ComPtr<ID3D12GraphicsCommandList>> perFrameCmdList_;
+    std::vector<ComPtr<RawGraphicsCommandList>> perFrameCmdList_;
 
     int                    dependencies_           = 1;
     std::atomic<int>       unfinishedDependencies_ = 0;

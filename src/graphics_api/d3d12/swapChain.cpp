@@ -44,11 +44,6 @@ SwapChain::SwapChain(
 
     swapChain_.Attach(static_cast<IDXGISwapChain3 *>(tSwapChain));
 
-    AGZ_SCOPE_GUARD({
-        if(window.isFullscreen())
-            swapChain_->SetFullscreenState(true, nullptr);
-    });
-
     imageIndex_ = swapChain_->GetCurrentBackBufferIndex();
 
     images_.resize(desc.imageCount);
@@ -76,6 +71,13 @@ SwapChain::SwapChain(
     {
         _resize(e.width, e.height);
     }));
+
+    if(window.isFullscreen())
+        swapChain_->SetFullscreenState(true, nullptr);
+
+    device.getFactory()->MakeWindowAssociation(
+        window.getWindowHandle(),
+        DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
 }
 
 SwapChain::~SwapChain()

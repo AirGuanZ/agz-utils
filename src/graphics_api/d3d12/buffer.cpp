@@ -82,6 +82,11 @@ ID3D12Resource *Buffer::getResource() const noexcept
     return resource_->resource.Get();
 }
 
+D3D12_GPU_VIRTUAL_ADDRESS Buffer::getGPUVirtualAddress() const noexcept
+{
+    return resource_->resource->GetGPUVirtualAddress();
+}
+
 size_t Buffer::getByteSize() const noexcept
 {
     return byteSize_;

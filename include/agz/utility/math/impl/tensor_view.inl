@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace agz::math {
+AGZ_MATH_BEGIN
 
 template<typename P, int D, bool CONST_TENSOR>
 tensor_view_t<P, D, CONST_TENSOR>::tensor_view_t(
@@ -97,4 +97,4 @@ tensor_view_t<P, D, true> tensor_view_t<P, D, CONST_TENSOR>::get_const_subview(
     return tensor_view_t<P, D, true>(data_, shape, base_ + base);
 }
 
-} // namespace agz::math
+AGZ_MATH_END

@@ -1,10 +1,12 @@
 #pragma once
 
+#include <dxcapi.h>
+
 #include <agz/utility/graphics_api/d3d12/common.h>
 
 AGZ_D3D12_BEGIN
 
-class ShaderCompiler
+class FXC
 {
 public:
 
@@ -21,7 +23,7 @@ public:
         const char             *entry      = "main";
     };
 
-    explicit ShaderCompiler();
+    explicit FXC();
 
     void setOptimization(OptimizationLevel level) noexcept;
 
@@ -43,6 +45,40 @@ private:
     UINT              flag_;
 
     std::string warnings_;
+};
+
+class DXC
+{
+public:
+
+    enum OptimizationLevel
+    {
+        Debug, O0, O1, O2, O3, Auto
+    };
+
+    struct Options
+    {
+        const wchar_t                                     *entry      = nullptr;
+        const wchar_t                                     *target     = nullptr;
+        const wchar_t                                     *sourceName = nullptr;
+        IDxcIncludeHandler                                *includes   = nullptr;
+        std::vector<std::pair<std::wstring, std::wstring>> macros;
+    };
+
+    explicit DXC();
+
+    void setOptimization(OptimizationLevel level) noexcept;
+
+    void setWarnings(bool treatWarningAsError) noexcept;
+
+    ComPtr<ID3DBlob> compile(
+        std::string_view  source,
+        const Options    &options);
+
+private:
+
+    OptimizationLevel optLevel_;
+    bool              warningAsError_;
 };
 
 AGZ_D3D12_END

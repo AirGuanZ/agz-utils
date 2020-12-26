@@ -16,8 +16,8 @@ class PipelineBuilder : public misc::uncopyable_t
 
     ComPtr<ID3D12RootSignature> rootSignature_;
 
-    ComPtr<ID3D10Blob> sharedVertexShaderByteCode_;
-    ComPtr<ID3D10Blob> sharedPixelShaderByteCode_;
+    ComPtr<ID3DBlob> sharedVertexShaderByteCode_;
+    ComPtr<ID3DBlob> sharedPixelShaderByteCode_;
 
     template<int I>
     void setRenderTargetFormatsAux() { }
@@ -45,9 +45,9 @@ public:
 
     void setRootSignature(ComPtr<ID3D12RootSignature> rootSignature);
 
-    void setVertexShader(ComPtr<ID3D10Blob> byteCode);
+    void setVertexShader(ComPtr<ID3DBlob> byteCode);
 
-    void setPixelShader(ComPtr<ID3D10Blob> byteCode);
+    void setPixelShader(ComPtr<ID3DBlob> byteCode);
 
     void setPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY_TYPE topology);
 

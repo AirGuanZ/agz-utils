@@ -2,17 +2,17 @@
 
 #include <cmath>
 
-namespace agz::math {
+AGZ_MATH_BEGIN
 
 template<typename T, int D>
-tvec<T, D>::tvec() noexcept
+AGZ_MATH_API tvec<T, D>::tvec() noexcept
     : tvec(T(0))
 {
 
 }
 
 template<typename T, int D>
-tvec<T, D>::tvec(T val) noexcept
+AGZ_MATH_API tvec<T, D>::tvec(T val) noexcept
     : tvec(UNINIT)
 {
     for(int i = 0; i != D; ++i)
@@ -20,21 +20,21 @@ tvec<T, D>::tvec(T val) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D>::tvec(uninitialized_t) noexcept
+AGZ_MATH_API tvec<T, D>::tvec(uninitialized_t) noexcept
 {
 
 }
 
 template<typename T, int D>
 template<typename...As, typename>
-tvec<T, D>::tvec(As&&...args) noexcept
+AGZ_MATH_API tvec<T, D>::tvec(As&&...args) noexcept
     : data{ T(std::forward<As>(args))... }
 {
 
 }
 
 template<typename T, int D>
-bool tvec<T, D>::is_zero() const noexcept
+AGZ_MATH_API bool tvec<T, D>::is_zero() const noexcept
 {
     for(auto c : data)
     {
@@ -45,13 +45,13 @@ bool tvec<T, D>::is_zero() const noexcept
 }
 
 template<typename T, int D>
-auto tvec<T, D>::length() const noexcept
+AGZ_MATH_API auto tvec<T, D>::length() const noexcept
 {
     return std::sqrt(length_square());
 }
 
 template<typename T, int D>
-auto tvec<T, D>::length_square() const noexcept
+AGZ_MATH_API auto tvec<T, D>::length_square() const noexcept
 {
     T ret = T(0);
     for(auto c : data)
@@ -60,13 +60,14 @@ auto tvec<T, D>::length_square() const noexcept
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t tvec<T, D>::normalize() const noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t tvec<T, D>::normalize() const noexcept
 {
     return *this / length();
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t tvec<T, D>::clamp(T min_v, T max_v) const noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t tvec<T, D>::clamp(
+    T min_v, T max_v) const noexcept
 {
     self_t ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -75,7 +76,8 @@ typename tvec<T, D>::self_t tvec<T, D>::clamp(T min_v, T max_v) const noexcept
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t tvec<T, D>::clamp_low(T min_v) const noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t tvec<T, D>::clamp_low(
+    T min_v) const noexcept
 {
     self_t ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -84,7 +86,8 @@ typename tvec<T, D>::self_t tvec<T, D>::clamp_low(T min_v) const noexcept
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t tvec<T, D>::clamp_high(T max_v) const noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t tvec<T, D>::clamp_high(
+    T max_v) const noexcept
 {
     self_t ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -93,7 +96,7 @@ typename tvec<T, D>::self_t tvec<T, D>::clamp_high(T max_v) const noexcept
 }
 
 template<typename T, int D>
-auto tvec<T, D>::sum() const noexcept
+AGZ_MATH_API auto tvec<T, D>::sum() const noexcept
 {
     T ret = T(0);
     for(auto c : data)
@@ -102,7 +105,7 @@ auto tvec<T, D>::sum() const noexcept
 }
 
 template<typename T, int D>
-auto tvec<T, D>::product() const noexcept
+AGZ_MATH_API auto tvec<T, D>::product() const noexcept
 {
     T ret = T(1);
     for(auto c : data)
@@ -112,7 +115,7 @@ auto tvec<T, D>::product() const noexcept
 
 template<typename T, int D>
 template<typename F>
-auto tvec<T, D>::map(F &&f) const noexcept
+AGZ_MATH_API auto tvec<T, D>::map(F &&f) const noexcept
 {
     using ret_t = tvec<rm_rcv_t<decltype(f(data[0]))>, D>;
     ret_t ret(UNINIT);
@@ -122,49 +125,53 @@ auto tvec<T, D>::map(F &&f) const noexcept
 }
 
 template<typename T, int D>
-bool tvec<T, D>::operator!() const noexcept
+AGZ_MATH_API bool tvec<T, D>::operator!() const noexcept
 {
     return is_zero();
 }
 
 template<typename T, int D>
-T &tvec<T, D>::operator[](size_t idx) noexcept
+AGZ_MATH_API T &tvec<T, D>::operator[](size_t idx) noexcept
 {
     return data[idx];
 }
 
 template<typename T, int D>
-const T &tvec<T, D>::operator[](size_t idx) const noexcept
+AGZ_MATH_API const T &tvec<T, D>::operator[](size_t idx) const noexcept
 {
     return data[idx];
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t &tvec<T, D>::operator+=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t &tvec<T, D>::operator+=(
+    const self_t &rhs) noexcept
 {
     return *this = *this + rhs;
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t &tvec<T, D>::operator-=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t &tvec<T, D>::operator-=(
+    const self_t &rhs) noexcept
 {
     return *this = *this - rhs;
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t &tvec<T, D>::operator*=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t &tvec<T, D>::operator*=(
+    const self_t &rhs) noexcept
 {
     return *this = *this * rhs;
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t &tvec<T, D>::operator/=(const self_t &rhs) noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t &tvec<T, D>::operator/=(
+    const self_t &rhs) noexcept
 {
     return *this = *this / rhs;
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t &tvec<T, D>::operator+=(T rhs) noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t &tvec<T, D>::operator+=(T rhs) noexcept
 {
     for(auto &c : data)
         c += rhs;
@@ -172,7 +179,7 @@ typename tvec<T, D>::self_t &tvec<T, D>::operator+=(T rhs) noexcept
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t &tvec<T, D>::operator-=(T rhs) noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t &tvec<T, D>::operator-=(T rhs) noexcept
 {
     for(auto &c : data)
         c -= rhs;
@@ -180,7 +187,7 @@ typename tvec<T, D>::self_t &tvec<T, D>::operator-=(T rhs) noexcept
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t &tvec<T, D>::operator*=(T rhs) noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t &tvec<T, D>::operator*=(T rhs) noexcept
 {
     for(auto &c : data)
         c *= rhs;
@@ -188,7 +195,7 @@ typename tvec<T, D>::self_t &tvec<T, D>::operator*=(T rhs) noexcept
 }
 
 template<typename T, int D>
-typename tvec<T, D>::self_t &tvec<T, D>::operator/=(T rhs) noexcept
+AGZ_MATH_API typename tvec<T, D>::self_t &tvec<T, D>::operator/=(T rhs) noexcept
 {
     for(auto &c : data)
         c /= rhs;
@@ -196,7 +203,7 @@ typename tvec<T, D>::self_t &tvec<T, D>::operator/=(T rhs) noexcept
 }
 
 template<typename T, int D>
-bool tvec<T, D>::elem_less(const self_t &rhs) const noexcept
+AGZ_MATH_API bool tvec<T, D>::elem_less(const self_t &rhs) const noexcept
 {
     if constexpr(D == 2)
     {
@@ -220,7 +227,7 @@ bool tvec<T, D>::elem_less(const self_t &rhs) const noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator-(const tvec<T, D> &vec) noexcept
+AGZ_MATH_API tvec<T, D> operator-(const tvec<T, D> &vec) noexcept
 {
     tvec<T, D> ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -229,7 +236,8 @@ tvec<T, D> operator-(const tvec<T, D> &vec) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator+(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator+(
+    const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 {
     tvec<T, D> ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -238,7 +246,8 @@ tvec<T, D> operator+(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator-(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator-(
+    const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 {
     tvec<T, D> ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -247,7 +256,8 @@ tvec<T, D> operator-(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator*(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator*(
+    const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 {
     tvec<T, D> ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -256,7 +266,8 @@ tvec<T, D> operator*(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator/(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator/(
+    const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 {
     tvec<T, D> ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -265,7 +276,7 @@ tvec<T, D> operator/(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator+(const tvec<T, D> &lhs, T rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator+(const tvec<T, D> &lhs, T rhs) noexcept
 {
     tvec<T, D> ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -274,7 +285,7 @@ tvec<T, D> operator+(const tvec<T, D> &lhs, T rhs) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator-(const tvec<T, D> &lhs, T rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator-(const tvec<T, D> &lhs, T rhs) noexcept
 {
     tvec<T, D> ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -283,7 +294,7 @@ tvec<T, D> operator-(const tvec<T, D> &lhs, T rhs) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator*(const tvec<T, D> &lhs, T rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator*(const tvec<T, D> &lhs, T rhs) noexcept
 {
     tvec<T, D> ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -292,7 +303,7 @@ tvec<T, D> operator*(const tvec<T, D> &lhs, T rhs) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator/(const tvec<T, D> &lhs, T rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator/(const tvec<T, D> &lhs, T rhs) noexcept
 {
     tvec<T, D> ret(UNINIT);
     for(int i = 0; i != D; ++i)
@@ -301,19 +312,20 @@ tvec<T, D> operator/(const tvec<T, D> &lhs, T rhs) noexcept
 }
 
 template<typename T, int D>
-tvec<T, D> operator+(T lhs, const tvec<T, D> &rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator+(T lhs, const tvec<T, D> &rhs) noexcept
 {
     return rhs + lhs;
 }
 
 template<typename T, int D>
-tvec<T, D> operator*(T lhs, const tvec<T, D> &rhs) noexcept
+AGZ_MATH_API tvec<T, D> operator*(T lhs, const tvec<T, D> &rhs) noexcept
 {
     return rhs * lhs;
 }
 
 template<typename T, int D>
-bool operator==(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
+AGZ_MATH_API bool operator==(
+    const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 {
     for(int i = 0; i != D; ++i)
     {
@@ -324,7 +336,8 @@ bool operator==(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 }
 
 template<typename T, int D>
-bool operator!=(const tvec<T, D>& lhs, const tvec<T, D>& rhs) noexcept
+AGZ_MATH_API bool operator!=(
+    const tvec<T, D>& lhs, const tvec<T, D>& rhs) noexcept
 {
     for(int i = 0; i != D; ++i)
     {
@@ -335,7 +348,8 @@ bool operator!=(const tvec<T, D>& lhs, const tvec<T, D>& rhs) noexcept
 }
 
 template<typename T, int D>
-auto dot(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
+AGZ_MATH_API auto dot(
+    const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 {
     T ret = T(0);
     for(int i = 0; i != D; ++i)
@@ -344,7 +358,7 @@ auto dot(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 }
 
 template<typename T, int D>
-auto cos(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
+AGZ_MATH_API auto cos(const tvec<T, D> &lhs, const tvec<T, D> &rhs) noexcept
 {
     return dot(lhs, rhs) / (lhs.length() * rhs.length());
 }
@@ -359,4 +373,4 @@ std::ostream &operator<<(std::ostream &out, const tvec<T, D> &vec)
     return out;
 }
 
-} // namespace agz::math
+AGZ_MATH_END
