@@ -11,6 +11,8 @@ namespace agz::alloc
 /**
  * @brief 固定类型对象池，分配和释放都需要手动进行
  *
+ * 池子销毁时已分配对象的析构函数并不会被自动调用，这只是个比较快的new/delete而已
+ *
  * 线程不安全
  */
 template<typename T>
@@ -86,6 +88,9 @@ public:
         std::swap(chunk_size_, other.chunk_size_);
     }
 
+    /**
+     * @brief 用给定构造函数参数创建一个对象
+     */
     template<typename...Args>
     T *create(Args &&...args)
     {
@@ -112,6 +117,9 @@ public:
         return obj;
     }
 
+    /**
+     * @brief 析构并释放一个由该池子创建的对象
+     */
     void destroy(T *obj) noexcept
     {
         assert(obj);

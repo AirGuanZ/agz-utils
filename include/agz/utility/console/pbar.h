@@ -42,11 +42,13 @@ public:
         return *this;
     }
 
+    /** @brief 重置进度条计时器 */
     void reset_time()
     {
         start_ = std::chrono::steady_clock::now();
     }
 
+    /** @brief 刷新显示的进度条 */
     void display() const
     {
         const float progress = float(finished_) / total_;
@@ -73,6 +75,7 @@ public:
         std::cout.flush();
     }
 
+    /** @brief 结束进度条的显示 */
     void done()
     {
         display();

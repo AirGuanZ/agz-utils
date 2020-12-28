@@ -94,7 +94,8 @@ public:
     int getCursorRelativeX() const noexcept;
     int getCursorRelativeY() const noexcept;
 
-    void setCursorLock(bool locked, int lockX = 0, int lockY = 0);
+    void setCursorLock(bool locked);
+    void setCursorLock(bool locked, int lockX, int lockY);
     bool isCursorLocked() const noexcept;
 
     int getCursorLockX() const noexcept;
@@ -188,6 +189,11 @@ inline int Input::getCursorRelativeX() const noexcept
 inline int Input::getCursorRelativeY() const noexcept
 {
     return relY_;
+}
+
+inline void Input::setCursorLock(bool locked)
+{
+    isLocked_ = locked;
 }
 
 inline void Input::setCursorLock(bool locked, int lockX, int lockY)

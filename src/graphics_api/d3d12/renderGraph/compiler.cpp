@@ -464,14 +464,22 @@ void Compiler::generateResourceTransitions(Temps &temps)
         if(usages.empty())
             continue;
 
-        const D3D12_RESOURCE_STATES initialState =
+        D3D12_RESOURCE_STATES initialState =
             rsc.asInternal() ? rsc.asInternal()->initialState_ :
             rsc.asExternal()->initialState_;
 
-        const D3D12_RESOURCE_STATES finalState =
+        D3D12_RESOURCE_STATES finalState =
             rsc.asInternal() ? rsc.asInternal()->initialState_ :
             rsc.asExternal()->finalState_;
-        
+
+        if(rsc.isInternal() && initialState == D3D12_RESOURCE_STATE_COMMON)
+        {
+            assert(finalState == D3D12_RESOURCE_STATE_COMMON);
+            initialState = usages[0].state;
+            finalState   = usages[0].state;
+            rsc.asInternal()->setInitialState(usages[0].state);
+        }
+
         D3D12_RESOURCE_STATES lastState = initialState;
         for(size_t i = 0; i < usages.size(); ++i)
         {
