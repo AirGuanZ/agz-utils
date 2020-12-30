@@ -1,6 +1,6 @@
 #pragma once
 
-#include <agz/utility/graphics_api/d3d12/renderGraph/graph.h>
+#include <agz/utility/graphics_api/d3d12/graph/graph.h>
 #include <agz/utility/graphics_api/d3d12/descriptorHeap.h>
 
 AGZ_D3D12_BEGIN
@@ -33,7 +33,7 @@ public:
 
     void destroy();
 
-    rg::Vertex *addToRenderGraph(
+    rg::Pass *addToRenderGraph(
         rg::Graph    &graph,
         rg::Resource *renderTarget,
         int           thread = 0,

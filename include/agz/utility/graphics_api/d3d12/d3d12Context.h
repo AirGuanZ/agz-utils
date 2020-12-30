@@ -124,7 +124,7 @@ public:
 
     void renderImGui(ID3D12GraphicsCommandList *cmdList);
 
-    rg::Vertex *addImGuiToRenderGraph(
+    rg::Pass *addImGuiToRenderGraph(
         rg::Graph    &graph,
         rg::Resource *renderTarget,
         int           thread = 0,
@@ -404,7 +404,7 @@ inline void D3D12Context::renderImGui(ID3D12GraphicsCommandList *cmdList)
     imgui_.render(cmdList);
 }
 
-inline rg::Vertex *D3D12Context::addImGuiToRenderGraph(
+inline rg::Pass *D3D12Context::addImGuiToRenderGraph(
     rg::Graph    &graph,
     rg::Resource *renderTarget,
     int           thread,

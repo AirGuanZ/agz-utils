@@ -5,7 +5,7 @@
 #include <agz/utility/graphics_api/d3d12/descriptorAllocator.h>
 #include <agz/utility/misc.h>
 
-#define AGZ_D3D12_RENDERGRAPH_BEGIN namespace agz::d3d12::rg {
+#define AGZ_D3D12_RENDERGRAPH_BEGIN namespace agz::d3d12::old_rg {
 #define AGZ_D3D12_RENDERGRAPH_END   }
 
 AGZ_D3D12_RENDERGRAPH_BEGIN

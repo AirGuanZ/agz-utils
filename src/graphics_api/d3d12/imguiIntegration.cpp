@@ -143,7 +143,7 @@ void ImGuiIntegration::destroy()
     inputDispatcher_.reset();
 }
 
-rg::Vertex *ImGuiIntegration::addToRenderGraph(
+rg::Pass *ImGuiIntegration::addToRenderGraph(
     rg::Graph    &graph,
     rg::Resource *renderTarget,
     int           thread,
@@ -155,12 +155,12 @@ rg::Vertex *ImGuiIntegration::addToRenderGraph(
             "try to add uninitialized imgui integration to render graph");
     }
 
-    auto *RTDesc = renderTarget->getDescription();
+    const auto &RTDesc = renderTarget->getDescription();
 
     D3D12_RENDER_TARGET_VIEW_DESC RTVDesc;
     RTVDesc.Format = DXGI_FORMAT_UNKNOWN;
 
-    if(RTDesc->SampleDesc.Count > 1)
+    if(RTDesc.SampleDesc.Count > 1)
     {
         RTVDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
         RTVDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
@@ -172,9 +172,8 @@ rg::Vertex *ImGuiIntegration::addToRenderGraph(
         RTVDesc.Texture2D.PlaneSlice = 0;
     }
 
-    auto pass = graph.addVertex("render imgui", thread, queue);
-    pass->useResource(
-        renderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET, RTVDesc);
+    auto pass = graph.addPass("render imgui", thread, queue);
+    pass->declDescriptor(renderTarget, RTVDesc);
 
     pass->setCallback([this, renderTarget](rg::PassContext &ctx)
     {
