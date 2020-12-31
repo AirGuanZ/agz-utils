@@ -112,23 +112,37 @@ public:
 
     DescriptorTable(bool cpu, bool gpu);
 
-    void declDescriptor(
+    void addSRV(
         const Resource                        *resource,
-        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc,
-        ShaderResourceType                     type = ShaderResourceType::PixelAndNonPixel);
+        ShaderResourceType                     type,
+        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc);
 
-    void declDescriptor(
+    void addUAV(
         const Resource                         *resource,
         const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc);
 
-    void declDescriptor(
+    void addRTV(
         const Resource                      *resource,
         const D3D12_RENDER_TARGET_VIEW_DESC &desc);
 
-    void declDescriptor(
+    void addDSV(
         const Resource                      *resource,
-        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc,
-        DepthStencilType                     type = DepthStencilType::ReadAndWrite);
+        DepthStencilType                     type,
+        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc);
+    
+    void addSRV(
+        const Resource                        *resource,
+        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
+    {
+        addSRV(resource, ShaderResourceType::PixelAndNonPixel, desc);
+    }
+    
+    void addDSV(
+        const Resource                      *resource,
+        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
+    {
+        addDSV(resource, DepthStencilType::ReadAndWrite, desc);
+    }
 
 private:
 
@@ -171,29 +185,45 @@ public:
 
     void setCallback(PassCallback callback);
 
-    void declareResourceState(
+    void addResourceState(
         const Resource       *resource,
         D3D12_RESOURCE_STATES state);
 
-    void declDescriptor(
+    void addSRV(
         DescriptorType                         type,
         const Resource                        *resource,
-        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc,
-        ShaderResourceType                     shaderResourceType = ShaderResourceType::PixelAndNonPixel);
+        ShaderResourceType                     shaderResourceType,
+        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc);
 
-    void declDescriptor(
+    void addUAV(
         DescriptorType                          type,
         const Resource                         *resource,
         const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc);
 
-    void declDescriptor(
+    void addRTV(
         const Resource                      *resource,
         const D3D12_RENDER_TARGET_VIEW_DESC &desc);
 
-    void declDescriptor(
+    void addDSV(
         const Resource                      *resource,
-        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc,
-        DepthStencilType                     depthStencilType = DepthStencilType::ReadAndWrite);
+        DepthStencilType                     depthStencilType,
+        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc);
+    
+    void addSRV(
+        DescriptorType                         type,
+        const Resource                        *resource,
+        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
+    {
+        addSRV(
+            type, resource, ShaderResourceType::PixelAndNonPixel, desc);
+    }
+    
+    void addDSV(
+        const Resource                      *resource,
+        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
+    {
+        addDSV(resource, DepthStencilType::ReadAndWrite, desc);
+    }
 
     DescriptorTable *declareDescriptorTable(DescriptorType type);
 

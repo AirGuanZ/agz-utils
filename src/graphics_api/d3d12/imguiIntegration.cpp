@@ -173,7 +173,7 @@ rg::Pass *ImGuiIntegration::addToRenderGraph(
     }
 
     auto pass = graph.addPass("render imgui", thread, queue);
-    pass->declDescriptor(renderTarget, RTVDesc);
+    pass->addRTV(renderTarget, RTVDesc);
 
     pass->setCallback([this, renderTarget](rg::PassContext &ctx)
     {

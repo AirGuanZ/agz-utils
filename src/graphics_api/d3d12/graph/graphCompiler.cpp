@@ -132,32 +132,32 @@ DescriptorTable::DescriptorTable(bool cpu, bool gpu)
     
 }
 
-void DescriptorTable::declDescriptor(
+void DescriptorTable::addSRV(
     const Resource                        *resource,
-    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc,
-    ShaderResourceType                     type)
+    ShaderResourceType                     type,
+    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
 {
     records_.push_back({ resource, desc, type, {} });
 }
 
-void DescriptorTable::declDescriptor(
+void DescriptorTable::addUAV(
     const Resource                         *resource,
     const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
 {
     records_.push_back({ resource, desc, {}, {} });
 }
 
-void DescriptorTable::declDescriptor(
+void DescriptorTable::addRTV(
     const Resource                      *resource,
     const D3D12_RENDER_TARGET_VIEW_DESC &desc)
 {
     records_.push_back({ resource, desc, {}, {} });
 }
 
-void DescriptorTable::declDescriptor(
+void DescriptorTable::addDSV(
     const Resource                      *resource,
-    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc,
-    DepthStencilType                     type)
+    DepthStencilType                     type,
+    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
 {
     records_.push_back({ resource, desc, {}, type });
 }
@@ -194,7 +194,7 @@ void Pass::setCallback(PassCallback callback)
     callback_ = std::make_shared<PassCallback>(std::move(callback));
 }
 
-void Pass::declareResourceState(
+void Pass::addResourceState(
     const Resource       *resource,
     D3D12_RESOURCE_STATES state)
 {
@@ -207,16 +207,16 @@ void Pass::declareResourceState(
     states_.insert({ resource, state });
 }
 
-void Pass::declDescriptor(
+void Pass::addSRV(
     DescriptorType                         type,
     const Resource                        *resource,
-    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc,
-    ShaderResourceType                     shaderResourceType)
+    ShaderResourceType                     shaderResourceType,
+    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
 {
     descriptors_.push_back({ resource, type, desc, shaderResourceType, {} });
 }
 
-void Pass::declDescriptor(
+void Pass::addUAV(
     DescriptorType                          type,
     const Resource                         *resource,
     const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
@@ -224,17 +224,17 @@ void Pass::declDescriptor(
     descriptors_.push_back({ resource, type, desc, {}, {} });
 }
 
-void Pass::declDescriptor(
+void Pass::addRTV(
     const Resource                      *resource,
     const D3D12_RENDER_TARGET_VIEW_DESC &desc)
 {
     descriptors_.push_back({ resource, CPUOnly, desc, {}, {} });
 }
 
-void Pass::declDescriptor(
+void Pass::addDSV(
     const Resource                      *resource,
-    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc,
-    DepthStencilType                     depthStencilType)
+    DepthStencilType                     depthStencilType,
+    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
 {
     descriptors_.push_back({ resource, CPUOnly, desc, {}, depthStencilType });
 }
@@ -250,15 +250,11 @@ DescriptorTable *Pass::declareDescriptorTable(DescriptorType type)
 bool Pass::DescriptorDeclaretion::operator<(
     const DescriptorDeclaretion &rhs) const
 {
-    const auto L = std::tie(
+    auto L = std::tie(
         resource, type, shaderResourceType, depthStencilType);
-    const auto R = std::tie(
+    auto R = std::tie(
         rhs.resource, rhs.type, rhs.shaderResourceType, rhs.depthStencilType);
-    if(L < R)
-        return true;
-    if(L == R)
-        return view < rhs.view;
-    return false;
+    return L < R || (L == R || view < rhs.view);
 }
 
 GraphCompiler::GraphCompiler()
