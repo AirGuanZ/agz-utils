@@ -254,7 +254,7 @@ bool Pass::DescriptorDeclaretion::operator<(
         resource, type, shaderResourceType, depthStencilType);
     auto R = std::tie(
         rhs.resource, rhs.type, rhs.shaderResourceType, rhs.depthStencilType);
-    return L < R || (L == R || view < rhs.view);
+    return L < R || (L == R && view < rhs.view);
 }
 
 GraphCompiler::GraphCompiler()
