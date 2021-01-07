@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-#include <agz/utility/graphics_api/d3d11/mouse.h>
+#include <agz-utils/graphics_api/d3d11/mouse.h>
 
 AGZ_D3D11_BEGIN
 

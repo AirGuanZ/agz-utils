@@ -1,7 +1,7 @@
 #if defined(AGZ_ENABLE_D3D11) || defined(AGZ_ENABLE_D3D12)
 
-#include <agz/utility/graphics_api/imgui/imgui.h>
-#include <agz/utility/graphics_api/imgui/inputDispatcher.h>
+#include <agz-utils/graphics_api/imgui/imgui.h>
+#include <agz-utils/graphics_api/imgui/inputDispatcher.h>
 
 namespace ImGui::Input
 {

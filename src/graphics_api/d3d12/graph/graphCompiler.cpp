@@ -2,8 +2,8 @@
 
 #include <tuple>
 
-#include <agz/utility/graphics_api/d3d12/graph/graphCompiler.h>
-#include <agz/utility/string.h>
+#include <agz-utils/graphics_api/d3d12/graph/graphCompiler.h>
+#include <agz-utils/string.h>
 
 AGZ_D3D12_GRAPH_BEGIN
 
@@ -162,11 +162,46 @@ void DescriptorTable::addDSV(
     records_.push_back({ resource, desc, {}, type });
 }
 
+bool Vertex::isAggregate() const
+{
+    return asAggregate() != nullptr;
+}
+
+Pass *Vertex::asPass()
+{
+    return nullptr;
+}
+
+const Pass *Vertex::asPass() const
+{
+    return nullptr;
+}
+
+PassAggregate *Vertex::asAggregate()
+{
+    return nullptr;
+}
+
+const PassAggregate *Vertex::asAggregate() const
+{
+    return nullptr;
+}
+
 Pass::Pass(std::string name, int index)
     : name_(std::move(name)), index_(index),
       thread_(0), queue_(0)
 {
     
+}
+
+Pass *Pass::asPass()
+{
+    return this;
+}
+
+const Pass *Pass::asPass() const
+{
+    return this;
 }
 
 const std::string &Pass::getName() const
@@ -239,7 +274,7 @@ void Pass::addDSV(
     descriptors_.push_back({ resource, CPUOnly, desc, {}, depthStencilType });
 }
 
-DescriptorTable *Pass::declareDescriptorTable(DescriptorType type)
+DescriptorTable *Pass::addDescriptorTable(DescriptorType type)
 {
     const bool cpu = type != GPUOnly;
     const bool gpu = type != CPUOnly;
@@ -255,6 +290,37 @@ bool Pass::DescriptorDeclaretion::operator<(
     auto R = std::tie(
         rhs.resource, rhs.type, rhs.shaderResourceType, rhs.depthStencilType);
     return L < R || (L == R && view < rhs.view);
+}
+
+PassAggregate::PassAggregate(std::string name)
+    : name_(std::move(name)), entry_(nullptr), exit_(nullptr)
+{
+    
+}
+
+const std::string &PassAggregate::getName() const
+{
+    return name_;
+}
+
+void PassAggregate::setEntry(Vertex *entry)
+{
+    entry_ = entry;
+}
+
+void PassAggregate::setExit(Vertex *exit)
+{
+    exit_ = exit;
+}
+
+PassAggregate *PassAggregate::asAggregate()
+{
+    return this;
+}
+
+const PassAggregate *PassAggregate::asAggregate() const
+{
+    return this;
 }
 
 GraphCompiler::GraphCompiler()
@@ -305,10 +371,58 @@ Pass *GraphCompiler::addPass(std::string name, int thread, int queue)
     return passes_.back().get();
 }
 
-void GraphCompiler::addDependency(Pass *head, Pass *tail)
+PassAggregate *GraphCompiler::addAggregate(
+    std::string name, Vertex *entry, Vertex *exit)
 {
-    head->out_.insert(tail);
-    tail->in_.insert(head);
+    aggregates_.push_back(std::make_unique<PassAggregate>(std::move(name)));
+    aggregates_.back()->setEntry(entry);
+    aggregates_.back()->setExit(exit);
+    return aggregates_.back().get();
+}
+
+void GraphCompiler::addDependency(Vertex *head, Vertex *tail)
+{
+    auto getEntryPass = [](Vertex *base)
+    {
+        for(;;)
+        {
+            assert(base);
+            if(auto p = base->asPass())
+                return p;
+            auto aggregate = base->asAggregate();
+            base = aggregate->entry_;
+            if(!base)
+            {
+                throw D3D12Exception(
+                    "entry pass is not set in PassAggregate " +
+                    aggregate->getName());
+            }
+        }
+    };
+
+    auto getExitPass = [](Vertex *base)
+    {
+        for(;;)
+        {
+            assert(base);
+            if(auto p = base->asPass())
+                return p;
+            auto aggregate = base->asAggregate();
+            base = aggregate->exit_;
+            if(!base)
+            {
+                throw D3D12Exception(
+                    "exit pass is not set in PassAggregate " +
+                    aggregate->getName());
+            }
+        }
+    };
+
+    auto exitOfHead = getExitPass(head);
+    auto entryOfTail = getEntryPass(tail);
+
+    exitOfHead->out_.insert(entryOfTail);
+    entryOfTail->in_.insert(exitOfHead);
 }
 
 void GraphCompiler::compile(

@@ -1,8 +1,8 @@
 ﻿#include <string>
 
-#include <agz/utility/misc/scope_guard.h>
-#include <agz/utility/system/library.h>
-#include <agz/utility/system/platform.h>
+#include <agz-utils/misc/scope_guard.h>
+#include <agz-utils/system/library.h>
+#include <agz-utils/system/platform.h>
 
 #ifdef AGZ_OS_WIN32
 #include <Windows.h>

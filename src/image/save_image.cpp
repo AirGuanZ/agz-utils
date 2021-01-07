@@ -1,8 +1,8 @@
 ﻿#include <cassert>
 #include <stdexcept>
 
-#include <agz/utility/file/file_raw.h>
-#include <agz/utility/image/save_image.h>
+#include <agz-utils/file/file_raw.h>
+#include <agz-utils/image/save_image.h>
 
 //============= includes for stb =============
 

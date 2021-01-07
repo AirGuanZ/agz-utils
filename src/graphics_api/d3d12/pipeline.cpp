@@ -2,7 +2,7 @@
 
 #include <d3dx12.h>
 
-#include <agz/utility/graphics_api/d3d12/pipeline.h>
+#include <agz-utils/graphics_api/d3d12/pipeline.h>
 
 AGZ_D3D12_BEGIN
 

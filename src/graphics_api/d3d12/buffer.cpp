@@ -2,8 +2,8 @@
 
 #include <d3dx12.h>
 
-#include <agz/utility/graphics_api/d3d12/buffer.h>
-#include <agz/utility/graphics_api/d3d12/resourceManager.h>
+#include <agz-utils/graphics_api/d3d12/buffer.h>
+#include <agz-utils/graphics_api/d3d12/resourceManager.h>
 
 AGZ_D3D12_BEGIN
 

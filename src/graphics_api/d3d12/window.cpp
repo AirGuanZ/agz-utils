@@ -4,7 +4,7 @@
 #include <map>
 #include <thread>
 
-#include <agz/utility/graphics_api/d3d12/window.h>
+#include <agz-utils/graphics_api/d3d12/window.h>
 
 AGZ_D3D12_BEGIN
 

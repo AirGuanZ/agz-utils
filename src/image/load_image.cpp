@@ -1,9 +1,9 @@
 ﻿#include <cassert>
 #include <climits>
 
-#include <agz/utility/file/file_raw.h>
-#include <agz/utility/image/load_image.h>
-#include <agz/utility/misc.h>
+#include <agz-utils/file/file_raw.h>
+#include <agz-utils/image/load_image.h>
+#include <agz-utils/misc.h>
 
 //=============================== begin stb SIMD includes ===============================
 

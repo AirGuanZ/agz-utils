@@ -2,7 +2,7 @@
 
 #include <avir.h>
 
-#include <agz/utility/graphics_api/d3d12/mipmapGenerator.h>
+#include <agz-utils/graphics_api/d3d12/mipmapGenerator.h>
 
 AGZ_D3D12_BEGIN
 

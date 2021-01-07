@@ -1,6 +1,6 @@
 #include <cctype>
 
-#include <agz/utility/misc/base64.h>
+#include <agz-utils/misc/base64.h>
 
 // ref: http://www.adp-gmbh.ch/cpp/common/base64.html (restyled)
 
@@ -9,7 +9,7 @@ namespace agz::misc
 
     namespace
     {
-        const std::string base64_chars =
+        const std::string_view base64_chars =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             "abcdefghijklmnopqrstuvwxyz"
             "0123456789+/";

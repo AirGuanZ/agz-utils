@@ -1,6 +1,6 @@
 #ifdef AGZ_ENABLE_GL
 
-#include <agz/utility/graphics_api/gl/mouse.h>
+#include <agz-utils/graphics_api/gl/mouse.h>
 
 AGZ_GL_BEGIN
 

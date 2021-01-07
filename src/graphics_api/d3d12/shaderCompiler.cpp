@@ -2,9 +2,9 @@
 
 #include <d3dcompiler.h>
 
-#include <agz/utility/graphics_api/d3d12/shaderCompiler.h>
-#include <agz/utility/string.h>
-#include <agz/utility/system.h>
+#include <agz-utils/graphics_api/d3d12/shaderCompiler.h>
+#include <agz-utils/string.h>
+#include <agz-utils/system.h>
 
 AGZ_D3D12_BEGIN
 

@@ -1,6 +1,6 @@
-﻿#include <agz/utility/file.h>
-#include <agz/utility/mesh/load_mesh.h>
-#include <agz/utility/string.h>
+﻿#include <agz-utils/file.h>
+#include <agz-utils/mesh/load_mesh.h>
+#include <agz-utils/string.h>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "./tinyply.h"

@@ -4,13 +4,13 @@ PROJECT(AGZ_UTILITY)
 
 FILE(GLOB_RECURSE UTILITY_SRC
 		"${PROJECT_SOURCE_DIR}/src/*.cpp"
-		"${PROJECT_SOURCE_DIR}/include/agz/utility/*.h"
-		"${PROJECT_SOURCE_DIR}/include/agz/utility/*.inl")
+		"${PROJECT_SOURCE_DIR}/include/*.h"
+		"${PROJECT_SOURCE_DIR}/include/*.inl")
 ADD_LIBRARY(AGZUtils STATIC ${UTILITY_SRC})
 
 FOREACH(_SRC IN ITEMS ${UTILITY_SRC})
     GET_FILENAME_COMPONENT(UTILITY_SRC "${_SRC}" PATH)
-    STRING(REPLACE "${PROJECT_SOURCE_DIR}/include/agz/utility" "include" _GRP_PATH "${UTILITY_SRC}")
+    STRING(REPLACE "${PROJECT_SOURCE_DIR}/include/agz-utils" "include" _GRP_PATH "${UTILITY_SRC}")
     STRING(REPLACE "${PROJECT_SOURCE_DIR}/src" "src" _GRP_PATH "${_GRP_PATH}")
     STRING(REPLACE "/" "\\" _GRP_PATH "${_GRP_PATH}")
     SOURCE_GROUP("${_GRP_PATH}" FILES "${_SRC}")

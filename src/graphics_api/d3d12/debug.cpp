@@ -3,7 +3,7 @@
 #include <dxgi1_3.h>
 #include <dxgidebug.h>
 
-#include <agz/utility/graphics_api/d3d12/debug.h>
+#include <agz-utils/graphics_api/d3d12/debug.h>
 
 AGZ_D3D12_BEGIN
 

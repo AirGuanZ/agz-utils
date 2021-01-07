@@ -1,6 +1,6 @@
 #ifdef AGZ_ENABLE_D3D11
 
-#include <agz/utility/graphics_api/d3d11/deviceContext.h>
+#include <agz-utils/graphics_api/d3d11/deviceContext.h>
 
 AGZ_D3D11_BEGIN
 
