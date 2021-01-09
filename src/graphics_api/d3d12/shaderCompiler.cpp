@@ -4,13 +4,12 @@
 
 #include <agz-utils/graphics_api/d3d12/shaderCompiler.h>
 #include <agz-utils/string.h>
-#include <agz-utils/system.h>
 
 AGZ_D3D12_BEGIN
 
 FXC::FXC()
 {
-    optLevel_       = Debug;
+    optLevel_       = Default;
     warningAsError_ = true;
     flag_           = 0;
     updateFlag();

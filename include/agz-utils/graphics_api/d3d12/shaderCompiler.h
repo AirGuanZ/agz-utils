@@ -4,6 +4,7 @@
 #include <dxcapi.h>
 
 #include <agz-utils/graphics_api/d3d12/common.h>
+#include <agz-utils/system.h>
 
 AGZ_D3D12_BEGIN
 
@@ -13,7 +14,12 @@ public:
 
     enum OptimizationLevel
     {
-        Debug, O0, O1, O2, O3
+        Debug, O0, O1, O2, O3,
+#ifdef AGZ_DEBUG
+        Default = Debug
+#else
+        Default = O3
+#endif
     };
 
     struct Options
