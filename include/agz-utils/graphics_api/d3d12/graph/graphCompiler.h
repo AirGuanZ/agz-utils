@@ -282,6 +282,9 @@ private:
     std::set<Pass *> in_;
     std::set<Pass *> out_;
 
+    std::set<Pass *> inFromLastFrame_;
+    std::set<Pass *> outToNextFrame_;
+
     std::map<const Resource*, D3D12_RESOURCE_STATES> states_;
     std::vector<DescriptorDeclaretion>               descriptors_;
     std::vector<std::unique_ptr<DescriptorTable>>    descriptorTables_;
@@ -341,6 +344,8 @@ public:
 
     void addDependency(Vertex *head, Vertex *tail);
 
+    void addCrossFrameDependency(Vertex *head, Vertex *tail);
+
     void compile(
         ID3D12Device                           *device,
         ResourceManager                        &resourceManager,
@@ -353,6 +358,7 @@ private:
     struct PassTemp
     {
         int parentSection = 0;
+        int idxInThread   = 0;
         bool shouldSubmit = false;
 
         std::vector<PassRuntime::StateTransition> stateTransitions;
@@ -383,6 +389,7 @@ private:
         int externalDependenciesCount = 0;
         std::vector<int> outputs;
 
+        std::vector<ComPtr<ID3D12Fence>> waitFencesOfLastFrame;
         std::vector<ComPtr<ID3D12Fence>> waitFences;
         ComPtr<ID3D12Fence>              signalFence;
     };
@@ -410,12 +417,17 @@ private:
 
     struct Temps
     {
+        std::vector<int>         linearPasses;
         std::vector<PassTemp>    passes;
         std::vector<SectionTemp> sections;
         std::vector<ThreadTemp>  threads;
     };
 
+    void addDependencyImpl(Vertex *head, Vertex *tail, bool crossFrame);
+
     std::vector<int> sortPasses() const;
+
+    void addEntryDependencyForComputePasses();
 
     Temps assignSectionsToThreads() const;
 

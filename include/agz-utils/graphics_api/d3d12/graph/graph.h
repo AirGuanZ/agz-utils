@@ -41,6 +41,8 @@ public:
 
     void addDependency(Vertex *head, Vertex *tail);
 
+    void addCrossFrameDependency(Vertex *head, Vertex *tail);
+
     void compile(
         ID3D12Device                           *device,
         ResourceManager                        &rscMgr,
@@ -132,7 +134,12 @@ inline PassAggregate *Graph::addAggregate(
 
 inline void Graph::addDependency(Vertex *head, Vertex *tail)
 {
-    return compiler_->addDependency(head, tail);
+    compiler_->addDependency(head, tail);
+}
+
+inline void Graph::addCrossFrameDependency(Vertex *head, Vertex *tail)
+{
+    compiler_->addCrossFrameDependency(head, tail);
 }
 
 inline void Graph::compile(

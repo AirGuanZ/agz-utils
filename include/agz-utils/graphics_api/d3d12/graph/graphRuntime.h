@@ -117,8 +117,7 @@ private:
 
         std::vector<CommandAllocator> perFrameCmdAlloc;
 
-        size_t                            sectionCount = 0;
-        std::unique_ptr<SectionRuntime[]> sections;
+        std::vector<SectionRuntime> sections;
 
         std::vector<int> descriptorSlots;
         std::vector<int> descriptorRangeSlots;
@@ -143,8 +142,8 @@ private:
     std::vector<DescriptorSlot>      descriptorSlots_;
     std::vector<DescriptorRangeSlot> descriptorRangeSlots_;
 
-    std::unique_ptr<PerThreadData[]> perThreadData_;
-    std::vector<std::thread>         threads_;
+    std::vector<PerThreadData> perThreadData_;
+    std::vector<std::thread>   threads_;
 
     Sync sync_;
 

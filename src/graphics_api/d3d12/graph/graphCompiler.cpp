@@ -326,7 +326,8 @@ const PassAggregate *PassAggregate::asAggregate() const
 GraphCompiler::GraphCompiler()
     : threadCount_(0), queueCount_(0), frameCount_(0)
 {
-    
+    auto entryPass = addPass("main_queue_entry_pass#auto-generated");
+    entryPass->setCallback([](rg::PassContext &) { });
 }
 
 void GraphCompiler::setThreadCount(int count)
@@ -382,6 +383,67 @@ PassAggregate *GraphCompiler::addAggregate(
 
 void GraphCompiler::addDependency(Vertex *head, Vertex *tail)
 {
+    addDependencyImpl(head, tail, false);
+}
+
+void GraphCompiler::addCrossFrameDependency(Vertex *head, Vertex *tail)
+{
+    addDependencyImpl(head, tail, true);
+}
+
+void GraphCompiler::compile(
+    ID3D12Device                           *device,
+    ResourceManager                        &resourceManager,
+    DescriptorAllocator                    &descriptorAllocator,
+    std::vector<ComPtr<ID3D12CommandQueue>> allQueues,
+    GraphRuntime                           &runtime)
+{
+    if(frameCount_ <= 0)
+    {
+        throw D3D12Exception(
+            "invalid frame count value: " + std::to_string(frameCount_));
+    }
+
+    if(queueCount_ <= 0)
+    {
+        throw D3D12Exception(
+            "invalid queue count value: " + std::to_string(queueCount_));
+    }
+
+    if(threadCount_ <= 0)
+    {
+        throw D3D12Exception(
+            "invalid thread count value: " + std::to_string(threadCount_));
+    }
+
+    addEntryDependencyForComputePasses();
+
+    Temps temps = assignSectionsToThreads();
+
+    generateSectionDependencies(device, temps);
+    generateResourceTransitions(temps);
+    generateDescriptorRecords(temps);
+
+    runtime.reset();
+    runtime.device_ = device;
+    runtime.queues_ = std::move(allQueues);
+    runtime.perThreadData_.resize(threadCount_);
+    
+    fillRuntimeResources(runtime, resourceManager, temps);
+    fillRuntimeDescriptors(device, runtime, descriptorAllocator, temps);
+    fillRuntimeSections(device, runtime, temps);
+    fillRuntimeCommandAllocators(device, runtime);
+
+    for(int ti = 0; ti < threadCount_; ++ti)
+    {
+        runtime.threads_.emplace_back(
+            &GraphRuntime::threadEntry, &runtime, ti);
+    }
+}
+
+void GraphCompiler::addDependencyImpl(
+    Vertex *head, Vertex *tail, bool crossFrame)
+{
     auto getEntryPass = [](Vertex *base)
     {
         for(;;)
@@ -421,56 +483,15 @@ void GraphCompiler::addDependency(Vertex *head, Vertex *tail)
     auto exitOfHead = getExitPass(head);
     auto entryOfTail = getEntryPass(tail);
 
-    exitOfHead->out_.insert(entryOfTail);
-    entryOfTail->in_.insert(exitOfHead);
-}
-
-void GraphCompiler::compile(
-    ID3D12Device                           *device,
-    ResourceManager                        &resourceManager,
-    DescriptorAllocator                    &descriptorAllocator,
-    std::vector<ComPtr<ID3D12CommandQueue>> allQueues,
-    GraphRuntime                           &runtime)
-{
-    if(frameCount_ <= 0)
+    if(crossFrame)
     {
-        throw D3D12Exception(
-            "invalid frame count value: " + std::to_string(frameCount_));
+        exitOfHead->outToNextFrame_.insert(entryOfTail);
+        entryOfTail->inFromLastFrame_.insert(exitOfHead);
     }
-
-    if(queueCount_ <= 0)
+    else
     {
-        throw D3D12Exception(
-            "invalid queue count value: " + std::to_string(queueCount_));
-    }
-
-    if(threadCount_ <= 0)
-    {
-        throw D3D12Exception(
-            "invalid thread count value: " + std::to_string(threadCount_));
-    }
-
-    Temps temps = assignSectionsToThreads();
-
-    generateSectionDependencies(device, temps);
-    generateResourceTransitions(temps);
-    generateDescriptorRecords(temps);
-
-    runtime.reset();
-    runtime.device_ = device;
-    runtime.queues_ = std::move(allQueues);
-    runtime.perThreadData_ =
-        std::make_unique<GraphRuntime::PerThreadData[]>(threadCount_);
-
-    fillRuntimeResources(runtime, resourceManager, temps);
-    fillRuntimeDescriptors(device, runtime, descriptorAllocator, temps);
-    fillRuntimeSections(device, runtime, temps);
-    fillRuntimeCommandAllocators(device, runtime);
-
-    for(int ti = 0; ti < threadCount_; ++ti)
-    {
-        runtime.threads_.emplace_back(
-            &GraphRuntime::threadEntry, &runtime, ti);
+        exitOfHead->out_.insert(entryOfTail);
+        entryOfTail->in_.insert(exitOfHead);
     }
 }
 
@@ -515,30 +536,69 @@ std::vector<int> GraphCompiler::sortPasses() const
     return result;
 }
 
+void GraphCompiler::addEntryDependencyForComputePasses()
+{
+    for(auto &p : passes_)
+    {
+        if(p->queue_ != 0 && p->in_.empty())
+            addDependency(passes_[0].get(), p.get());
+    }
+}
+
 GraphCompiler::Temps GraphCompiler::assignSectionsToThreads() const
 {
     Temps result;
 
     // apply topology sort on all passes
 
-    std::vector<int> linearPasses = sortPasses();
+    result.linearPasses = sortPasses();
 
     // assign passes to threads
 
     result.threads.resize(threadCount_);
-    for(int i : linearPasses)
+    result.passes.resize(passes_.size());
+
+    for(int i : result.linearPasses)
+    {
+        result.passes[i].idxInThread =
+            static_cast<int>(result.threads[passes_[i]->thread_].passes.size());
         result.threads[passes_[i]->thread_].passes.push_back(i);
+    }
 
     // generate shouldSubmit flag
-
-    result.passes.resize(passes_.size());
 
     for(auto &v : passes_)
     {
         for(auto o : v->out_)
         {
             if(v->queue_ != o->queue_ || v->thread_ != o->thread_)
+            {
                 result.passes[v->index_].shouldSubmit = true;
+                
+                const int idxInThread = result.passes[o->index_].idxInThread;
+                if(idxInThread > 0)
+                {
+                    const int lastPassInThread =
+                        result.threads[o->thread_].passes[idxInThread - 1];
+                    result.passes[lastPassInThread].shouldSubmit = true;
+                }
+            }
+        }
+
+        for(auto o : v->outToNextFrame_)
+        {
+            if(v->queue_ != o->queue_ || v->thread_ != o->thread_)
+            {
+                result.passes[v->index_].shouldSubmit = true;
+
+                const int idxInThread = result.passes[o->index_].idxInThread;
+                if(idxInThread > 0)
+                {
+                    const int lastPassInThread =
+                        result.threads[o->thread_].passes[idxInThread - 1];
+                    result.passes[lastPassInThread].shouldSubmit = true;
+                }
+            }
         }
     }
 
@@ -563,7 +623,7 @@ GraphCompiler::Temps GraphCompiler::assignSectionsToThreads() const
             {
                 t.sections.push_back(static_cast<int>(result.sections.size()));
                 result.sections.push_back({
-                  ti, sectionIndexInThread++, {}, 0, {}, {}, {} });
+                  ti, sectionIndexInThread++, {}, 0, {}, {}, {}, {} });
                 needNewSection = false;
             }
 
@@ -593,6 +653,7 @@ void GraphCompiler::generateSectionDependencies(
             auto &section = temps.sections[si];
 
             std::set<int> outputSections;
+            std::set<int> outputToNextFrameSections;
             for(int pi : section.passes)
             {
                 for(auto o : passes_[pi]->out_)
@@ -600,14 +661,19 @@ void GraphCompiler::generateSectionDependencies(
                     outputSections.insert(
                         temps.passes[o->getIndex()].parentSection);
                 }
+
+                for(auto o : passes_[pi]->outToNextFrame_)
+                {
+                    outputToNextFrameSections.insert(
+                        temps.passes[o->getIndex()].parentSection);
+                }
             }
             outputSections.erase(si);
-
-            if(outputSections.empty())
-                continue;
+            outputToNextFrameSections.erase(si);
 
             const int thisQueue = passes_[section.passes.front()]->queue_;
             bool needSignalFence = false;
+
             for(int outputSi : outputSections)
             {
                 auto &outputSection = temps.sections[outputSi];
@@ -617,6 +683,21 @@ void GraphCompiler::generateSectionDependencies(
                 {
                     needSignalFence = true;
                     break;
+                }
+            }
+
+            if(!needSignalFence)
+            {
+                for(int outputSi : outputToNextFrameSections)
+                {
+                    auto &outputSection = temps.sections[outputSi];
+                    const int outputQueue =
+                        passes_[outputSection.passes.front()]->queue_;
+                    if(outputQueue != thisQueue)
+                    {
+                        needSignalFence = true;
+                        break;
+                    }
                 }
             }
 
@@ -640,6 +721,19 @@ void GraphCompiler::generateSectionDependencies(
                 ++outputSection.externalDependenciesCount;
             }
 
+            for(int outputSi : outputToNextFrameSections)
+            {
+                auto &outputSection = temps.sections[outputSi];
+                const int outputQueue =
+                    passes_[outputSection.passes.front()]->queue_;
+
+                if(outputQueue != thisQueue)
+                {
+                    outputSection.waitFencesOfLastFrame.push_back(
+                        section.signalFence);
+                }
+            }
+
             section.outputs = { outputSections.begin(), outputSections.end() };
         }
     }
@@ -660,8 +754,10 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
 
     std::vector<ResourceRecord> resourceRecords(resources_.size());
 
-    for(auto &p : passes_)
+    for(int pi : temps.linearPasses)
     {
+        auto &p = passes_[pi];
+
         std::map<int, D3D12_RESOURCE_STATES> rscStates;
         std::transform(
             p->states_.begin(), p->states_.end(),
@@ -1267,10 +1363,7 @@ void GraphCompiler::fillRuntimeSections(
     {
         auto &threadTemp = temps.threads[ti];
         auto &threadData = runtime.perThreadData_[ti];
-
-        threadData.sectionCount = threadTemp.sections.size();
-        threadData.sections = std::make_unique<SectionRuntime[]>(
-            threadData.sectionCount);
+        threadData.sections.resize(threadTemp.sections.size());
     }
 
     for(int ti = 0; ti < threadCount_; ++ti)
@@ -1327,6 +1420,9 @@ void GraphCompiler::fillRuntimeSections(
             for(auto &f : sectionTemp.waitFences)
                 section.addWaitFence(f);
 
+            for(auto &f : sectionTemp.waitFencesOfLastFrame)
+                section.addWaitFenceOfLastFrame(f);
+
             section.setSignalFence(sectionTemp.signalFence);
 
             for(auto out : sectionTemp.outputs)
@@ -1353,7 +1449,7 @@ void GraphCompiler::fillRuntimeCommandAllocators(
         bool hasGraphics = false;
         bool hasCompute  = false;
 
-        for(size_t si = 0; si < threadData.sectionCount; ++si)
+        for(size_t si = 0; si < threadData.sections.size(); ++si)
         {
             const auto cmdListType =
                 threadData.sections[si].getCommandListType();

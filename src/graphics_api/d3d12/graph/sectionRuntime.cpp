@@ -39,6 +39,11 @@ void SectionRuntime::addWaitFence(ComPtr<ID3D12Fence> fence)
     waitFences_.push_back(std::move(fence));
 }
 
+void SectionRuntime::addWaitFenceOfLastFrame(ComPtr<ID3D12Fence> fence)
+{
+    waitFencesOfLastFrame_.push_back(std::move(fence));
+}
+
 void SectionRuntime::setSignalFence(ComPtr<ID3D12Fence> fence)
 {
     signalFence_ = std::move(fence);
@@ -71,6 +76,9 @@ void SectionRuntime::execute(
 
     for(auto &f : waitFences_)
         queue->Wait(f.Get(), fenceValue);
+
+    for(auto &f : waitFencesOfLastFrame_)
+        queue->Wait(f.Get(), fenceValue - 1);
 
     auto &cmdList = perFrameCmdList_[frameIndex];
     if(!cmdList)

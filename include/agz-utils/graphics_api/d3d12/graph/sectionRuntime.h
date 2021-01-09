@@ -4,9 +4,13 @@
 
 AGZ_D3D12_GRAPH_BEGIN
 
-class SectionRuntime : public misc::uncopyable_t
+class SectionRuntime
 {
 public:
+
+    SectionRuntime() = default;
+
+    SectionRuntime(const SectionRuntime &) { misc::unreachable(); }
 
     void setDevice(ID3D12Device *device);
 
@@ -21,6 +25,8 @@ public:
     void addPass(PassRuntime pass);
 
     void addWaitFence(ComPtr<ID3D12Fence> fence);
+
+    void addWaitFenceOfLastFrame(ComPtr<ID3D12Fence> fence);
 
     void setSignalFence(ComPtr<ID3D12Fence> fence);
 
@@ -55,6 +61,7 @@ private:
 
     std::vector<PassRuntime> passes_;
 
+    std::vector<ComPtr<ID3D12Fence>> waitFencesOfLastFrame_;
     std::vector<ComPtr<ID3D12Fence>> waitFences_;
     ComPtr<ID3D12Fence>              signalFence_;
 };

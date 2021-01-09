@@ -25,8 +25,8 @@ void GraphRuntime::runAsync(int frameIndex)
     for(size_t ti = 0; ti < threads_.size(); ++ti)
     {
         auto &d = perThreadData_[ti];
-        for(size_t si = 0; si < d.sectionCount; ++si)
-            d.sections[si].resetFinishedDependencies();
+        for(auto &s : d.sections)
+            s.resetFinishedDependencies();
     }
 
     sync_.latch.set_counter(static_cast<int>(threads_.size()));
@@ -80,9 +80,8 @@ void GraphRuntime::frameFunc(int threadIndex)
         heapCount = 2;
     }
 
-    for(size_t si = 0; si < threadData.sectionCount; ++si)
+    for(auto &section : threadData.sections)
     {
-        auto &section = threadData.sections[si];
         auto cmdListType = section.getCommandListType();
 
         auto tCmdAlloc =
@@ -212,7 +211,7 @@ void GraphRuntime::reset()
     descriptorSlots_.clear();
     descriptorRangeSlots_.clear();
 
-    perThreadData_.reset();
+    perThreadData_.clear();
     threads_.clear();
 
     frameIndex_    = 0;
