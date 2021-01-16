@@ -55,7 +55,6 @@
 #include "./graphics_api/d3d12/raytracing/shaderTable.h"
 
 #include "./graphics_api/d3d12/graph/graph.h"
-#include "./graphics_api/d3d12/renderGraph/graph.h"
 
 #include "./graphics_api/d3d12/buffer.h"
 #include "./graphics_api/d3d12/commandList.h"
