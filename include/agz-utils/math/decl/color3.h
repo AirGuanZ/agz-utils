@@ -20,6 +20,8 @@ public:
     AGZ_MATH_API explicit tcolor3(uninitialized_t)   noexcept;
     AGZ_MATH_API explicit tcolor3(const tvec3<T> &c) noexcept;
 
+    AGZ_MATH_API operator tvec3<T>() const noexcept;
+
     AGZ_MATH_API bool is_black() const noexcept;
     
     AGZ_MATH_API self_t clamp(T min_v, T max_v) const noexcept;
@@ -36,7 +38,7 @@ public:
     template<typename F>
     AGZ_MATH_API auto map(F &&f) const noexcept;
 
-    AGZ_MATH_API bool operator!() const noexcept;
+    AGZ_MATH_API bool     operator!() const noexcept;
     AGZ_MATH_API T       &operator[](size_t idx)       noexcept;
     AGZ_MATH_API const T &operator[](size_t idx) const noexcept;
 

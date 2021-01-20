@@ -39,6 +39,12 @@ AGZ_MATH_API tcolor3<T>::tcolor3(const tvec3<T> &c) noexcept
 }
 
 template<typename T>
+AGZ_MATH_API tcolor3<T>::operator tvec3<T>() const noexcept
+{
+    return tvec3<T>(r, g, b);
+}
+
+template<typename T>
 AGZ_MATH_API bool tcolor3<T>::is_black() const noexcept
 {
     return !r && !g && !b;

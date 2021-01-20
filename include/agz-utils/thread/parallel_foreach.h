@@ -91,7 +91,7 @@ void parallel_foreach(
 // 和parallal_foreach相似，只是暂时这么写，以后改成parallal_foreach + range
 // IMPROVE: use parallel_foreach + range
 template<typename T, typename Func>
-void parallel_forrange(T beg, T end, const Func &func, int worker_count = 0)
+void parallel_forrange(T beg, T end, Func &&func, int worker_count = 0)
 {
     std::mutex it_mutex;
     T it = beg;

@@ -14,7 +14,7 @@ template<typename T, typename Func>
 void parallel_forrange(
     T               beg,
     T               end,
-    const Func     &func,
+    Func          &&func,
     thread_group_t &threads,
     int             worker_count = 0)
 {
