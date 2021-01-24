@@ -37,6 +37,8 @@ class obj_arena_t;
 template<typename T> class obj_pool_t;
 ```
 
+---
+
 ```cpp
 #include <agz-utils/common/common.h>
 
@@ -63,6 +65,8 @@ template<typename T>
 constexpr T upalign_to(T value, T alignto) noexcept;
 ```
 
+---
+
 ```cpp
 #include <agz-utils/console.h>
 
@@ -78,6 +82,8 @@ constexpr T upalign_to(T value, T alignto) noexcept;
 class progress_bar_t;
 class progress_bar_f_t;
 ```
+
+---
 
 ```cpp
 #include <agz-utils/container.h>
@@ -106,6 +112,8 @@ class interval_mgr_t;
 template<typename Key, typename Value>
 class linked_map_t;
 ```
+
+---
 
 ```cpp
 #include <agz-utils/event.h>
@@ -154,6 +162,8 @@ keycode_t win_vk_to_keycode(int VK) noexcept;
 #endif
 ```
 
+---
+
 ```cpp
 #include <agz-utils/file.h>
 
@@ -168,6 +178,8 @@ void write_raw_file(
 
 std::string read_txt_file(const std::string &filename);
 ```
+
+---
 
 ```cpp
 // define macro AGZ_ENABLE_D3D11 in compiler settings
@@ -204,6 +216,8 @@ class Texture2DLoader;
 class Window;
 ```
 
+---
+
 ```cpp
 // define macro AGZ_ENABLE_D3D12 in compiler settings
 #include <agz-utils/graphics_api.h>
@@ -236,6 +250,8 @@ class TextureLoader;
 class Window;
 ```
 
+---
+
 ```cpp
 // define macro AGZ_ENABLE_OPENGL in compiler settings
 #include <agz-utils/graphics_api.h>
@@ -243,6 +259,8 @@ class Window;
 // in namespace agz::gl
 // TODO: opengl components doc
 ```
+
+---
 
 ```cpp
 #include <agz-utils/image.h>
@@ -420,33 +438,49 @@ void save_rgb_to_hdr_file(
     const std::string &filename, const math::tensor_t<math::color3f, 2> &data);
 ```
 
+---
+
 ```cpp
 #include <agz-utils/math.h>
 ```
+
+---
 
 ```cpp
 #include <agz-utils/mesh.h>
 ```
 
+---
+
 ```cpp
 #include <agz-utils/misc.h>
 ```
+
+---
 
 ```cpp
 #include <agz-utils/string.h>
 ```
 
+---
+
 ```cpp
 #include <agz-utils/system.h>
 ```
+
+---
 
 ```cpp
 #include <agz-utils/texture.h>
 ```
 
+---
+
 ```cpp
 #include <agz-utils/thread.h>
 ```
+
+---
 
 ```cpp
 #include <agz-utils/time.h>
