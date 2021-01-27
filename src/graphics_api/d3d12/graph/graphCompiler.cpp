@@ -63,6 +63,29 @@ const D3D12_RESOURCE_DESC &Resource::getDescription() const
     return desc_;
 }
 
+D3D12_VIEWPORT Resource::getDefaultViewport(
+    float minDepth, float maxDepth) const
+{
+    D3D12_VIEWPORT ret;
+    ret.TopLeftX = 0;
+    ret.TopLeftY = 0;
+    ret.Width    = static_cast<float>(desc_.Width);
+    ret.Height   = static_cast<float>(desc_.Height);
+    ret.MinDepth = minDepth;
+    ret.MaxDepth = maxDepth;
+    return ret;
+}
+
+D3D12_RECT Resource::getDefaultScissor() const
+{
+    D3D12_RECT ret;
+    ret.left   = 0;
+    ret.top    = 0;
+    ret.right  = static_cast<LONG>(desc_.Width);
+    ret.bottom = static_cast<LONG>(desc_.Height);
+    return ret;
+}
+
 InternalResource::InternalResource(std::string name, int index)
     : Resource(std::move(name), index),
       heapType_(D3D12_HEAP_TYPE_DEFAULT),
@@ -160,6 +183,31 @@ void DescriptorTable::addDSV(
     const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
 {
     records_.push_back({ resource, desc, {}, type });
+}
+
+bool DescriptorTable::operator<(const DescriptorTable &rhs) const
+{
+    return std::tie(cpu_, gpu_, records_) <
+           std::tie(rhs.cpu_, rhs.gpu_, rhs.records_);
+}
+
+bool DescriptorTable::Record::operator<(const Record &rhs) const
+{
+    const int LResourceIndex = resource->getIndex();
+    const int RResourceIndex = rhs.resource->getIndex();
+
+    auto L = std::tie(
+        LResourceIndex,
+        resource,
+        shaderResourceType,
+        depthStencilType);
+    auto R = std::tie(
+        RResourceIndex,
+        rhs.resource,
+        rhs.shaderResourceType,
+        rhs.depthStencilType);
+
+    return L < R || (L == R && view < rhs.view);
 }
 
 bool Vertex::isAggregate() const
@@ -954,12 +1002,30 @@ void GraphCompiler::generateDescriptorRecords(Temps &temps)
 
     // descriptor ranges
 
-    int rangeSlotCount = 0;
-    auto allocateDescriptorRangeSlot = [&](
-        int thread, const DescriptorTable *table)
+    struct DescriptorRangeKey
     {
-        const int newSlot = rangeSlotCount++;
-        temps.threads[thread].descRanges.push_back({ newSlot, table });
+        int thread = 0;
+        DescriptorTable *table = nullptr;
+
+        bool operator<(const DescriptorRangeKey &rhs) const
+        {
+            return std::tie(thread, *table) < std::tie(rhs.thread, *rhs.table);
+        }
+    };
+
+    std::map<DescriptorRangeKey, int> descriptorRangeSlotCache;
+
+    auto allocateDescriptorRangeSlot = [&](const DescriptorRangeKey &key)
+    {
+        const auto it = descriptorRangeSlotCache.find(key);
+        if(it != descriptorRangeSlotCache.end())
+            return it->second;
+
+        const int newSlot = static_cast<int>(descriptorRangeSlotCache.size());
+        descriptorRangeSlotCache.insert({ key, newSlot });
+
+        temps.threads[key.thread].descRanges.push_back({ newSlot, key.table });
+
         return newSlot;
     };
 
@@ -968,7 +1034,7 @@ void GraphCompiler::generateDescriptorRecords(Temps &temps)
         auto &passTemp = temps.passes[p->getIndex()];
         for(auto &t : p->descriptorTables_)
         {
-            const int slot = allocateDescriptorRangeSlot(p->thread_, t.get());
+            const int slot = allocateDescriptorRangeSlot({ p->thread_, t.get() });
             passTemp.descriptorRanges_.push_back({ t.get(), slot });
         }
     }

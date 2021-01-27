@@ -8,8 +8,6 @@ AGZ_D3D12_BEGIN
 
 class RootSignatureBuilder : public misc::uncopyable_t
 {
-    ID3D12Device *device_;
-
     std::vector<D3D12_ROOT_PARAMETER>      parameters_;
     std::vector<D3D12_STATIC_SAMPLER_DESC> staticSamplers_;
     D3D12_ROOT_SIGNATURE_FLAGS             flags_;
@@ -17,8 +15,6 @@ class RootSignatureBuilder : public misc::uncopyable_t
 public:
 
     RootSignatureBuilder();
-
-    explicit RootSignatureBuilder(ID3D12Device *device);
 
     template<int N>
     void addParameters(const D3D12_ROOT_PARAMETER (&params)[N])
@@ -68,7 +64,7 @@ public:
 
     void addFlags(D3D12_ROOT_SIGNATURE_FLAGS flags);
 
-    ComPtr<ID3D12RootSignature> build() const;
+    ComPtr<ID3D12RootSignature> build(ID3D12Device *device) const;
 };
 
 AGZ_D3D12_END

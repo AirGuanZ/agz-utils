@@ -256,6 +256,17 @@ AGZ_MATH_API typename tvec4<T>::self_t &tvec4<T>::operator/=(T rhs) noexcept
     return *this;
 }
 
+template<typename T>
+std::string tvec4<T>::to_string() const
+{
+    return "(" +
+            std::to_string(x) + ", " +
+            std::to_string(y) + ", " +
+            std::to_string(z) + ", " +
+            std::to_string(w) +
+            ")";
+}
+
 AGZ_MATH_API template<typename T>
 tvec3<T> tvec4<T>::homogenize() const noexcept
 {

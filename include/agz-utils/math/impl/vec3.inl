@@ -232,6 +232,16 @@ AGZ_MATH_API typename tvec3<T>::self_t &tvec3<T>::operator/=(T rhs) noexcept
 }
 
 template<typename T>
+std::string tvec3<T>::to_string() const
+{
+    return "(" +
+            std::to_string(x) + ", " +
+            std::to_string(y) + ", " +
+            std::to_string(z) +
+            ")";
+}
+
+template<typename T>
 AGZ_MATH_API tvec3<T> operator-(const tvec3<T> &vec) noexcept
 {
     return tvec3<T>(-vec.x, -vec.y, -vec.z);

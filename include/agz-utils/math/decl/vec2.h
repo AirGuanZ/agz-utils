@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include <ostream>
+#include <string>
 
 #include "../../misc/hash.h"
 #include "common.h"
-#include "vec.h"
 
 AGZ_MATH_BEGIN
 
@@ -59,6 +59,8 @@ public:
     AGZ_MATH_API self_t &operator-=(T rhs) noexcept;
     AGZ_MATH_API self_t &operator*=(T rhs) noexcept;
     AGZ_MATH_API self_t &operator/=(T rhs) noexcept;
+
+    std::string to_string() const;
 
 #include "../impl/swizzle_vec2.inl"
 

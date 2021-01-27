@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include <ostream>
+#include <string>
 
 #include "common.h"
-#include "vec.h"
 
 AGZ_MATH_BEGIN
 
@@ -60,6 +60,8 @@ public:
     AGZ_MATH_API self_t &operator-=(T rhs) noexcept;
     AGZ_MATH_API self_t &operator*=(T rhs) noexcept;
     AGZ_MATH_API self_t &operator/=(T rhs) noexcept;
+
+    std::string to_string() const;
 
     AGZ_MATH_API tvec3<T> homogenize() const noexcept;
 

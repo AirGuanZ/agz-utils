@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <ostream>
+#include <string>
 
 #include "../../misc/hash.h"
 #include "common.h"
@@ -60,6 +61,8 @@ public:
     AGZ_MATH_API self_t &operator-=(T rhs) noexcept;
     AGZ_MATH_API self_t &operator*=(T rhs) noexcept;
     AGZ_MATH_API self_t &operator/=(T rhs) noexcept;
+
+    std::string to_string() const;
 
 #include "../impl/swizzle_vec3.inl"
 };

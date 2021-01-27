@@ -220,6 +220,12 @@ AGZ_MATH_API typename tvec2<T>::self_t &tvec2<T>::operator/=(T rhs) noexcept
 }
 
 template<typename T>
+std::string tvec2<T>::to_string() const
+{
+    return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
+}
+
+template<typename T>
 AGZ_MATH_API bool tvec2<T>::operator<(const tvec2 &rhs) const noexcept
 {
     return std::tie(x, y) < std::tie(rhs.x, rhs.y);

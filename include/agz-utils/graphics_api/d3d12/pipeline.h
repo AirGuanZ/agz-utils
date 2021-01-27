@@ -8,8 +8,6 @@ AGZ_D3D12_BEGIN
 
 class PipelineBuilder : public misc::uncopyable_t
 {
-    ID3D12Device *device_;
-
     D3D12_GRAPHICS_PIPELINE_STATE_DESC desc_;
 
     std::vector<D3D12_INPUT_ELEMENT_DESC> inputElems_;
@@ -31,7 +29,7 @@ class PipelineBuilder : public misc::uncopyable_t
 
 public:
 
-    explicit PipelineBuilder(ID3D12Device *device = nullptr);
+    PipelineBuilder();
 
     void addInputElement(const D3D12_INPUT_ELEMENT_DESC &elem);
 
@@ -107,7 +105,7 @@ public:
         D3D12_STENCIL_OP      depthFailOp,
         D3D12_STENCIL_OP      passOp);
 
-    ComPtr<ID3D12PipelineState> build();
+    ComPtr<ID3D12PipelineState> build(ID3D12Device *device);
 };
 
 AGZ_D3D12_END

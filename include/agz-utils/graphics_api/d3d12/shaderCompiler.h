@@ -16,9 +16,9 @@ public:
     {
         Debug, O0, O1, O2, O3,
 #ifdef AGZ_DEBUG
-        Default = Debug
+        Auto = Debug
 #else
-        Default = O3
+        Auto = O3
 #endif
     };
 

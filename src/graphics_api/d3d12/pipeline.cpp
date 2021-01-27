@@ -34,11 +34,10 @@ namespace
 
 } // namespace anonymous
 
-PipelineBuilder::PipelineBuilder(ID3D12Device *device)
-    : device_(device), desc_{}
+PipelineBuilder::PipelineBuilder()
+    : desc_{}
 {
     desc_.BlendState                        = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    //desc_.BlendState.IndependentBlendEnable = true;
     desc_.SampleMask                        = 0xffffffff;
     desc_.RasterizerState                   = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     desc_.DepthStencilState                 = defaultDepthStencilDesc();
@@ -47,9 +46,6 @@ PipelineBuilder::PipelineBuilder(ID3D12Device *device)
     desc_.DSVFormat                         = DXGI_FORMAT_UNKNOWN;
     desc_.SampleDesc                        = { 1, 0 };
     desc_.Flags                             = D3D12_PIPELINE_STATE_FLAG_NONE;
-
-    //for(auto &b : desc_.BlendState.RenderTarget)
-    //    b.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 }
 
 void PipelineBuilder::addInputElement(const D3D12_INPUT_ELEMENT_DESC &elem)
@@ -215,7 +211,7 @@ void PipelineBuilder::setBackStencil(
     };
 }
 
-ComPtr<ID3D12PipelineState> PipelineBuilder::build()
+ComPtr<ID3D12PipelineState> PipelineBuilder::build(ID3D12Device *device)
 {
     assert(device_);
 
@@ -226,7 +222,7 @@ ComPtr<ID3D12PipelineState> PipelineBuilder::build()
     ComPtr<ID3D12PipelineState> ret;
     AGZ_D3D12_CHECK_HR_MSG(
         "failed to create d3d12 graphics pipeline state",
-        device_->CreateGraphicsPipelineState(
+        device->CreateGraphicsPipelineState(
             &desc_, IID_PPV_ARGS(ret.GetAddressOf())));
 
     return ret;

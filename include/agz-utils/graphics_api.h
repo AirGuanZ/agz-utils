@@ -76,6 +76,7 @@
 #include "./graphics_api/d3d12/shaderCompiler.h"
 #include "./graphics_api/d3d12/swapChain.h"
 #include "./graphics_api/d3d12/textureLoader.h"
+#include "./graphics_api/d3d12/viewDescHelper.h"
 #include "./graphics_api/d3d12/window.h"
 
 #endif // #ifdef AGZ_ENABLE_D3D12

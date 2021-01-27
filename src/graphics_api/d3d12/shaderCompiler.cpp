@@ -9,7 +9,7 @@ AGZ_D3D12_BEGIN
 
 FXC::FXC()
 {
-    optLevel_       = Default;
+    optLevel_       = Auto;
     warningAsError_ = true;
     flag_           = 0;
     updateFlag();

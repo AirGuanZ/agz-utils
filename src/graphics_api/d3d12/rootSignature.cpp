@@ -5,20 +5,13 @@
 AGZ_D3D12_BEGIN
 
 RootSignatureBuilder::RootSignatureBuilder()
-    : RootSignatureBuilder(nullptr)
-{
-    
-}
-
-RootSignatureBuilder::RootSignatureBuilder(ID3D12Device *device)
-    : device_(device), flags_(D3D12_ROOT_SIGNATURE_FLAG_NONE)
+    : flags_(D3D12_ROOT_SIGNATURE_FLAG_NONE)
 {
     
 }
 
 void RootSignatureBuilder::addParameter(const D3D12_ROOT_PARAMETER &parameter)
 {
-    assert(device_);
     parameters_.push_back(parameter);
 }
 
@@ -92,7 +85,6 @@ void RootSignatureBuilder::addParameterUAV(
 void RootSignatureBuilder::addStaticSampler(
     const D3D12_STATIC_SAMPLER_DESC &staticSampler)
 {
-    assert(device_);
     staticSamplers_.push_back(staticSampler);
 }
 
@@ -125,14 +117,11 @@ void RootSignatureBuilder::addStaticSampler(
 
 void RootSignatureBuilder::addFlags(D3D12_ROOT_SIGNATURE_FLAGS flags)
 {
-    assert(device_);
     flags_ |= flags;
 }
 
-ComPtr<ID3D12RootSignature> RootSignatureBuilder::build() const
+ComPtr<ID3D12RootSignature> RootSignatureBuilder::build(ID3D12Device *device) const
 {
-    assert(device_);
-
     D3D12_ROOT_SIGNATURE_DESC desc;
     desc.NumParameters     = static_cast<UINT>(parameters_.size());
     desc.pParameters       = parameters_.data();
@@ -153,7 +142,7 @@ ComPtr<ID3D12RootSignature> RootSignatureBuilder::build() const
     ComPtr<ID3D12RootSignature> ret;
     AGZ_D3D12_CHECK_HR_MSG(
         "failed to create root signature",
-        device_->CreateRootSignature(
+        device->CreateRootSignature(
             0,
             serialized->GetBufferPointer(),
             serialized->GetBufferSize(),

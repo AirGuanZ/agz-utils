@@ -35,6 +35,11 @@ public:
 
     const D3D12_RESOURCE_DESC &getDescription() const;
 
+    D3D12_VIEWPORT getDefaultViewport(
+        float minDepth = 0, float maxDepth = 1) const;
+
+    D3D12_RECT getDefaultScissor() const;
+
 private:
 
     std::string name_;
@@ -144,6 +149,8 @@ public:
         addDSV(resource, DepthStencilType::ReadAndWrite, desc);
     }
 
+    bool operator<(const DescriptorTable &rhs) const;
+
 private:
 
     friend class GraphCompiler;
@@ -154,6 +161,8 @@ private:
         ResourceView       view               = {};
         ShaderResourceType shaderResourceType = ShaderResourceType::PixelAndNonPixel;
         DepthStencilType   depthStencilType   = DepthStencilType::ReadAndWrite;
+
+        bool operator<(const Record &rhs) const;
     };
 
     bool cpu_;
