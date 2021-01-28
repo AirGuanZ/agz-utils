@@ -50,7 +50,7 @@ Descriptor PassContext::getDescriptor(const Resource *resource, int index)
             "undeclared resource descriptor of " + resource->getName());
     }
 
-    assert(it->second->cpu ^ it->second->gpu);
+    assert(it->second[index]->cpu ^ it->second[index]->gpu);
     return it->second[index]->cpu ?
         it->second[index]->cpuDescriptor : it->second[index]->gpuDescriptor;
 }
