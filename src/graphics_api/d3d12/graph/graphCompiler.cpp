@@ -334,7 +334,7 @@ void Pass::addSRV(
     ShaderResourceType                     shaderResourceType,
     const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
 {
-    descriptors_.push_back({ resource, type, desc, shaderResourceType, {} });
+    descriptors_[resource].push_back({ resource, type, desc, shaderResourceType, {} });
 }
 
 void Pass::addUAV(
@@ -342,14 +342,14 @@ void Pass::addUAV(
     const Resource                         *resource,
     const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
 {
-    descriptors_.push_back({ resource, type, desc, {}, {} });
+    descriptors_[resource].push_back({ resource, type, desc, {}, {} });
 }
 
 void Pass::addRTV(
     const Resource                      *resource,
     const D3D12_RENDER_TARGET_VIEW_DESC &desc)
 {
-    descriptors_.push_back({ resource, CPUOnly, desc, {}, {} });
+    descriptors_[resource].push_back({ resource, CPUOnly, desc, {}, {} });
 }
 
 void Pass::addDSV(
@@ -357,7 +357,7 @@ void Pass::addDSV(
     DepthStencilType                     depthStencilType,
     const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
 {
-    descriptors_.push_back({ resource, CPUOnly, desc, {}, depthStencilType });
+    descriptors_[resource].push_back({ resource, CPUOnly, desc, {}, depthStencilType });
 }
 
 DescriptorTable *Pass::addDescriptorTable(DescriptorType type)
@@ -956,19 +956,22 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
             });
         };
 
-        for(auto &descDecl : p->descriptors_)
+        for(auto &descDeclVec : p->descriptors_)
         {
-            auto subrscs = viewToSubresources(
-                descDecl.resource->getDescription(), descDecl.view);
-
-            for(UINT s : subrscs)
+            for(auto &descDecl : descDeclVec.second)
             {
-                addNewDescDecl(
-                    descDecl.resource,
-                    s,
-                    descDecl.view,
-                    descDecl.shaderResourceType,
-                    descDecl.depthStencilType);
+                auto subrscs = viewToSubresources(
+                    descDecl.resource->getDescription(), descDecl.view);
+
+                for(UINT s : subrscs)
+                {
+                    addNewDescDecl(
+                        descDecl.resource,
+                        s,
+                        descDecl.view,
+                        descDecl.shaderResourceType,
+                        descDecl.depthStencilType);
+                }
             }
         }
 
@@ -1141,11 +1144,14 @@ void GraphCompiler::generateDescriptorRecords(Temps &temps)
     for(auto &p : passes_)
     {
         auto &passTemp = temps.passes[p->getIndex()];
-        for(auto &u : p->descriptors_)
+        for(auto &descDeclVec : p->descriptors_)
         {
-            assert(!u.view.is<std::monostate>());
-            const int slot = allocateDescriptorSlot({ p->thread_, u });
-            passTemp.descriptors_.push_back({ u.resource, slot });
+            for(auto &u : descDeclVec.second)
+            {
+                assert(!u.view.is<std::monostate>());
+                const int slot = allocateDescriptorSlot({ p->thread_, u });
+                passTemp.descriptors_.push_back({ u.resource, slot });
+            }
         }
     }
 
@@ -1610,10 +1616,8 @@ void GraphCompiler::fillRuntimeSections(
 
                 for(auto &d : passTemp.descriptors_)
                 {
-                    descriptorMap.insert({
-                        d.resource,
-                        &runtime.descriptorSlots_[d.descriptorSlot]
-                    });
+                    descriptorMap[d.resource].push_back(
+                        &runtime.descriptorSlots_[d.descriptorSlot]);
                 }
 
                 for(auto &d : passTemp.descriptorRanges_)
