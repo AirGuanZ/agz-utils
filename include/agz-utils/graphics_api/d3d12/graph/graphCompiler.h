@@ -225,7 +225,8 @@ public:
 
     void addResourceState(
         const Resource       *resource,
-        D3D12_RESOURCE_STATES state);
+        D3D12_RESOURCE_STATES state,
+        UINT                  subrsc = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
 
     void addSRV(
         DescriptorType                         type,
@@ -269,6 +270,12 @@ private:
 
     friend class GraphCompiler;
 
+    struct ResourceStateRecord
+    {
+        D3D12_RESOURCE_STATES state       = D3D12_RESOURCE_STATE_COMMON;
+        UINT                  subresource = 0;
+    };
+
     struct DescriptorDeclaretion
     {
         const Resource    *resource           = nullptr;
@@ -294,7 +301,7 @@ private:
     std::set<Pass *> inFromLastFrame_;
     std::set<Pass *> outToNextFrame_;
 
-    std::map<const Resource*, D3D12_RESOURCE_STATES> states_;
+    std::map<const Resource*, ResourceStateRecord> states_;
     std::vector<DescriptorDeclaretion>               descriptors_;
     std::vector<std::unique_ptr<DescriptorTable>>    descriptorTables_;
 };

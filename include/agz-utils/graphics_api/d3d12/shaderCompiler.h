@@ -1,7 +1,7 @@
 #pragma once
 
 #include <d3dcompiler.h>
-#include <dxcapi.h>
+//#include <dxcapi.h>
 
 #include <agz-utils/graphics_api/d3d12/common.h>
 #include <agz-utils/system.h>
@@ -54,7 +54,7 @@ private:
     std::string warnings_;
 };
 
-class DXC
+/*class DXC
 {
 public:
 
@@ -86,6 +86,6 @@ private:
 
     OptimizationLevel optLevel_;
     bool              warningAsError_;
-};
+};*/
 
 AGZ_D3D12_END

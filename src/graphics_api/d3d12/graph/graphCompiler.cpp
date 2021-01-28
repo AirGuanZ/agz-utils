@@ -3,9 +3,46 @@
 #include <tuple>
 
 #include <agz-utils/graphics_api/d3d12/graph/graphCompiler.h>
+#include <agz-utils/graphics_api/d3d12/graph/viewSubresource.h>
+#include <agz-utils/graphics_api/d3d12/mipmapGenerator.h>
 #include <agz-utils/string.h>
 
 AGZ_D3D12_GRAPH_BEGIN
+
+namespace
+{
+    UINT getTotalMipLevelCount(const D3D12_RESOURCE_DESC &rsc)
+    {
+        if(rsc.MipLevels > 0)
+            return rsc.MipLevels;
+
+        if(rsc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE3D)
+        {
+            return (std::max)(
+                MipmapGenerator::computeMipmapChainLength(
+                    static_cast<UINT>(rsc.Width),
+                    static_cast<UINT>(rsc.Height)),
+                MipmapGenerator::computeMipmapChainLength(
+                    static_cast<UINT>(rsc.DepthOrArraySize), 1));
+        }
+
+        return MipmapGenerator::computeMipmapChainLength(
+            static_cast<UINT>(rsc.Width),
+            static_cast<UINT>(rsc.Height));
+    }
+
+    UINT getSubresourceCount(const D3D12_RESOURCE_DESC &desc)
+    {
+        const UINT arraySize =
+            desc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE3D ?
+            1 : desc.DepthOrArraySize;
+
+        const UINT mipSliceCount = getTotalMipLevelCount(desc);
+
+        return arraySize * mipSliceCount;
+    }
+
+} // namespace anonymous
 
 Resource::Resource(std::string name, int index)
     : name_(std::move(name)), index_(index), desc_{}
@@ -279,7 +316,8 @@ void Pass::setCallback(PassCallback callback)
 
 void Pass::addResourceState(
     const Resource       *resource,
-    D3D12_RESOURCE_STATES state)
+    D3D12_RESOURCE_STATES state,
+    UINT                  subrsc)
 {
     if(states_.find(resource) != states_.end())
     {
@@ -287,7 +325,7 @@ void Pass::addResourceState(
             "repeated resource state declaretion of " +
             resource->getName() + "in pass " + name_);
     }
-    states_.insert({ resource, state });
+    states_.insert({ resource, { state, subrsc } });
 }
 
 void Pass::addSRV(
@@ -375,7 +413,7 @@ GraphCompiler::GraphCompiler()
     : threadCount_(0), queueCount_(0), frameCount_(0)
 {
     auto entryPass = addPass("main_queue_entry_pass#auto-generated");
-    entryPass->setCallback([](rg::PassContext &) { });
+    entryPass->setCallback([](PassContext &) { });
 }
 
 void GraphCompiler::setThreadCount(int count)
@@ -793,8 +831,8 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
     {
         struct Usage
         {
-            int                   pass;
-            D3D12_RESOURCE_STATES state;
+            int pass;
+            std::map<UINT, D3D12_RESOURCE_STATES> state;
         };
 
         std::vector<Usage> usages;
@@ -806,21 +844,52 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
     {
         auto &p = passes_[pi];
 
-        std::map<int, D3D12_RESOURCE_STATES> rscStates;
-        std::transform(
-            p->states_.begin(), p->states_.end(),
-            misc::direct_inserter(rscStates),
-            [](const auto &pair)
-        {
-            return std::make_pair(pair.first->getIndex(), pair.second);
-        });
+        std::map<std::pair<int, UINT>, D3D12_RESOURCE_STATES> rscStates;
 
-        auto addNewState = [&](const Resource *rsc, D3D12_RESOURCE_STATES state)
+        for(auto &pair : p->states_)
         {
-            if(auto it = rscStates.find(rsc->getIndex()); it != rscStates.end())
+            if(pair.second.subresource != D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
+            {
+                rscStates.insert({
+                    std::make_pair(
+                        pair.first->getIndex(),
+                        pair.second.subresource),
+                    pair.second.state
+                });
+            }
+            else
+            {
+                const UINT subrscCount = getSubresourceCount(
+                    pair.first->getDescription());
+
+                for(UINT i = 0; i < subrscCount; ++i)
+                {
+                    rscStates.insert({
+                        std::make_pair(pair.first->getIndex(), i),
+                        pair.second.state
+                    });
+                }
+            }
+        }
+
+        auto addNewState = [&](
+            const Resource *rsc, UINT subrsc, D3D12_RESOURCE_STATES state)
+        {
+            if(auto it = rscStates.find({ rsc->getIndex(), subrsc });
+               it != rscStates.end())
                 it->second |= state;
             else
-                rscStates.insert({ rsc->getIndex(), state });
+            {
+                if(subrsc != D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
+                    rscStates.insert({ { rsc->getIndex(), subrsc }, state });
+                else
+                {
+                    const UINT subrscCount = getSubresourceCount(
+                        rsc->getDescription());
+                    for(UINT i = 0; i < subrscCount; ++i)
+                        rscStates.insert({ { rsc->getIndex(), i }, state });
+                }
+            }
         };
 
         auto shaderResourceTypeToState = [](ShaderResourceType type)
@@ -852,6 +921,7 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
 
         auto addNewDescDecl = [&](
             const Resource     *resource,
+            UINT                subrsc,
             const ResourceView &view,
             ShaderResourceType  shaderResourceType,
             DepthStencilType    depthStencilType)
@@ -861,23 +931,23 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
                 [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &)
             {
                 addNewState(
-                    resource,
+                    resource, subrsc,
                     shaderResourceTypeToState(shaderResourceType));
             },
                 [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &)
             {
                 addNewState(
-                    resource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+                    resource, subrsc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
             },
                 [&](const D3D12_RENDER_TARGET_VIEW_DESC &)
             {
                 addNewState(
-                    resource, D3D12_RESOURCE_STATE_RENDER_TARGET);
+                    resource, subrsc, D3D12_RESOURCE_STATE_RENDER_TARGET);
             },
                 [&](const D3D12_DEPTH_STENCIL_VIEW_DESC &)
             {
                 addNewState(
-                    resource,
+                    resource, subrsc,
                     depthStencilTypeToState(depthStencilType));
             },
                 [&](const std::monostate &)
@@ -888,29 +958,51 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
 
         for(auto &descDecl : p->descriptors_)
         {
-            addNewDescDecl(
-                descDecl.resource,
-                descDecl.view,
-                descDecl.shaderResourceType,
-                descDecl.depthStencilType);
-        }
+            auto subrscs = viewToSubresources(
+                descDecl.resource->getDescription(), descDecl.view);
 
-        for(auto &descTable : p->descriptorTables_)
-        {
-            for(auto &descDecl : descTable->records_)
+            for(UINT s : subrscs)
             {
                 addNewDescDecl(
                     descDecl.resource,
+                    s,
                     descDecl.view,
                     descDecl.shaderResourceType,
                     descDecl.depthStencilType);
             }
         }
 
+        for(auto &descTable : p->descriptorTables_)
+        {
+            for(auto &descDecl : descTable->records_)
+            {
+                auto subrscs = viewToSubresources(
+                    descDecl.resource->getDescription(), descDecl.view);
+
+                for(UINT s : subrscs)
+                {
+                    addNewDescDecl(
+                        descDecl.resource,
+                        s,
+                        descDecl.view,
+                        descDecl.shaderResourceType,
+                        descDecl.depthStencilType);
+                }
+            }
+        }
+
         for(auto &r : rscStates)
         {
-            resourceRecords[r.first].usages.push_back(
-                { p->getIndex(), r.second });
+            auto &record = resourceRecords[r.first.first];
+
+            if(record.usages.empty() ||
+               record.usages.back().pass != p->getIndex())
+            {
+                record.usages.push_back(
+                    { p->getIndex(), {} });
+            }
+
+            record.usages.back().state.insert({ r.first.second, r.second });
         }
     }
 
@@ -922,11 +1014,7 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
         if(usages.empty())
             continue;
 
-        if(resource.isInternal() &&
-           resource.asInternal()->initialState_ == D3D12_RESOURCE_STATE_COMMON)
-        {
-            resource.asInternal()->initialState_ = usages[0].state;
-        }
+        const UINT subrscCount = getSubresourceCount(resource.getDescription());
 
         const D3D12_RESOURCE_STATES initialState =
             resource.asInternal() ? resource.asInternal()->initialState_ :
@@ -936,25 +1024,86 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
             resource.asInternal() ? resource.asInternal()->initialState_ :
             resource.asExternal()->finalState_;
 
-        D3D12_RESOURCE_STATES lastState = initialState;
+        std::vector<D3D12_RESOURCE_STATES> subrscToState(
+            subrscCount, initialState);
+
         for(size_t i = 0; i < usages.size(); ++i)
         {
-            auto &usage = usages[i];
-            const D3D12_RESOURCE_STATES beg = lastState;
-            const D3D12_RESOURCE_STATES mid = usage.state;
-            const D3D12_RESOURCE_STATES end =
-                (i == usages.size() - 1) ? finalState : mid;
+            auto newSubrscToState = subrscToState;
 
-            if(beg != mid || mid != end)
+            auto &usage = usages[i];
+            assert(!usage.state.empty());
+            for(auto &p : usage.state)
             {
-                temps.passes[usage.pass].stateTransitions.push_back(
-                    PassRuntime::StateTransition{ &resource, beg, mid, end });
+                if(newSubrscToState[p.first] != p.second)
+                    newSubrscToState[p.first] = p.second;
             }
 
-            // TODO: UAV barrier
+            bool isAllOldStateSame = true;
+            for(size_t j = 1; j < subrscToState.size(); ++j)
+            {
+                if(subrscToState[j - 1] != subrscToState[j])
+                {
+                    isAllOldStateSame = false;
+                    break;
+                }
+            }
 
-            lastState = end;
+            bool isAllNewStateSame = true;
+            for(size_t j = 1; j < newSubrscToState.size(); ++j)
+            {
+                if(newSubrscToState[j - 1] != newSubrscToState[j])
+                {
+                    isAllNewStateSame = false;
+                    break;
+                }
+            }
+
+            if(isAllOldStateSame && isAllNewStateSame)
+            {
+                const auto beg = subrscToState[0];
+                const auto mid = newSubrscToState[0];
+                const auto end =
+                    (i == usages.size() - 1) ? finalState : mid;
+
+                if(beg != mid || mid != end)
+                {
+                    temps.passes[usage.pass].stateTransitions.push_back(
+                        PassRuntime::StateTransition{
+                            .resource = &resource,
+                            .subrsc   = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+                            .beg      = beg,
+                            .mid      = mid,
+                            .end      = end
+                        });
+                }
+            }
+            else
+            {
+                for(UINT sub = 0; sub < subrscCount; ++sub)
+                {
+                    const auto beg = subrscToState[sub];
+                    const auto mid = newSubrscToState[sub];
+                    const auto end = (i == usages.size() - 1) ? finalState : mid;
+
+                    if(beg != mid || mid != end)
+                    {
+                        temps.passes[usage.pass].stateTransitions.push_back(
+                            PassRuntime::StateTransition{
+                                .resource = &resource,
+                                .subrsc   = sub,
+                                .beg      = beg,
+                                .mid      = mid,
+                                .end      = end
+                            });
+                    }
+                }
+            }
+
+            subrscToState = newSubrscToState;
         }
+
+        // TODO: UAV barrier
     }
 }
 

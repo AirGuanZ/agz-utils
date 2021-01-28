@@ -97,7 +97,7 @@ void FXC::updateFlag()
         flag_ |= D3DCOMPILE_WARNINGS_ARE_ERRORS;
 }
 
-DXC::DXC()
+/*DXC::DXC()
     : optLevel_(Auto), warningAsError_(false)
 {
     
@@ -205,7 +205,7 @@ ComPtr<ID3D10Blob> DXC::compile(
             reinterpret_cast<IDxcBlob **>(result.GetAddressOf())));
 
     return result;
-}
+}*/
 
 AGZ_D3D12_END
 

@@ -31,13 +31,13 @@ void PassRuntime::execute(
         if(rt.beg != rt.mid)
         {
             entryBarriers_.push_back(CD3DX12_RESOURCE_BARRIER::Transition(
-                runtime_->getRawResource(rt.resource), rt.beg, rt.mid));
+                runtime_->getRawResource(rt.resource), rt.beg, rt.mid, rt.subrsc));
         }
 
         if(rt.mid != rt.end)
         {
             exitBarriers_.push_back(CD3DX12_RESOURCE_BARRIER::Transition(
-                runtime_->getRawResource(rt.resource), rt.mid, rt.end));
+                runtime_->getRawResource(rt.resource), rt.mid, rt.end, rt.subrsc));
         }
     }
 

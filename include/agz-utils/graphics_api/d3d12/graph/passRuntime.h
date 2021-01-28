@@ -11,6 +11,7 @@ public:
     struct StateTransition
     {
         Resource *resource;
+        UINT      subrsc;
         D3D12_RESOURCE_STATES beg;
         D3D12_RESOURCE_STATES mid;
         D3D12_RESOURCE_STATES end;

@@ -50,7 +50,8 @@ IF(DEFINED AGZ_ENABLE_D3D12 AND AGZ_ENABLE_D3D12)
 	ADD_SUBDIRECTORY("${PROJECT_SOURCE_DIR}/ext/D3D12MemAlloc")
 	
 	TARGET_INCLUDE_DIRECTORIES(AGZUtils PUBLIC "${PROJECT_SOURCE_DIR}/ext/d3dx12")
-	SET(AGZ_D3D12_LIBS d3d12.lib dxgi.lib d3dcompiler.lib dxcompiler.lib dxguid.lib D3D12MemAlloc)
+	SET(AGZ_D3D12_LIBS d3d12.lib dxgi.lib d3dcompiler.lib dxguid.lib D3D12MemAlloc)
+	#SET(AGZ_D3D12_LIBS d3d12.lib dxgi.lib d3dcompiler.lib dxcompiler.lib dxguid.lib D3D12MemAlloc)
 ENDIF()
 
 if(DEFINED AGZ_ENABLE_GL AND AGZ_ENABLE_GL)

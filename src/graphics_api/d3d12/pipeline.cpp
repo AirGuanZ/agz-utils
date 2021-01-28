@@ -213,8 +213,6 @@ void PipelineBuilder::setBackStencil(
 
 ComPtr<ID3D12PipelineState> PipelineBuilder::build(ID3D12Device *device)
 {
-    assert(device_);
-
     desc_.pRootSignature                 = rootSignature_.Get();
     desc_.InputLayout.NumElements        = static_cast<UINT>(inputElems_.size());
     desc_.InputLayout.pInputElementDescs = inputElems_.data();

@@ -176,7 +176,7 @@ const T &min3(const T &a, const T &b, const T &c)
 }
 
 template<typename T>
-tvec3<T> max(const tvec3<T> &a, const tvec3<T> &b)
+tvec3<T> vec_max(const tvec3<T> &a, const tvec3<T> &b)
 {
     return tvec3<T>(
         (std::max)(a.x, b.x),
@@ -185,7 +185,7 @@ tvec3<T> max(const tvec3<T> &a, const tvec3<T> &b)
 }
 
 template<typename T>
-tvec3<T> min(const tvec3<T> &a, const tvec3<T> &b)
+tvec3<T> vec_min(const tvec3<T> &a, const tvec3<T> &b)
 {
     return tvec3<T>(
         (std::min)(a.x, b.x),
@@ -194,22 +194,22 @@ tvec3<T> min(const tvec3<T> &a, const tvec3<T> &b)
 }
 
 template<typename T>
-tvec3<T> max(std::initializer_list<tvec3<T>> vs)
+tvec3<T> vec_max(std::initializer_list<tvec3<T>> vs)
 {
     auto it = vs.begin();
     tvec3<T> result = *it++;
     while(it != vs.end())
-        result = (math::max)(result, *it++);
+        result = (math::vec_max)(result, *it++);
     return result;
 }
 
 template<typename T>
-tvec3<T> min(std::initializer_list<tvec3<T>> vs)
+tvec3<T> vec_min(std::initializer_list<tvec3<T>> vs)
 {
     auto it = vs.begin();
     tvec3<T> result = *it++;
     while(it != vs.end())
-        result = (math::min)(result, *it++);
+        result = (math::vec_min)(result, *it++);
     return result;
 }
 
