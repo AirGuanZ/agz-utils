@@ -9,7 +9,7 @@ class PassContext : public misc::uncopyable_t
 {
 public:
 
-    using DescriptorMap      = std::map<const Resource *, DescriptorSlot *>;
+    using DescriptorMap      = std::map<const Resource *, std::vector<DescriptorSlot *>>;
     using DescriptorRangeMap = std::map<const DescriptorTable *, DescriptorRangeSlot *>;
 
     struct ResourceUsage
@@ -33,11 +33,11 @@ public:
 
     ID3D12Resource *getRawResource(const Resource *resource);
 
-    Descriptor getDescriptor(const Resource *resource);
+    Descriptor getDescriptor(const Resource *resource, int index = 0);
 
-    Descriptor getCPUDescriptor(const Resource *resource);
+    Descriptor getCPUDescriptor(const Resource *resource, int index = 0);
 
-    Descriptor getGPUDescriptor(const Resource *resource);
+    Descriptor getGPUDescriptor(const Resource *resource, int index = 0);
 
     DescriptorRange getDescriptorRange(const DescriptorTable *table);
 

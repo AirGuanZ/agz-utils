@@ -301,9 +301,9 @@ private:
     std::set<Pass *> inFromLastFrame_;
     std::set<Pass *> outToNextFrame_;
 
-    std::map<const Resource*, ResourceStateRecord> states_;
-    std::vector<DescriptorDeclaretion>               descriptors_;
-    std::vector<std::unique_ptr<DescriptorTable>>    descriptorTables_;
+    std::map<const Resource*, ResourceStateRecord>                 states_;
+    std::map<const Resource *, std::vector<DescriptorDeclaretion>> descriptors_;
+    std::vector<std::unique_ptr<DescriptorTable>>                  descriptorTables_;
 };
 
 class PassAggregate : public Vertex
