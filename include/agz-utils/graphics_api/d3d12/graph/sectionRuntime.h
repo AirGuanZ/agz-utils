@@ -47,7 +47,9 @@ public:
 private:
 
     void increaseFinishedDependenciesCount(
-        int frameIndex, ComPtr<ID3D12CommandQueue> *allQueues);
+        int                         frameIndex,
+        ComPtr<ID3D12CommandQueue> *allQueues,
+        UINT64                      fenceValue);
 
     ID3D12Device *device_     = nullptr;
     int           queueIndex_ = 0;

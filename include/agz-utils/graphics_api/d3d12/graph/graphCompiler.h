@@ -329,17 +329,6 @@ private:
         UINT                  subresource = 0;
     };
 
-    /*struct DescriptorDeclaretion
-    {
-        const Resource    *resource           = nullptr;
-        DescriptorType     type               = CPUOnly;
-        ResourceView       view               = {};
-        ShaderResourceType shaderResourceType = ShaderResourceType::PixelAndNonPixel;
-        DepthStencilType   depthStencilType   = DepthStencilType::ReadAndWrite;
-
-        bool operator<(const DescriptorDeclaretion &rhs) const;
-    };*/
-
     std::string name_;
     int         index_;
 
@@ -355,7 +344,6 @@ private:
     std::set<Pass *> outToNextFrame_;
 
     std::map<const Resource*, ResourceStateRecord> states_;
-    //std::map<const Resource *, std::vector<DescriptorDeclaretion>> descriptors_;
     std::vector<std::unique_ptr<DescriptorItem>>   descriptors_;
     std::vector<std::unique_ptr<DescriptorTable>>  descriptorTables_;
 };
@@ -435,7 +423,6 @@ private:
 
         struct DescriptorDeclaretion
         {
-            //const Resource *resource       = nullptr;
             const DescriptorItem *item           = nullptr;
             int                   descriptorSlot = 0;
         };
@@ -474,7 +461,6 @@ private:
         {
             int                   slot;
             const DescriptorItem *item;
-            //Pass::DescriptorDeclaretion decl;
         };
 
         struct DescriptorRangeRecord
@@ -498,8 +484,6 @@ private:
     void addDependencyImpl(Vertex *head, Vertex *tail, bool crossFrame);
 
     std::vector<int> sortPasses() const;
-
-    void addEntryDependencyForComputePasses();
 
     Temps assignSectionsToThreads() const;
 

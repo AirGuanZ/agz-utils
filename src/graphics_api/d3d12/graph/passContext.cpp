@@ -43,46 +43,6 @@ ID3D12Resource *PassContext::getRawResource(const Resource *resource)
     return runtime_->getRawResource(resource);
 }
 
-/*Descriptor PassContext::getDescriptor(const Resource *resource, int index)
-{
-    const auto it = descriptors_.find(resource);
-    if(it == descriptors_.end())
-    {
-        throw D3D12Exception(
-            "undeclared resource descriptor of " + resource->getName());
-    }
-
-    assert(it->second[index]->cpu ^ it->second[index]->gpu);
-    return it->second[index]->cpu ?
-        it->second[index]->cpuDescriptor : it->second[index]->gpuDescriptor;
-}
-
-Descriptor PassContext::getCPUDescriptor(const Resource *resource, int index)
-{
-    const auto it = descriptors_.find(resource);
-    if(it == descriptors_.end())
-    {
-        throw D3D12Exception(
-            "undeclared resource descriptor of " + resource->getName());
-    }
-
-    assert(it->second[index]->cpu);
-    return it->second[index]->cpuDescriptor;
-}
-
-Descriptor PassContext::getGPUDescriptor(const Resource *resource, int index)
-{
-    const auto it = descriptors_.find(resource);
-    if(it == descriptors_.end())
-    {
-        throw D3D12Exception(
-            "undeclared resource descriptor of " + resource->getName());
-    }
-
-    assert(it->second[index]->gpu);
-    return it->second[index]->gpuDescriptor;
-}*/
-
 Descriptor PassContext::getDescriptor(const Resource *resource)
 {
     const auto it = descriptorResourceMap_.find(resource);

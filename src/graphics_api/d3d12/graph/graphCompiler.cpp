@@ -428,38 +428,6 @@ DescriptorItem *Pass::addDSV(
     return item;
 }
 
-/*void Pass::addSRV(
-    DescriptorType                         type,
-    const Resource                        *resource,
-    ShaderResourceType                     shaderResourceType,
-    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
-{
-    descriptors_[resource].push_back({ resource, type, desc, shaderResourceType, {} });
-}
-
-void Pass::addUAV(
-    DescriptorType                          type,
-    const Resource                         *resource,
-    const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
-{
-    descriptors_[resource].push_back({ resource, type, desc, {}, {} });
-}
-
-void Pass::addRTV(
-    const Resource                      *resource,
-    const D3D12_RENDER_TARGET_VIEW_DESC &desc)
-{
-    descriptors_[resource].push_back({ resource, CPUOnly, desc, {}, {} });
-}
-
-void Pass::addDSV(
-    const Resource                      *resource,
-    DepthStencilType                     depthStencilType,
-    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
-{
-    descriptors_[resource].push_back({ resource, CPUOnly, desc, {}, depthStencilType });
-}*/
-
 DescriptorItem *Pass::addDescriptor(bool cpuVisible, bool gpuVisible)
 {
     descriptors_.push_back(
@@ -473,16 +441,6 @@ DescriptorTable *Pass::addDescriptorTable(bool cpuVisible, bool gpuVisible)
         std::make_unique<DescriptorTable>(cpuVisible, gpuVisible));
     return descriptorTables_.back().get();
 }
-
-/*bool Pass::DescriptorDeclaretion::operator<(
-    const DescriptorDeclaretion &rhs) const
-{
-    auto L = std::tie(
-        resource, type, shaderResourceType, depthStencilType);
-    auto R = std::tie(
-        rhs.resource, rhs.type, rhs.shaderResourceType, rhs.depthStencilType);
-    return L < R || (L == R && view < rhs.view);
-}*/
 
 PassAggregate::PassAggregate(std::string name)
     : name_(std::move(name)), entry_(nullptr), exit_(nullptr)
@@ -518,8 +476,7 @@ const PassAggregate *PassAggregate::asAggregate() const
 GraphCompiler::GraphCompiler()
     : threadCount_(0), queueCount_(0), frameCount_(0)
 {
-    auto entryPass = addPass("main_queue_entry_pass#auto-generated");
-    entryPass->setCallback([](PassContext &) { });
+
 }
 
 void GraphCompiler::setThreadCount(int count)
@@ -607,8 +564,6 @@ void GraphCompiler::compile(
         throw D3D12Exception(
             "invalid thread count value: " + std::to_string(threadCount_));
     }
-
-    addEntryDependencyForComputePasses();
 
     Temps temps = assignSectionsToThreads();
 
@@ -726,15 +681,6 @@ std::vector<int> GraphCompiler::sortPasses() const
     }
 
     return result;
-}
-
-void GraphCompiler::addEntryDependencyForComputePasses()
-{
-    for(auto &p : passes_)
-    {
-        if(p->queue_ != 0 && p->in_.empty())
-            addDependency(passes_[0].get(), p.get());
-    }
 }
 
 GraphCompiler::Temps GraphCompiler::assignSectionsToThreads() const
@@ -1221,8 +1167,7 @@ void GraphCompiler::generateDescriptorRecords(Temps &temps)
     {
         int thread = 0;
         DescriptorItem *item = nullptr;
-        //Pass::DescriptorDeclaretion decl;
-
+        
         bool operator<(const DescriptorKey &rhs) const
         {
             return std::tie(thread, *item) < std::tie(rhs.thread, *rhs.item);
@@ -1405,9 +1350,6 @@ void GraphCompiler::fillRuntimeDescriptors(
 {
     // count descs
 
-    //auto isCPUDesc = [](auto type) { return type != Pass::GPUOnly; };
-    //auto isGPUDesc = [](auto type) { return type != Pass::CPUOnly; };
-
     uint32_t cpuDescCount = 0, gpuDescCount = 0, rtvCount = 0, dsvCount = 0;
 
     size_t descSlotCount = 0, descTableSlotCount = 0;
@@ -1423,13 +1365,13 @@ void GraphCompiler::fillRuntimeDescriptors(
                 descDecl.item->view_,
                 [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &)
             {
-                cpuDescCount += descDecl.item->cpu_;// isCPUDesc(descDecl.item->cpu_.type);
-                gpuDescCount += descDecl.item->gpu_;// isGPUDesc(descDecl.item->gpu_.type);
+                cpuDescCount += descDecl.item->cpu_;
+                gpuDescCount += descDecl.item->gpu_;
             },
                 [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &)
             {
-                cpuDescCount += descDecl.item->cpu_;// isCPUDesc(descDecl.item->cpu_.type);
-                gpuDescCount += descDecl.item->gpu_;// isGPUDesc(descDecl.item->gpu_.type);
+                cpuDescCount += descDecl.item->cpu_;
+                gpuDescCount += descDecl.item->gpu_;
             },
                 [&](const D3D12_RENDER_TARGET_VIEW_DESC &)
             {
@@ -1539,10 +1481,10 @@ void GraphCompiler::fillRuntimeDescriptors(
             threadData.descriptorSlots.push_back(d.slot);
             auto &slot = runtime.descriptorSlots_[d.slot];
 
-            slot.resourceIndex = d.item->resource_->getIndex();// .decl.resource->getIndex();
-            slot.cpu           = d.item->cpu_; //isCPUDesc(d.decl.type);
-            slot.gpu           = d.item->gpu_; //isGPUDesc(d.decl.type);
-            slot.view          = d.item->view_; //.view;
+            slot.resourceIndex = d.item->resource_->getIndex();
+            slot.cpu           = d.item->cpu_;
+            slot.gpu           = d.item->gpu_;
+            slot.view          = d.item->view_;
             slot.isDirty       = true;
 
             if(slot.view.is<D3D12_RENDER_TARGET_VIEW_DESC>())
@@ -1721,10 +1663,6 @@ void GraphCompiler::fillRuntimeSections(
                         d.item,
                         &runtime.descriptorSlots_[d.descriptorSlot]
                     });
-                    //descriptorMap[d.item] =
-                    //    &runtime.descriptorSlots_[d.descriptorSlot];
-                    //descriptorMap[d.resource].push_back(
-                    //    &runtime.descriptorSlots_[d.descriptorSlot]);
                 }
 
                 for(auto &d : passTemp.descriptorRanges_)

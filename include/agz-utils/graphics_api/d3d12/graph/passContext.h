@@ -9,7 +9,6 @@ class PassContext : public misc::uncopyable_t
 {
 public:
 
-    //using DescriptorMap      = std::map<const Resource *, std::vector<DescriptorSlot *>>;
     using DescriptorMap         = std::map<const DescriptorItem *,  DescriptorSlot *>;
     using DescriptorResourceMap = std::map<const Resource *,        DescriptorSlot *>;
     using DescriptorRangeMap    = std::map<const DescriptorTable *, DescriptorRangeSlot *>;

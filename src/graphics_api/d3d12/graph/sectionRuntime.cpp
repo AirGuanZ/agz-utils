@@ -72,14 +72,6 @@ void SectionRuntime::execute(
     ID3D12DescriptorHeap      **GPUHeaps,
     int                         GPUHeapCount)
 {
-    auto &queue = allQueues[queueIndex_];
-
-    for(auto &f : waitFences_)
-        queue->Wait(f.Get(), fenceValue);
-
-    for(auto &f : waitFencesOfLastFrame_)
-        queue->Wait(f.Get(), fenceValue - 1);
-
     auto &cmdList = perFrameCmdList_[frameIndex];
     if(!cmdList)
     {
@@ -98,23 +90,35 @@ void SectionRuntime::execute(
 
     cmdList->Close();
 
-    if(signalFence_)
-        queue->Signal(signalFence_.Get(), fenceValue);
-
-    increaseFinishedDependenciesCount(frameIndex, allQueues);
+    increaseFinishedDependenciesCount(frameIndex, allQueues, fenceValue);
 }
 
 void SectionRuntime::increaseFinishedDependenciesCount(
     int                         frameIndex,
-    ComPtr<ID3D12CommandQueue> *allQueues)
+    ComPtr<ID3D12CommandQueue> *allQueues,
+    UINT64                      fenceValue)
 {
     if(!--unfinishedDependencies_)
     {
+        auto queue = allQueues[queueIndex_];
+
+        for(auto &f : waitFences_)
+            queue->Wait(f.Get(), fenceValue);
+
+        for(auto &f : waitFencesOfLastFrame_)
+            queue->Wait(f.Get(), fenceValue - 1);
+
         ID3D12CommandList *rawCmdList = perFrameCmdList_[frameIndex].Get();
         allQueues[queueIndex_]->ExecuteCommandLists(1, &rawCmdList);
 
+        if(signalFence_)
+            queue->Signal(signalFence_.Get(), fenceValue);
+
         for(auto o : out_)
-            o->increaseFinishedDependenciesCount(frameIndex, allQueues);
+        {
+            o->increaseFinishedDependenciesCount(
+                frameIndex, allQueues, fenceValue);
+        }
     }
 }
 
