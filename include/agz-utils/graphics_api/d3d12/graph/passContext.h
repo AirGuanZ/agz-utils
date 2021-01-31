@@ -9,8 +9,10 @@ class PassContext : public misc::uncopyable_t
 {
 public:
 
-    using DescriptorMap      = std::map<const Resource *, std::vector<DescriptorSlot *>>;
-    using DescriptorRangeMap = std::map<const DescriptorTable *, DescriptorRangeSlot *>;
+    //using DescriptorMap      = std::map<const Resource *, std::vector<DescriptorSlot *>>;
+    using DescriptorMap         = std::map<const DescriptorItem *,  DescriptorSlot *>;
+    using DescriptorResourceMap = std::map<const Resource *,        DescriptorSlot *>;
+    using DescriptorRangeMap    = std::map<const DescriptorTable *, DescriptorRangeSlot *>;
 
     struct ResourceUsage
     {
@@ -19,11 +21,12 @@ public:
     };
 
     PassContext(
-        GraphRuntime             *runtime,
-        int                       frameIndex,
-        RawGraphicsCommandList   *cmdList,
-        const DescriptorMap      &descriptors,
-        const DescriptorRangeMap &descriptorRanges);
+        GraphRuntime                *runtime,
+        int                          frameIndex,
+        RawGraphicsCommandList      *cmdList,
+        const DescriptorMap         &descriptors,
+        const DescriptorResourceMap &descriptorResources,
+        const DescriptorRangeMap    &descriptorRanges);
 
     int getFrameIndex() const;
 
@@ -33,11 +36,17 @@ public:
 
     ID3D12Resource *getRawResource(const Resource *resource);
 
-    Descriptor getDescriptor(const Resource *resource, int index = 0);
+    Descriptor getDescriptor(const Resource *resource);
+    
+    Descriptor getCPUDescriptor(const Resource *resource);
+    
+    Descriptor getGPUDescriptor(const Resource *resource);
 
-    Descriptor getCPUDescriptor(const Resource *resource, int index = 0);
+    Descriptor getDescriptor(const DescriptorItem *item);
 
-    Descriptor getGPUDescriptor(const Resource *resource, int index = 0);
+    Descriptor getCPUDescriptor(const DescriptorItem *item);
+
+    Descriptor getGPUDescriptor(const DescriptorItem *item);
 
     DescriptorRange getDescriptorRange(const DescriptorTable *table);
 
@@ -52,8 +61,9 @@ private:
     int                     frameIndex_;
     RawGraphicsCommandList *cmdList_;
 
-    const DescriptorMap      &descriptors_;
-    const DescriptorRangeMap &descriptorRanges_;
+    const DescriptorMap         &descriptors_;
+    const DescriptorResourceMap &descriptorResourceMap_;
+    const DescriptorRangeMap    &descriptorRanges_;
 };
 
 AGZ_D3D12_GRAPH_END

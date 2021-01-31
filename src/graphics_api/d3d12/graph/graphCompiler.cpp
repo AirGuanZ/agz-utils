@@ -272,6 +272,64 @@ const PassAggregate *Vertex::asAggregate() const
     return nullptr;
 }
 
+DescriptorItem::DescriptorItem(bool cpu, bool gpu)
+    : cpu_(cpu), gpu_(gpu)
+{
+    
+}
+
+void DescriptorItem::setSRV(
+    const Resource                        *resource,
+    ShaderResourceType                     type,
+    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
+{
+    resource_           = resource;
+    view_               = desc;
+    shaderResourceType_ = type;
+}
+
+void DescriptorItem::setUAV(
+    const Resource                         *resource,
+    const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
+{
+    resource_ = resource;
+    view_     = desc;
+}
+
+void DescriptorItem::setRTV(
+    const Resource                      *resource,
+    const D3D12_RENDER_TARGET_VIEW_DESC &desc)
+{
+    resource_ = resource;
+    view_     = desc;
+}
+
+void DescriptorItem::setDSV(
+    const Resource                      *resource,
+    DepthStencilType                     type,
+    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
+{
+    resource_         = resource;
+    depthStencilType_ = type;
+    view_             = desc;
+}
+
+const Resource *DescriptorItem::getResource() const
+{
+    return resource_;
+}
+
+bool DescriptorItem::operator<(const DescriptorItem &rhs) const
+{
+    auto L = std::tie(
+        resource_, cpu_, gpu_,
+        shaderResourceType_, depthStencilType_);
+    auto R = std::tie(
+        rhs.resource_, cpu_, gpu_,
+        rhs.shaderResourceType_, rhs.depthStencilType_);
+    return L < R || (L == R && view_ < rhs.view_);
+}
+
 Pass::Pass(std::string name, int index)
     : name_(std::move(name)), index_(index),
       thread_(0), queue_(0)
@@ -328,7 +386,49 @@ void Pass::addResourceState(
     states_.insert({ resource, { state, subrsc } });
 }
 
-void Pass::addSRV(
+DescriptorItem *Pass::addSRV(
+    bool                                   cpu,
+    bool                                   gpu,
+    const Resource                        *resource,
+    ShaderResourceType                     shaderResourceType,
+    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
+{
+    auto item = addDescriptor(cpu, gpu);
+    item->setSRV(resource, shaderResourceType, desc);
+    return item;
+}
+
+DescriptorItem *Pass::addUAV(
+    bool                                    cpu,
+    bool                                    gpu,
+    const Resource                         *resource,
+    const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
+{
+    auto item = addDescriptor(cpu, gpu);
+    item->setUAV(resource, desc);
+    return item;
+}
+
+DescriptorItem *Pass::addRTV(
+    const Resource                      *resource,
+    const D3D12_RENDER_TARGET_VIEW_DESC &desc)
+{
+    auto item = addDescriptor(true, false);
+    item->setRTV(resource, desc);
+    return item;
+}
+
+DescriptorItem *Pass::addDSV(
+    const Resource                      *resource,
+    DepthStencilType                     depthStencilType,
+    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
+{
+    auto item = addDescriptor(true, false);
+    item->setDSV(resource, depthStencilType, desc);
+    return item;
+}
+
+/*void Pass::addSRV(
     DescriptorType                         type,
     const Resource                        *resource,
     ShaderResourceType                     shaderResourceType,
@@ -358,17 +458,23 @@ void Pass::addDSV(
     const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
 {
     descriptors_[resource].push_back({ resource, CPUOnly, desc, {}, depthStencilType });
+}*/
+
+DescriptorItem *Pass::addDescriptor(bool cpuVisible, bool gpuVisible)
+{
+    descriptors_.push_back(
+        std::make_unique<DescriptorItem>(cpuVisible, gpuVisible));
+    return descriptors_.back().get();
 }
 
-DescriptorTable *Pass::addDescriptorTable(DescriptorType type)
+DescriptorTable *Pass::addDescriptorTable(bool cpuVisible, bool gpuVisible)
 {
-    const bool cpu = type != GPUOnly;
-    const bool gpu = type != CPUOnly;
-    descriptorTables_.push_back(std::make_unique<DescriptorTable>(cpu, gpu));
+    descriptorTables_.push_back(
+        std::make_unique<DescriptorTable>(cpuVisible, gpuVisible));
     return descriptorTables_.back().get();
 }
 
-bool Pass::DescriptorDeclaretion::operator<(
+/*bool Pass::DescriptorDeclaretion::operator<(
     const DescriptorDeclaretion &rhs) const
 {
     auto L = std::tie(
@@ -376,7 +482,7 @@ bool Pass::DescriptorDeclaretion::operator<(
     auto R = std::tie(
         rhs.resource, rhs.type, rhs.shaderResourceType, rhs.depthStencilType);
     return L < R || (L == R && view < rhs.view);
-}
+}*/
 
 PassAggregate::PassAggregate(std::string name)
     : name_(std::move(name)), entry_(nullptr), exit_(nullptr)
@@ -956,22 +1062,19 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
             });
         };
 
-        for(auto &descDeclVec : p->descriptors_)
+        for(auto &descDecl : p->descriptors_)
         {
-            for(auto &descDecl : descDeclVec.second)
-            {
-                auto subrscs = viewToSubresources(
-                    descDecl.resource->getDescription(), descDecl.view);
+            auto subrscs = viewToSubresources(
+                descDecl->resource_->getDescription(), descDecl->view_);
 
-                for(UINT s : subrscs)
-                {
-                    addNewDescDecl(
-                        descDecl.resource,
-                        s,
-                        descDecl.view,
-                        descDecl.shaderResourceType,
-                        descDecl.depthStencilType);
-                }
+            for(UINT s : subrscs)
+            {
+                addNewDescDecl(
+                    descDecl->resource_,
+                    s,
+                    descDecl->view_,
+                    descDecl->shaderResourceType_,
+                    descDecl->depthStencilType_);
             }
         }
 
@@ -1117,11 +1220,12 @@ void GraphCompiler::generateDescriptorRecords(Temps &temps)
     struct DescriptorKey
     {
         int thread = 0;
-        Pass::DescriptorDeclaretion decl;
+        DescriptorItem *item = nullptr;
+        //Pass::DescriptorDeclaretion decl;
 
         bool operator<(const DescriptorKey &rhs) const
         {
-            return std::tie(thread, decl) < std::tie(rhs.thread, rhs.decl);
+            return std::tie(thread, *item) < std::tie(rhs.thread, *rhs.item);
         }
     };
 
@@ -1136,7 +1240,7 @@ void GraphCompiler::generateDescriptorRecords(Temps &temps)
         const int newSlot = static_cast<int>(descriptorSlotCache.size());
         descriptorSlotCache.insert({ key, newSlot });
 
-        temps.threads[key.thread].descDecls.push_back({ newSlot, key.decl });
+        temps.threads[key.thread].descDecls.push_back({ newSlot, key.item });
 
         return newSlot;
     };
@@ -1144,14 +1248,11 @@ void GraphCompiler::generateDescriptorRecords(Temps &temps)
     for(auto &p : passes_)
     {
         auto &passTemp = temps.passes[p->getIndex()];
-        for(auto &descDeclVec : p->descriptors_)
+        for(auto &u : p->descriptors_)
         {
-            for(auto &u : descDeclVec.second)
-            {
-                assert(!u.view.is<std::monostate>());
-                const int slot = allocateDescriptorSlot({ p->thread_, u });
-                passTemp.descriptors_.push_back({ u.resource, slot });
-            }
+            assert(!u->view_.is<std::monostate>());
+            const int slot = allocateDescriptorSlot({ p->thread_, u.get() });
+            passTemp.descriptors_.push_back({ u.get(), slot });
         }
     }
 
@@ -1282,7 +1383,7 @@ void GraphCompiler::fillRuntimeResources(
         for(auto &dr : thread.descDecls)
         {
             addDescSlot(
-                runtime.resources_[dr.decl.resource->getIndex()], dr.slot);
+                runtime.resources_[dr.item->resource_->getIndex()], dr.slot);
         }
 
         for(auto &dr : thread.descRanges)
@@ -1304,8 +1405,8 @@ void GraphCompiler::fillRuntimeDescriptors(
 {
     // count descs
 
-    auto isCPUDesc = [](auto type) { return type != Pass::GPUOnly; };
-    auto isGPUDesc = [](auto type) { return type != Pass::CPUOnly; };
+    //auto isCPUDesc = [](auto type) { return type != Pass::GPUOnly; };
+    //auto isGPUDesc = [](auto type) { return type != Pass::CPUOnly; };
 
     uint32_t cpuDescCount = 0, gpuDescCount = 0, rtvCount = 0, dsvCount = 0;
 
@@ -1319,16 +1420,16 @@ void GraphCompiler::fillRuntimeDescriptors(
         for(auto &descDecl : t.descDecls)
         {
             match_variant(
-                descDecl.decl.view,
+                descDecl.item->view_,
                 [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &)
             {
-                cpuDescCount += isCPUDesc(descDecl.decl.type);
-                gpuDescCount += isGPUDesc(descDecl.decl.type);
+                cpuDescCount += descDecl.item->cpu_;// isCPUDesc(descDecl.item->cpu_.type);
+                gpuDescCount += descDecl.item->gpu_;// isGPUDesc(descDecl.item->gpu_.type);
             },
                 [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &)
             {
-                cpuDescCount += isCPUDesc(descDecl.decl.type);
-                gpuDescCount += isGPUDesc(descDecl.decl.type);
+                cpuDescCount += descDecl.item->cpu_;// isCPUDesc(descDecl.item->cpu_.type);
+                gpuDescCount += descDecl.item->gpu_;// isGPUDesc(descDecl.item->gpu_.type);
             },
                 [&](const D3D12_RENDER_TARGET_VIEW_DESC &)
             {
@@ -1438,10 +1539,10 @@ void GraphCompiler::fillRuntimeDescriptors(
             threadData.descriptorSlots.push_back(d.slot);
             auto &slot = runtime.descriptorSlots_[d.slot];
 
-            slot.resourceIndex = d.decl.resource->getIndex();
-            slot.cpu           = isCPUDesc(d.decl.type);
-            slot.gpu           = isGPUDesc(d.decl.type);
-            slot.view          = d.decl.view;
+            slot.resourceIndex = d.item->resource_->getIndex();// .decl.resource->getIndex();
+            slot.cpu           = d.item->cpu_; //isCPUDesc(d.decl.type);
+            slot.gpu           = d.item->gpu_; //isGPUDesc(d.decl.type);
+            slot.view          = d.item->view_; //.view;
             slot.isDirty       = true;
 
             if(slot.view.is<D3D12_RENDER_TARGET_VIEW_DESC>())
@@ -1616,8 +1717,14 @@ void GraphCompiler::fillRuntimeSections(
 
                 for(auto &d : passTemp.descriptors_)
                 {
-                    descriptorMap[d.resource].push_back(
-                        &runtime.descriptorSlots_[d.descriptorSlot]);
+                    descriptorMap.insert({
+                        d.item,
+                        &runtime.descriptorSlots_[d.descriptorSlot]
+                    });
+                    //descriptorMap[d.item] =
+                    //    &runtime.descriptorSlots_[d.descriptorSlot];
+                    //descriptorMap[d.resource].push_back(
+                    //    &runtime.descriptorSlots_[d.descriptorSlot]);
                 }
 
                 for(auto &d : passTemp.descriptorRanges_)

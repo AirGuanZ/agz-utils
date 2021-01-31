@@ -10,6 +10,7 @@
 
 AGZ_D3D12_GRAPH_BEGIN
 
+class DescriptorItem;
 class DescriptorTable;
 class ExternalResource;
 class InternalResource;

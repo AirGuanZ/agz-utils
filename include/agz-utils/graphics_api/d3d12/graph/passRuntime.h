@@ -38,6 +38,8 @@ private:
     PassContext::DescriptorMap      descriptors_;
     PassContext::DescriptorRangeMap descriptorRanges_;
 
+    PassContext::DescriptorResourceMap descriptorResourcesMap_;
+
     mutable std::vector<D3D12_RESOURCE_BARRIER> entryBarriers_;
     mutable std::vector<D3D12_RESOURCE_BARRIER> exitBarriers_;
 };

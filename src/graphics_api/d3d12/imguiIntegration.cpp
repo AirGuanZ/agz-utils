@@ -173,11 +173,12 @@ rg::Pass *ImGuiIntegration::addToRenderGraph(
     }
 
     auto pass = graph.addPass("render imgui", thread, queue);
-    pass->addRTV(renderTarget, RTVDesc);
 
-    pass->setCallback([this, renderTarget](rg::PassContext &ctx)
+    auto rtvItem = pass->addRTV(renderTarget, RTVDesc);
+
+    pass->setCallback([this, rtvItem](rg::PassContext &ctx)
     {
-        auto rawRTV = ctx.getDescriptor(renderTarget).getCPUHandle();
+        auto rawRTV = ctx.getDescriptor(rtvItem).getCPUHandle();
         ctx->OMSetRenderTargets(1, &rawRTV, false, nullptr);
         render(ctx.getCommandList());
     });

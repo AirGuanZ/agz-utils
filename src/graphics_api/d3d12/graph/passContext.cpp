@@ -7,15 +7,17 @@
 AGZ_D3D12_GRAPH_BEGIN
 
 PassContext::PassContext(
-    GraphRuntime             *runtime,
-    int                       frameIndex,
-    RawGraphicsCommandList   *cmdList,
-    const DescriptorMap      &descriptors,
-    const DescriptorRangeMap &descriptorRanges)
+    GraphRuntime                *runtime,
+    int                          frameIndex,
+    RawGraphicsCommandList      *cmdList,
+    const DescriptorMap         &descriptors,
+    const DescriptorResourceMap &descriptorResources,
+    const DescriptorRangeMap    &descriptorRanges)
     : runtime_(runtime),
       frameIndex_(frameIndex),
       cmdList_(cmdList),
       descriptors_(descriptors),
+      descriptorResourceMap_(descriptorResources),
       descriptorRanges_(descriptorRanges)
 {
     
@@ -41,7 +43,7 @@ ID3D12Resource *PassContext::getRawResource(const Resource *resource)
     return runtime_->getRawResource(resource);
 }
 
-Descriptor PassContext::getDescriptor(const Resource *resource, int index)
+/*Descriptor PassContext::getDescriptor(const Resource *resource, int index)
 {
     const auto it = descriptors_.find(resource);
     if(it == descriptors_.end())
@@ -79,6 +81,86 @@ Descriptor PassContext::getGPUDescriptor(const Resource *resource, int index)
 
     assert(it->second[index]->gpu);
     return it->second[index]->gpuDescriptor;
+}*/
+
+Descriptor PassContext::getDescriptor(const Resource *resource)
+{
+    const auto it = descriptorResourceMap_.find(resource);
+    if(it == descriptorResourceMap_.end())
+    {
+        throw D3D12Exception(
+            "undeclared resource descriptor");
+    }
+
+    assert(it->second->cpu ^ it->second->gpu);
+    return it->second->cpu ?
+        it->second->cpuDescriptor : it->second->gpuDescriptor;
+}
+
+Descriptor PassContext::getCPUDescriptor(const Resource *resource)
+{
+    const auto it = descriptorResourceMap_.find(resource);
+    if(it == descriptorResourceMap_.end())
+    {
+        throw D3D12Exception(
+            "undeclared resource descriptor");
+    }
+
+    assert(it->second->cpu);
+    return it->second->cpuDescriptor;
+}
+
+Descriptor PassContext::getGPUDescriptor(const Resource *resource)
+{
+    const auto it = descriptorResourceMap_.find(resource);
+    if(it == descriptorResourceMap_.end())
+    {
+        throw D3D12Exception(
+            "undeclared resource descriptor");
+    }
+
+    assert(it->second->gpu);
+    return it->second->gpuDescriptor;
+}
+
+Descriptor PassContext::getDescriptor(const DescriptorItem *item)
+{
+    const auto it = descriptors_.find(item);
+    if(it == descriptors_.end())
+    {
+        throw D3D12Exception(
+            "undeclared resource descriptor");
+    }
+
+    assert(it->second->cpu ^ it->second->gpu);
+    return it->second->cpu ?
+        it->second->cpuDescriptor : it->second->gpuDescriptor;
+}
+
+Descriptor PassContext::getCPUDescriptor(const DescriptorItem *item)
+{
+    const auto it = descriptors_.find(item);
+    if(it == descriptors_.end())
+    {
+        throw D3D12Exception(
+            "undeclared resource descriptor");
+    }
+
+    assert(it->second->cpu);
+    return it->second->cpuDescriptor;
+}
+
+Descriptor PassContext::getGPUDescriptor(const DescriptorItem *item)
+{
+    const auto it = descriptors_.find(item);
+    if(it == descriptors_.end())
+    {
+        throw D3D12Exception(
+            "undeclared resource descriptor");
+    }
+
+    assert(it->second->gpu);
+    return it->second->gpuDescriptor;
 }
 
 DescriptorRange PassContext::getDescriptorRange(const DescriptorTable *table)
@@ -90,7 +172,7 @@ DescriptorRange PassContext::getDescriptorRange(const DescriptorTable *table)
             "undeclared resource descriptor range");
     }
 
-    assert(it->second->cpu ^it->second->gpu);
+    assert(it->second->cpu ^ it->second->gpu);
     return it->second->cpu ?
         it->second->cpuDescriptorRange : it->second->gpuDescriptorRange;
 }

@@ -111,6 +111,61 @@ enum class DepthStencilType
     ReadAndWrite
 };
 
+class DescriptorItem
+{
+public:
+
+    DescriptorItem(bool cpu, bool gpu);
+
+    void setSRV(
+        const Resource                        *resource,
+        ShaderResourceType                     type,
+        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc);
+    
+    void setUAV(
+        const Resource                         *resource,
+        const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc);
+
+    void setRTV(
+        const Resource                      *resource,
+        const D3D12_RENDER_TARGET_VIEW_DESC &desc);
+
+    void setDSV(
+        const Resource                      *resource,
+        DepthStencilType                     type,
+        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc);
+    
+    void setSRV(
+        const Resource                        *resource,
+        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
+    {
+        setSRV(resource, ShaderResourceType::PixelAndNonPixel, desc);
+    }
+    
+    void setDSV(
+        const Resource                      *resource,
+        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
+    {
+        setDSV(resource, DepthStencilType::ReadAndWrite, desc);
+    }
+
+    const Resource *getResource() const;
+
+    bool operator<(const DescriptorItem &rhs) const;
+
+private:
+
+    friend class GraphCompiler;
+
+    bool cpu_;
+    bool gpu_;
+
+    const Resource    *resource_           = nullptr;
+    ResourceView       view_               = {};
+    ShaderResourceType shaderResourceType_ = ShaderResourceType::PixelAndNonPixel;
+    DepthStencilType   depthStencilType_   = DepthStencilType::ReadAndWrite;
+};
+
 class DescriptorTable
 {
 public:
@@ -193,13 +248,6 @@ class Pass : public Vertex
 {
 public:
 
-    enum DescriptorType
-    {
-        CPUOnly,
-        GPUOnly,
-        BothCPUAndGPU
-    };
-
     Pass(std::string name, int index);
 
     Pass *asPass() override;
@@ -228,43 +276,48 @@ public:
         D3D12_RESOURCE_STATES state,
         UINT                  subrsc = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
 
-    void addSRV(
-        DescriptorType                         type,
+    DescriptorItem *addSRV(
+        bool                                   cpu,
+        bool                                   gpu,
         const Resource                        *resource,
         ShaderResourceType                     shaderResourceType,
         const D3D12_SHADER_RESOURCE_VIEW_DESC &desc);
 
-    void addUAV(
-        DescriptorType                          type,
+    DescriptorItem *addUAV(
+        bool                                   cpu,
+        bool                                   gpu,
         const Resource                         *resource,
         const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc);
 
-    void addRTV(
+    DescriptorItem *addRTV(
         const Resource                      *resource,
         const D3D12_RENDER_TARGET_VIEW_DESC &desc);
 
-    void addDSV(
+    DescriptorItem *addDSV(
         const Resource                      *resource,
         DepthStencilType                     depthStencilType,
         const D3D12_DEPTH_STENCIL_VIEW_DESC &desc);
     
-    void addSRV(
-        DescriptorType                         type,
+    DescriptorItem *addSRV(
+        bool                                   cpu,
+        bool                                   gpu,
         const Resource                        *resource,
         const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
     {
-        addSRV(
-            type, resource, ShaderResourceType::PixelAndNonPixel, desc);
+        return addSRV(
+            cpu, gpu, resource, ShaderResourceType::PixelAndNonPixel, desc);
     }
     
-    void addDSV(
+    DescriptorItem *addDSV(
         const Resource                      *resource,
         const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
     {
-        addDSV(resource, DepthStencilType::ReadAndWrite, desc);
+        return addDSV(resource, DepthStencilType::ReadAndWrite, desc);
     }
 
-    DescriptorTable *addDescriptorTable(DescriptorType type);
+    DescriptorItem *addDescriptor(bool cpuVisible, bool gpuVisible);
+
+    DescriptorTable *addDescriptorTable(bool cpuVisible, bool gpuVisible);
 
 private:
 
@@ -276,7 +329,7 @@ private:
         UINT                  subresource = 0;
     };
 
-    struct DescriptorDeclaretion
+    /*struct DescriptorDeclaretion
     {
         const Resource    *resource           = nullptr;
         DescriptorType     type               = CPUOnly;
@@ -285,7 +338,7 @@ private:
         DepthStencilType   depthStencilType   = DepthStencilType::ReadAndWrite;
 
         bool operator<(const DescriptorDeclaretion &rhs) const;
-    };
+    };*/
 
     std::string name_;
     int         index_;
@@ -301,9 +354,10 @@ private:
     std::set<Pass *> inFromLastFrame_;
     std::set<Pass *> outToNextFrame_;
 
-    std::map<const Resource*, ResourceStateRecord>                 states_;
-    std::map<const Resource *, std::vector<DescriptorDeclaretion>> descriptors_;
-    std::vector<std::unique_ptr<DescriptorTable>>                  descriptorTables_;
+    std::map<const Resource*, ResourceStateRecord> states_;
+    //std::map<const Resource *, std::vector<DescriptorDeclaretion>> descriptors_;
+    std::vector<std::unique_ptr<DescriptorItem>>   descriptors_;
+    std::vector<std::unique_ptr<DescriptorTable>>  descriptorTables_;
 };
 
 class PassAggregate : public Vertex
@@ -381,8 +435,9 @@ private:
 
         struct DescriptorDeclaretion
         {
-            const Resource *resource       = nullptr;
-            int             descriptorSlot = 0;
+            //const Resource *resource       = nullptr;
+            const DescriptorItem *item           = nullptr;
+            int                   descriptorSlot = 0;
         };
 
         struct DescriptorTableDeclaretion
@@ -417,8 +472,9 @@ private:
 
         struct DescriptorRecord
         {
-            int                         slot;
-            Pass::DescriptorDeclaretion decl;
+            int                   slot;
+            const DescriptorItem *item;
+            //Pass::DescriptorDeclaretion decl;
         };
 
         struct DescriptorRangeRecord
