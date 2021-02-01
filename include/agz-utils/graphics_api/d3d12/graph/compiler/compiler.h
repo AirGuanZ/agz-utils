@@ -103,7 +103,7 @@ private:
             const DescriptorTable *table;
         };
 
-        std::vector<DescriptorRecord>      descDecls;
+        std::vector<DescriptorRecord>      descs;
         std::vector<DescriptorRangeRecord> descRanges;
     };
 

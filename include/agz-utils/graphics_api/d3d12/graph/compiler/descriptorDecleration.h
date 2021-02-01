@@ -17,6 +17,17 @@ enum class DepthStencilType
     ReadAndWrite
 };
 
+struct DescriptorInfo
+{
+    const Resource    *resource           = nullptr;
+    ResourceView       view               = {};
+    ShaderResourceType shaderResourceType = ShaderResourceType::PixelAndNonPixel;
+    DepthStencilType   depthStencilType   = DepthStencilType::ReadAndWrite;
+    const Resource    *uavCounterResource = nullptr;
+
+    bool operator<(const DescriptorInfo &info) const;
+};
+
 class DescriptorItem
 {
 public:
@@ -30,6 +41,7 @@ public:
     
     void setUAV(
         const Resource                         *resource,
+        const Resource                         *uavCounterResource,
         const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc);
 
     void setRTV(
@@ -40,20 +52,6 @@ public:
         const Resource                      *resource,
         DepthStencilType                     type,
         const D3D12_DEPTH_STENCIL_VIEW_DESC &desc);
-    
-    void setSRV(
-        const Resource                        *resource,
-        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
-    {
-        setSRV(resource, ShaderResourceType::PixelAndNonPixel, desc);
-    }
-    
-    void setDSV(
-        const Resource                      *resource,
-        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
-    {
-        setDSV(resource, DepthStencilType::ReadAndWrite, desc);
-    }
 
     const Resource *getResource() const;
 
@@ -66,10 +64,7 @@ private:
     bool cpu_;
     bool gpu_;
 
-    const Resource    *resource_           = nullptr;
-    ResourceView       view_               = {};
-    ShaderResourceType shaderResourceType_ = ShaderResourceType::PixelAndNonPixel;
-    DepthStencilType   depthStencilType_   = DepthStencilType::ReadAndWrite;
+    DescriptorInfo info_;
 };
 
 class DescriptorTable
@@ -85,6 +80,7 @@ public:
 
     void addUAV(
         const Resource                         *resource,
+        const Resource                         *uavCounterResource,
         const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc);
 
     void addRTV(
@@ -95,20 +91,6 @@ public:
         const Resource                      *resource,
         DepthStencilType                     type,
         const D3D12_DEPTH_STENCIL_VIEW_DESC &desc);
-    
-    void addSRV(
-        const Resource                        *resource,
-        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
-    {
-        addSRV(resource, ShaderResourceType::PixelAndNonPixel, desc);
-    }
-    
-    void addDSV(
-        const Resource                      *resource,
-        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
-    {
-        addDSV(resource, DepthStencilType::ReadAndWrite, desc);
-    }
 
     bool operator<(const DescriptorTable &rhs) const;
 
@@ -116,20 +98,10 @@ private:
 
     friend class Compiler;
 
-    struct Record
-    {
-        const Resource    *resource           = nullptr;
-        ResourceView       view               = {};
-        ShaderResourceType shaderResourceType = ShaderResourceType::PixelAndNonPixel;
-        DepthStencilType   depthStencilType   = DepthStencilType::ReadAndWrite;
-
-        bool operator<(const Record &rhs) const;
-    };
-
     bool cpu_;
     bool gpu_;
 
-    std::vector<Record> records_;
+    std::vector<DescriptorInfo> records_;
 };
 
 AGZ_D3D12_GRAPH_END

@@ -101,10 +101,11 @@ DescriptorItem *Pass::addUAV(
     bool                                    cpu,
     bool                                    gpu,
     const Resource                         *resource,
+    const Resource                         *uavCounterResource,
     const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
 {
     auto item = addDescriptor(cpu, gpu);
-    item->setUAV(resource, desc);
+    item->setUAV(resource, uavCounterResource, desc);
     return item;
 }
 

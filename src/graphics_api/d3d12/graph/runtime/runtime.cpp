@@ -293,6 +293,10 @@ void Runtime::refreshDescriptor(DescriptorSlot &slot)
         if(slot.gpuDescriptor)
             slot.freeGPUDescriptorQueue.push(slot.gpuDescriptor);
 
+        ID3D12Resource *uavCounterResource = nullptr;
+        if(slot.uavCounterResourceIndex >= 0)
+            uavCounterResource = getRawResource(slot.uavCounterResourceIndex);
+
         if(slot.cpu)
         {
             assert(!slot.freeCPUDescriptorQueue.empty());
@@ -300,7 +304,7 @@ void Runtime::refreshDescriptor(DescriptorSlot &slot)
             slot.freeCPUDescriptorQueue.pop();
 
             device_->CreateUnorderedAccessView(
-                resource, nullptr, &desc, slot.cpuDescriptor);
+                resource, uavCounterResource, &desc, slot.cpuDescriptor);
         }
 
         if(slot.gpu)
@@ -318,7 +322,7 @@ void Runtime::refreshDescriptor(DescriptorSlot &slot)
             else
             {
                 device_->CreateUnorderedAccessView(
-                    resource, nullptr, &desc, slot.gpuDescriptor);
+                    resource, uavCounterResource, &desc, slot.gpuDescriptor);
             }
         }
     },
@@ -368,6 +372,7 @@ void Runtime::refreshDescriptorRange(DescriptorRangeSlot &slot)
 
     auto createView = [&](
         ID3D12Resource   *resource,
+        int               uavCounterResourceIndex,
         const Descriptor &descriptor,
         ResourceView     &view)
     {
@@ -382,8 +387,13 @@ void Runtime::refreshDescriptorRange(DescriptorRangeSlot &slot)
             [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
         {
             assert(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+            ID3D12Resource *uavCounterResource = nullptr;
+            if(uavCounterResourceIndex >= 0)
+                uavCounterResource = getRawResource(uavCounterResourceIndex);
+
             device_->CreateUnorderedAccessView(
-                resource, nullptr, &desc, descriptor);
+                resource, uavCounterResource, &desc, descriptor);
         },
             [&](const D3D12_RENDER_TARGET_VIEW_DESC &desc)
         {
@@ -411,7 +421,11 @@ void Runtime::refreshDescriptorRange(DescriptorRangeSlot &slot)
         for(uint32_t i = 0; i < slot.views.size(); ++i)
         {
             ID3D12Resource *resource = getRawResource(slot.resourceIndices[i]);
-            createView(resource, slot.cpuDescriptorRange[i], slot.views[i]);
+            createView(
+                resource,
+                slot.uavCounterResourceIndices[i],
+                slot.cpuDescriptorRange[i],
+                slot.views[i]);
         }
     }
 
@@ -433,7 +447,11 @@ void Runtime::refreshDescriptorRange(DescriptorRangeSlot &slot)
             for(uint32_t i = 0; i < slot.views.size(); ++i)
             {
                 ID3D12Resource *resource = getRawResource(slot.resourceIndices[i]);
-                createView(resource, slot.gpuDescriptorRange[i], slot.views[i]);
+                createView(
+                    resource,
+                    slot.uavCounterResourceIndices[i],
+                    slot.gpuDescriptorRange[i],
+                    slot.views[i]);
             }
         }
     }

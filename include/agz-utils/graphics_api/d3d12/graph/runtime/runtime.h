@@ -12,6 +12,8 @@ struct DescriptorSlot
 {
     int resourceIndex = 0;
 
+    int uavCounterResourceIndex = 0;
+
     bool cpu = false;
     bool gpu = false;
     ResourceView view;
@@ -27,6 +29,8 @@ struct DescriptorSlot
 struct DescriptorRangeSlot
 {
     std::vector<int> resourceIndices;
+
+    std::vector<int> uavCounterResourceIndices;
 
     D3D12_DESCRIPTOR_HEAP_TYPE heapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     

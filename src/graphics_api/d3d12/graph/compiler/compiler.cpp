@@ -545,6 +545,7 @@ void Compiler::generateResourceTransitions(Temps &temps)
 
         auto addNewDescDecl = [&](
             const Resource     *resource,
+            const Resource     *uavCounterResource,
             UINT                subrsc,
             const ResourceView &view,
             ShaderResourceType  shaderResourceType,
@@ -562,6 +563,13 @@ void Compiler::generateResourceTransitions(Temps &temps)
             {
                 addNewState(
                     resource, subrsc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+                if(uavCounterResource)
+                {
+                    addNewState(
+                        uavCounterResource, 0,
+                        D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+                }
             },
                 [&](const D3D12_RENDER_TARGET_VIEW_DESC &)
             {
@@ -583,16 +591,17 @@ void Compiler::generateResourceTransitions(Temps &temps)
         for(auto &descDecl : p->descriptors_)
         {
             auto subrscs = viewToSubresources(
-                descDecl->resource_->getDescription(), descDecl->view_);
+                descDecl->info_.resource->getDescription(), descDecl->info_.view);
 
             for(UINT s : subrscs)
             {
                 addNewDescDecl(
-                    descDecl->resource_,
+                    descDecl->info_.resource,
+                    descDecl->info_.uavCounterResource,
                     s,
-                    descDecl->view_,
-                    descDecl->shaderResourceType_,
-                    descDecl->depthStencilType_);
+                    descDecl->info_.view,
+                    descDecl->info_.shaderResourceType,
+                    descDecl->info_.depthStencilType);
             }
         }
 
@@ -607,6 +616,7 @@ void Compiler::generateResourceTransitions(Temps &temps)
                 {
                     addNewDescDecl(
                         descDecl.resource,
+                        descDecl.uavCounterResource,
                         s,
                         descDecl.view,
                         descDecl.shaderResourceType,
@@ -757,7 +767,7 @@ void Compiler::generateDescriptorRecords(Temps &temps)
         const int newSlot = static_cast<int>(descriptorSlotCache.size());
         descriptorSlotCache.insert({ key, newSlot });
 
-        temps.threads[key.thread].descDecls.push_back({ newSlot, key.item });
+        temps.threads[key.thread].descs.push_back({ newSlot, key.item });
 
         return newSlot;
     };
@@ -897,10 +907,16 @@ void Compiler::fillRuntimeResources(
 
         auto &thread = temps.threads[ti];
 
-        for(auto &dr : thread.descDecls)
+        for(auto &dr : thread.descs)
         {
             addDescSlot(
-                runtime.resources_[dr.item->resource_->getIndex()], dr.slot);
+                runtime.resources_[dr.item->info_.resource->getIndex()], dr.slot);
+
+            if(dr.item->info_.uavCounterResource)
+            {
+                const int index = dr.item->info_.uavCounterResource->getIndex();
+                addDescSlot(runtime.resources_[index], dr.slot);
+            }
         }
 
         for(auto &dr : thread.descRanges)
@@ -909,6 +925,12 @@ void Compiler::fillRuntimeResources(
             {
                 addDescRangeSlot(
                     runtime.resources_[r.resource->getIndex()], dr.slot);
+
+                if(r.uavCounterResource)
+                {
+                    const int index = r.resource->getIndex();
+                    addDescRangeSlot(runtime.resources_[index], dr.slot);
+                }
             }
         }
     }
@@ -928,13 +950,13 @@ void Compiler::fillRuntimeDescriptors(
 
     for(auto &t : temps.threads)
     {
-        descSlotCount      += t.descDecls.size();
+        descSlotCount      += t.descs.size();
         descTableSlotCount += t.descRanges.size();
 
-        for(auto &descDecl : t.descDecls)
+        for(auto &descDecl : t.descs)
         {
             match_variant(
-                descDecl.item->view_,
+                descDecl.item->info_.view,
                 [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &)
             {
                 cpuDescCount += descDecl.item->cpu_;
@@ -1048,16 +1070,20 @@ void Compiler::fillRuntimeDescriptors(
 
         // cpu desc
 
-        for(auto &d : threadTemp.descDecls)
+        for(auto &d : threadTemp.descs)
         {
             threadData.descriptorSlots.push_back(d.slot);
             auto &slot = runtime.descriptorSlots_[d.slot];
 
-            slot.resourceIndex = d.item->resource_->getIndex();
+            slot.resourceIndex = d.item->info_.resource->getIndex();
             slot.cpu           = d.item->cpu_;
             slot.gpu           = d.item->gpu_;
-            slot.view          = d.item->view_;
+            slot.view          = d.item->info_.view;
             slot.isDirty       = true;
+
+            slot.uavCounterResourceIndex =
+                d.item->info_.uavCounterResource ?
+                d.item->info_.uavCounterResource->getIndex() : -1;
 
             if(slot.view.is<D3D12_RENDER_TARGET_VIEW_DESC>())
             {
@@ -1124,12 +1150,17 @@ void Compiler::fillRuntimeDescriptors(
             const uint32_t recordCount =
                 static_cast<uint32_t>(d.table->records_.size());
             slot.resourceIndices.resize(recordCount);
-            slot.views          .resize(recordCount);
+            slot.uavCounterResourceIndices.resize(recordCount);
+            slot.views.resize(recordCount);
 
             for(uint32_t i = 0; i < recordCount; ++i)
             {
                 slot.resourceIndices[i] = d.table->records_[i].resource->getIndex();
                 slot.views[i]           = d.table->records_[i].view;
+
+                slot.uavCounterResourceIndices[i] =
+                    d.table->records_[i].uavCounterResource ?
+                    d.table->records_[i].uavCounterResource->getIndex() : -1;
             }
 
             slot.heapType = viewToHeapType(d.table->records_.front().view);

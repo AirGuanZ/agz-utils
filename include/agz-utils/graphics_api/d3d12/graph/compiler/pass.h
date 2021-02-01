@@ -68,6 +68,7 @@ public:
         bool                                   cpu,
         bool                                   gpu,
         const Resource                         *resource,
+        const Resource                         *uavCounterResource,
         const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc);
 
     DescriptorItem *addRTV(
@@ -78,23 +79,6 @@ public:
         const Resource                      *resource,
         DepthStencilType                     depthStencilType,
         const D3D12_DEPTH_STENCIL_VIEW_DESC &desc);
-    
-    DescriptorItem *addSRV(
-        bool                                   cpu,
-        bool                                   gpu,
-        const Resource                        *resource,
-        const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
-    {
-        return addSRV(
-            cpu, gpu, resource, ShaderResourceType::PixelAndNonPixel, desc);
-    }
-    
-    DescriptorItem *addDSV(
-        const Resource                      *resource,
-        const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
-    {
-        return addDSV(resource, DepthStencilType::ReadAndWrite, desc);
-    }
 
     DescriptorItem *addDescriptor(bool cpuVisible, bool gpuVisible);
 
