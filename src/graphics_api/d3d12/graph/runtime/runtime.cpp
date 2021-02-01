@@ -1,16 +1,16 @@
 #ifdef AGZ_ENABLE_D3D12
 
-#include <agz-utils/graphics_api/d3d12/graph/graphCompiler.h>
-#include <agz-utils/graphics_api/d3d12/graph/graphRuntime.h>
+#include <agz-utils/graphics_api/d3d12/graph/compiler/compiler.h>
+#include <agz-utils/graphics_api/d3d12/graph/runtime/runtime.h>
 
 AGZ_D3D12_GRAPH_BEGIN
 
-GraphRuntime::~GraphRuntime()
+Runtime::~Runtime()
 {
     reset();
 }
 
-void GraphRuntime::runAsync(int frameIndex)
+void Runtime::runAsync(int frameIndex)
 {
     // launch_thread.set_latch_count   | 
     // launch_thread.set_trigger       | 
@@ -38,18 +38,18 @@ void GraphRuntime::runAsync(int frameIndex)
     sync_.cond.notify_all();
 }
 
-void GraphRuntime::sync()
+void Runtime::sync()
 {
     sync_.latch.wait();
 }
 
-void GraphRuntime::run(int frameIndex)
+void Runtime::run(int frameIndex)
 {
     runAsync(frameIndex);
     sync();
 }
 
-void GraphRuntime::frameFunc(int threadIndex)
+void Runtime::frameFunc(int threadIndex)
 {
     auto &threadData = perThreadData_[threadIndex];
 
@@ -95,7 +95,7 @@ void GraphRuntime::frameFunc(int threadIndex)
     }
 }
 
-void GraphRuntime::threadEntry(int threadIndex)
+void Runtime::threadEntry(int threadIndex)
 {
     int trigger = -1;
     for(;;)
@@ -119,12 +119,12 @@ void GraphRuntime::threadEntry(int threadIndex)
     }
 }
 
-ID3D12Resource *GraphRuntime::getRawResource(const Resource *resource)
+ID3D12Resource *Runtime::getRawResource(const Resource *resource)
 {
     return getRawResource(resource->getIndex());
 }
 
-ID3D12Resource *GraphRuntime::getRawResource(int resourceIndex)
+ID3D12Resource *Runtime::getRawResource(int resourceIndex)
 {
     return match_variant(
         resources_[resourceIndex],
@@ -138,12 +138,12 @@ ID3D12Resource *GraphRuntime::getRawResource(int resourceIndex)
     });
 }
 
-void GraphRuntime::setSamplerHeap(ComPtr<ID3D12DescriptorHeap> heap)
+void Runtime::setSamplerHeap(ComPtr<ID3D12DescriptorHeap> heap)
 {
     samplerHeap_ = std::move(heap);
 }
 
-void GraphRuntime::setExternalResource(
+void Runtime::setExternalResource(
     ExternalResource      *node,
     ComPtr<ID3D12Resource> resource)
 {
@@ -185,7 +185,7 @@ void GraphRuntime::setExternalResource(
         descriptorRangeSlots_[ds].isDirty = true;
 }
 
-void GraphRuntime::clearExternalResources()
+void Runtime::clearExternalResources()
 {
     for(auto &r : resources_)
     {
@@ -194,7 +194,7 @@ void GraphRuntime::clearExternalResources()
     }
 }
 
-void GraphRuntime::reset()
+void Runtime::reset()
 {
     {
         std::lock_guard lk(sync_.mutex);
@@ -235,7 +235,7 @@ void GraphRuntime::reset()
     DSVDescriptorHeap_.destroy();
 }
 
-void GraphRuntime::refreshDescriptor(DescriptorSlot &slot)
+void Runtime::refreshDescriptor(DescriptorSlot &slot)
 {
     if(!slot.isDirty)
         return;
@@ -356,7 +356,7 @@ void GraphRuntime::refreshDescriptor(DescriptorSlot &slot)
     slot.isDirty = false;
 }
 
-void GraphRuntime::refreshDescriptorRange(DescriptorRangeSlot &slot)
+void Runtime::refreshDescriptorRange(DescriptorRangeSlot &slot)
 {
     if(!slot.isDirty)
         return;

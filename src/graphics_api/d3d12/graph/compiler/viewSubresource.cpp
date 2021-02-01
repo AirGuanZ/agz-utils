@@ -2,7 +2,7 @@
 
 #include <d3dx12.h>
 
-#include <agz-utils/graphics_api/d3d12/graph/viewSubresource.h>
+#include <agz-utils/graphics_api/d3d12/graph/compiler/viewSubresource.h>
 #include <agz-utils/graphics_api/d3d12/mipmapGenerator.h>
 
 AGZ_D3D12_GRAPH_BEGIN

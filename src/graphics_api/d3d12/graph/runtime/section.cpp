@@ -1,6 +1,6 @@
 #ifdef AGZ_ENABLE_D3D12
 
-#include <agz-utils/graphics_api/d3d12/graph/sectionRuntime.h>
+#include <agz-utils/graphics_api/d3d12/graph/runtime/section.h>
 
 AGZ_D3D12_GRAPH_BEGIN
 

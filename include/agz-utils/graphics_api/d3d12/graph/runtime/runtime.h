@@ -2,7 +2,7 @@
 
 #include <queue>
 
-#include <agz-utils/graphics_api/d3d12/graph/sectionRuntime.h>
+#include <agz-utils/graphics_api/d3d12/graph/runtime/section.h>
 #include <agz-utils/graphics_api/d3d12/uniqueResource.h>
 #include <agz-utils/thread.h>
 
@@ -42,11 +42,11 @@ struct DescriptorRangeSlot
     std::queue<DescriptorRange> freeGPUDescriptorRangeQueue;
 };
 
-class GraphRuntime : public misc::uncopyable_t
+class Runtime : public misc::uncopyable_t
 {
 public:
 
-    ~GraphRuntime();
+    ~Runtime();
 
     void runAsync(int frameIndex);
 
@@ -67,7 +67,7 @@ public:
 
 private:
 
-    friend class GraphCompiler;
+    friend class Compiler;
 
     void reset();
 

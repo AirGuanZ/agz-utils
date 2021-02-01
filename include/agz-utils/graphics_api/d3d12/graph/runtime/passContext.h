@@ -20,11 +20,11 @@ public:
     };
 
     PassContext(
-        GraphRuntime                *runtime,
+        Runtime                     *runtime,
         int                          frameIndex,
         RawGraphicsCommandList      *cmdList,
         const DescriptorMap         &descriptors,
-        const DescriptorResourceMap &descriptorResources,
+        const DescriptorResourceMap &resourceToDescriptors,
         const DescriptorRangeMap    &descriptorRanges);
 
     int getFrameIndex() const;
@@ -55,13 +55,13 @@ public:
 
 private:
 
-    GraphRuntime           *runtime_;
+    Runtime *runtime_;
 
     int                     frameIndex_;
     RawGraphicsCommandList *cmdList_;
 
     const DescriptorMap         &descriptors_;
-    const DescriptorResourceMap &descriptorResourceMap_;
+    const DescriptorResourceMap &resourceToDescriptors_;
     const DescriptorRangeMap    &descriptorRanges_;
 };
 

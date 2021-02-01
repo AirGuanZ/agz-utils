@@ -1,6 +1,6 @@
 #pragma once
 
-#include <agz-utils/graphics_api/d3d12/graph/passContext.h>
+#include <agz-utils/graphics_api/d3d12/graph/runtime/passContext.h>
 
 AGZ_D3D12_GRAPH_BEGIN
 
@@ -18,7 +18,7 @@ public:
     };
 
     PassRuntime(
-        GraphRuntime                   *runtime,
+        Runtime                        *runtime,
         std::shared_ptr<PassCallback>   callback,
         std::vector<StateTransition>    transitions,
         PassContext::DescriptorMap      descriptors,
@@ -30,7 +30,7 @@ public:
 
 private:
 
-    GraphRuntime *runtime_;
+    Runtime *runtime_;
 
     std::shared_ptr<PassCallback> callback_;
 
@@ -38,7 +38,7 @@ private:
     PassContext::DescriptorMap      descriptors_;
     PassContext::DescriptorRangeMap descriptorRanges_;
 
-    PassContext::DescriptorResourceMap descriptorResourcesMap_;
+    PassContext::DescriptorResourceMap resourceToDescriptors_;
 
     mutable std::vector<D3D12_RESOURCE_BARRIER> entryBarriers_;
     mutable std::vector<D3D12_RESOURCE_BARRIER> exitBarriers_;

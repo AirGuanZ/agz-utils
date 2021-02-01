@@ -1,7 +1,7 @@
 #pragma once
 
-#include <agz-utils/graphics_api/d3d12/graph/graphCompiler.h>
-#include <agz-utils/graphics_api/d3d12/graph/graphRuntime.h>
+#include <agz-utils/graphics_api/d3d12/graph/compiler/compiler.h>
+#include <agz-utils/graphics_api/d3d12/graph/runtime/runtime.h>
 
 AGZ_D3D12_GRAPH_BEGIN
 
@@ -68,14 +68,14 @@ public:
 
 private:
 
-    std::unique_ptr<GraphCompiler> compiler_;
-    std::unique_ptr<GraphRuntime>  runtime_;
+    std::unique_ptr<Compiler> compiler_;
+    std::unique_ptr<Runtime>  runtime_;
 };
 
 inline Graph::Graph()
 {
-    compiler_ = std::make_unique<GraphCompiler>();
-    runtime_  = std::make_unique<GraphRuntime>();
+    compiler_ = std::make_unique<Compiler>();
+    runtime_  = std::make_unique<Runtime>();
 }
 
 inline Graph::Graph(Graph &&other) noexcept

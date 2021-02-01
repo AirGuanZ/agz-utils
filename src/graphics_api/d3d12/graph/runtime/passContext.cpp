@@ -1,23 +1,23 @@
 #ifdef AGZ_ENABLE_D3D12
 
-#include <agz-utils/graphics_api/d3d12/graph/graphCompiler.h>
-#include <agz-utils/graphics_api/d3d12/graph/graphRuntime.h>
-#include <agz-utils/graphics_api/d3d12/graph/passContext.h>
+#include <agz-utils/graphics_api/d3d12/graph/compiler/compiler.h>
+#include <agz-utils/graphics_api/d3d12/graph/runtime/passContext.h>
+#include <agz-utils/graphics_api/d3d12/graph/runtime/runtime.h>
 
 AGZ_D3D12_GRAPH_BEGIN
 
 PassContext::PassContext(
-    GraphRuntime                *runtime,
+    Runtime                     *runtime,
     int                          frameIndex,
     RawGraphicsCommandList      *cmdList,
     const DescriptorMap         &descriptors,
-    const DescriptorResourceMap &descriptorResources,
+    const DescriptorResourceMap &resourceToDescriptors,
     const DescriptorRangeMap    &descriptorRanges)
     : runtime_(runtime),
       frameIndex_(frameIndex),
       cmdList_(cmdList),
       descriptors_(descriptors),
-      descriptorResourceMap_(descriptorResources),
+      resourceToDescriptors_(resourceToDescriptors),
       descriptorRanges_(descriptorRanges)
 {
     
@@ -45,11 +45,19 @@ ID3D12Resource *PassContext::getRawResource(const Resource *resource)
 
 Descriptor PassContext::getDescriptor(const Resource *resource)
 {
-    const auto it = descriptorResourceMap_.find(resource);
-    if(it == descriptorResourceMap_.end())
+    const auto it = resourceToDescriptors_.find(resource);
+    if(it == resourceToDescriptors_.end())
     {
         throw D3D12Exception(
-            "undeclared resource descriptor");
+            "PassContext::getDescriptor: "
+            "no descriptor is declared for " + resource->getName());
+    }
+
+    if(!it->second)
+    {
+        throw D3D12Exception(
+            "PassContext::getDescriptor: "
+            "multiple descriptors are declared for " + resource->getName());
     }
 
     assert(it->second->cpu ^ it->second->gpu);
@@ -59,11 +67,19 @@ Descriptor PassContext::getDescriptor(const Resource *resource)
 
 Descriptor PassContext::getCPUDescriptor(const Resource *resource)
 {
-    const auto it = descriptorResourceMap_.find(resource);
-    if(it == descriptorResourceMap_.end())
+    const auto it = resourceToDescriptors_.find(resource);
+    if(it == resourceToDescriptors_.end())
     {
         throw D3D12Exception(
-            "undeclared resource descriptor");
+            "PassContext::getDescriptor: "
+            "no descriptor is declared for " + resource->getName());
+    }
+
+    if(!it->second)
+    {
+        throw D3D12Exception(
+            "PassContext::getDescriptor: "
+            "multiple descriptors are declared for " + resource->getName());
     }
 
     assert(it->second->cpu);
@@ -72,11 +88,19 @@ Descriptor PassContext::getCPUDescriptor(const Resource *resource)
 
 Descriptor PassContext::getGPUDescriptor(const Resource *resource)
 {
-    const auto it = descriptorResourceMap_.find(resource);
-    if(it == descriptorResourceMap_.end())
+    const auto it = resourceToDescriptors_.find(resource);
+    if(it == resourceToDescriptors_.end())
     {
         throw D3D12Exception(
-            "undeclared resource descriptor");
+            "PassContext::getDescriptor: "
+            "no descriptor is declared for " + resource->getName());
+    }
+
+    if(!it->second)
+    {
+        throw D3D12Exception(
+            "PassContext::getDescriptor: "
+            "multiple descriptors are declared for " + resource->getName());
     }
 
     assert(it->second->gpu);

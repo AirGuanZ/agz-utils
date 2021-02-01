@@ -1,12 +1,12 @@
 #ifdef AGZ_ENABLE_D3D12
 
-#include <agz-utils/graphics_api/d3d12/graph/graphCompiler.h>
-#include <agz-utils/graphics_api/d3d12/graph/graphRuntime.h>
+#include <agz-utils/graphics_api/d3d12/graph/compiler/compiler.h>
+#include <agz-utils/graphics_api/d3d12/graph/runtime/runtime.h>
 
 AGZ_D3D12_GRAPH_BEGIN
 
 PassRuntime::PassRuntime(
-    GraphRuntime                   *runtime,
+    Runtime                        *runtime,
     std::shared_ptr<PassCallback>   callback,
     std::vector<StateTransition>    transitions,
     PassContext::DescriptorMap      descriptors,
@@ -18,7 +18,13 @@ PassRuntime::PassRuntime(
       descriptorRanges_(std::move(descriptorRanges))
 {
     for(auto &p : descriptors_)
-        descriptorResourcesMap_[p.first->getResource()] = p.second;
+    {
+        const auto it = resourceToDescriptors_.find(p.first->getResource());
+        if(it == resourceToDescriptors_.end())
+            resourceToDescriptors_.insert({ p.first->getResource(), p.second });
+        else
+            it->second = nullptr;
+    }
 }
 
 void PassRuntime::execute(
@@ -52,7 +58,7 @@ void PassRuntime::execute(
 
     PassContext passContext(
         runtime_, frameIndex, cmdList,
-        descriptors_, descriptorResourcesMap_, descriptorRanges_);
+        descriptors_, resourceToDescriptors_, descriptorRanges_);
 
     (*callback_)(passContext);
 

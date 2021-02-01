@@ -2,8 +2,9 @@
 
 #include <tuple>
 
-#include <agz-utils/graphics_api/d3d12/graph/graphCompiler.h>
-#include <agz-utils/graphics_api/d3d12/graph/viewSubresource.h>
+#include <agz-utils/graphics_api/d3d12/graph/compiler/compiler.h>
+#include <agz-utils/graphics_api/d3d12/graph/compiler/viewComparer.h>
+#include <agz-utils/graphics_api/d3d12/graph/compiler/viewSubresource.h>
 #include <agz-utils/graphics_api/d3d12/mipmapGenerator.h>
 #include <agz-utils/string.h>
 
@@ -44,457 +45,28 @@ namespace
 
 } // namespace anonymous
 
-Resource::Resource(std::string name, int index)
-    : name_(std::move(name)), index_(index), desc_{}
-{
-    
-}
-
-const std::string &Resource::getName() const
-{
-    return name_;
-}
-
-int Resource::getIndex() const
-{
-    return index_;
-}
-
-bool Resource::isInternal() const
-{
-    return asInternal() != nullptr;
-}
-
-bool Resource::isExternal() const
-{
-    return asExternal() != nullptr;
-}
-
-InternalResource *Resource::asInternal()
-{
-    return nullptr;
-}
-
-const InternalResource *Resource::asInternal() const
-{
-    return nullptr;
-}
-
-ExternalResource *Resource::asExternal()
-{
-    return nullptr;
-}
-
-const ExternalResource *Resource::asExternal() const
-{
-    return nullptr;
-}
-
-void Resource::setDescription(const D3D12_RESOURCE_DESC &desc)
-{
-    desc_ = desc;
-}
-
-const D3D12_RESOURCE_DESC &Resource::getDescription() const
-{
-    return desc_;
-}
-
-D3D12_VIEWPORT Resource::getDefaultViewport(
-    float minDepth, float maxDepth) const
-{
-    D3D12_VIEWPORT ret;
-    ret.TopLeftX = 0;
-    ret.TopLeftY = 0;
-    ret.Width    = static_cast<float>(desc_.Width);
-    ret.Height   = static_cast<float>(desc_.Height);
-    ret.MinDepth = minDepth;
-    ret.MaxDepth = maxDepth;
-    return ret;
-}
-
-D3D12_RECT Resource::getDefaultScissor() const
-{
-    D3D12_RECT ret;
-    ret.left   = 0;
-    ret.top    = 0;
-    ret.right  = static_cast<LONG>(desc_.Width);
-    ret.bottom = static_cast<LONG>(desc_.Height);
-    return ret;
-}
-
-InternalResource::InternalResource(std::string name, int index)
-    : Resource(std::move(name), index),
-      heapType_(D3D12_HEAP_TYPE_DEFAULT),
-      clear_(false), clearValue_{},
-      initialState_(D3D12_RESOURCE_STATE_COMMON)
-{
-    
-}
-
-void InternalResource::setClearValue(const D3D12_CLEAR_VALUE &clearValue)
-{
-    clear_      = true;
-    clearValue_ = clearValue;
-}
-
-void InternalResource::setInitialState(D3D12_RESOURCE_STATES state)
-{
-    initialState_ = state;
-}
-
-void InternalResource::setHeapType(D3D12_HEAP_TYPE heapType)
-{
-    heapType_ = heapType;
-}
-
-InternalResource *InternalResource::asInternal()
-{
-    return this;
-}
-
-const InternalResource *InternalResource::asInternal() const
-{
-    return this;
-}
-
-ExternalResource::ExternalResource(std::string name, int index)
-    : Resource(std::move(name), index),
-      initialState_(D3D12_RESOURCE_STATE_COMMON),
-      finalState_(D3D12_RESOURCE_STATE_COMMON)
-{
-    
-}
-
-void ExternalResource::setInitialState(D3D12_RESOURCE_STATES state)
-{
-    initialState_ = state;
-}
-
-void ExternalResource::setFinalState(D3D12_RESOURCE_STATES state)
-{
-    finalState_ = state;
-}
-
-ExternalResource *ExternalResource::asExternal()
-{
-    return this;
-}
-
-const ExternalResource *ExternalResource::asExternal() const
-{
-    return this;
-}
-
-DescriptorTable::DescriptorTable(bool cpu, bool gpu)
-    : cpu_(cpu), gpu_(gpu)
-{
-    
-}
-
-void DescriptorTable::addSRV(
-    const Resource                        *resource,
-    ShaderResourceType                     type,
-    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
-{
-    records_.push_back({ resource, desc, type, {} });
-}
-
-void DescriptorTable::addUAV(
-    const Resource                         *resource,
-    const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
-{
-    records_.push_back({ resource, desc, {}, {} });
-}
-
-void DescriptorTable::addRTV(
-    const Resource                      *resource,
-    const D3D12_RENDER_TARGET_VIEW_DESC &desc)
-{
-    records_.push_back({ resource, desc, {}, {} });
-}
-
-void DescriptorTable::addDSV(
-    const Resource                      *resource,
-    DepthStencilType                     type,
-    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
-{
-    records_.push_back({ resource, desc, {}, type });
-}
-
-bool DescriptorTable::operator<(const DescriptorTable &rhs) const
-{
-    return std::tie(cpu_, gpu_, records_) <
-           std::tie(rhs.cpu_, rhs.gpu_, rhs.records_);
-}
-
-bool DescriptorTable::Record::operator<(const Record &rhs) const
-{
-    const int LResourceIndex = resource->getIndex();
-    const int RResourceIndex = rhs.resource->getIndex();
-
-    auto L = std::tie(
-        LResourceIndex,
-        resource,
-        shaderResourceType,
-        depthStencilType);
-    auto R = std::tie(
-        RResourceIndex,
-        rhs.resource,
-        rhs.shaderResourceType,
-        rhs.depthStencilType);
-
-    return L < R || (L == R && view < rhs.view);
-}
-
-bool Vertex::isAggregate() const
-{
-    return asAggregate() != nullptr;
-}
-
-Pass *Vertex::asPass()
-{
-    return nullptr;
-}
-
-const Pass *Vertex::asPass() const
-{
-    return nullptr;
-}
-
-PassAggregate *Vertex::asAggregate()
-{
-    return nullptr;
-}
-
-const PassAggregate *Vertex::asAggregate() const
-{
-    return nullptr;
-}
-
-DescriptorItem::DescriptorItem(bool cpu, bool gpu)
-    : cpu_(cpu), gpu_(gpu)
-{
-    
-}
-
-void DescriptorItem::setSRV(
-    const Resource                        *resource,
-    ShaderResourceType                     type,
-    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
-{
-    resource_           = resource;
-    view_               = desc;
-    shaderResourceType_ = type;
-}
-
-void DescriptorItem::setUAV(
-    const Resource                         *resource,
-    const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
-{
-    resource_ = resource;
-    view_     = desc;
-}
-
-void DescriptorItem::setRTV(
-    const Resource                      *resource,
-    const D3D12_RENDER_TARGET_VIEW_DESC &desc)
-{
-    resource_ = resource;
-    view_     = desc;
-}
-
-void DescriptorItem::setDSV(
-    const Resource                      *resource,
-    DepthStencilType                     type,
-    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
-{
-    resource_         = resource;
-    depthStencilType_ = type;
-    view_             = desc;
-}
-
-const Resource *DescriptorItem::getResource() const
-{
-    return resource_;
-}
-
-bool DescriptorItem::operator<(const DescriptorItem &rhs) const
-{
-    auto L = std::tie(
-        resource_, cpu_, gpu_,
-        shaderResourceType_, depthStencilType_);
-    auto R = std::tie(
-        rhs.resource_, cpu_, gpu_,
-        rhs.shaderResourceType_, rhs.depthStencilType_);
-    return L < R || (L == R && view_ < rhs.view_);
-}
-
-Pass::Pass(std::string name, int index)
-    : name_(std::move(name)), index_(index),
-      thread_(0), queue_(0)
-{
-    
-}
-
-Pass *Pass::asPass()
-{
-    return this;
-}
-
-const Pass *Pass::asPass() const
-{
-    return this;
-}
-
-const std::string &Pass::getName() const
-{
-    return name_;
-}
-
-int Pass::getIndex() const
-{
-    return index_;
-}
-
-void Pass::setQueue(int queueIndex)
-{
-    queue_ = queueIndex;
-}
-
-void Pass::setThread(int threadIndex)
-{
-    thread_ = threadIndex;
-}
-
-void Pass::setCallback(PassCallback callback)
-{
-    callback_ = std::make_shared<PassCallback>(std::move(callback));
-}
-
-void Pass::addResourceState(
-    const Resource       *resource,
-    D3D12_RESOURCE_STATES state,
-    UINT                  subrsc)
-{
-    if(states_.find(resource) != states_.end())
-    {
-        throw D3D12Exception(
-            "repeated resource state declaretion of " +
-            resource->getName() + "in pass " + name_);
-    }
-    states_.insert({ resource, { state, subrsc } });
-}
-
-DescriptorItem *Pass::addSRV(
-    bool                                   cpu,
-    bool                                   gpu,
-    const Resource                        *resource,
-    ShaderResourceType                     shaderResourceType,
-    const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
-{
-    auto item = addDescriptor(cpu, gpu);
-    item->setSRV(resource, shaderResourceType, desc);
-    return item;
-}
-
-DescriptorItem *Pass::addUAV(
-    bool                                    cpu,
-    bool                                    gpu,
-    const Resource                         *resource,
-    const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
-{
-    auto item = addDescriptor(cpu, gpu);
-    item->setUAV(resource, desc);
-    return item;
-}
-
-DescriptorItem *Pass::addRTV(
-    const Resource                      *resource,
-    const D3D12_RENDER_TARGET_VIEW_DESC &desc)
-{
-    auto item = addDescriptor(true, false);
-    item->setRTV(resource, desc);
-    return item;
-}
-
-DescriptorItem *Pass::addDSV(
-    const Resource                      *resource,
-    DepthStencilType                     depthStencilType,
-    const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
-{
-    auto item = addDescriptor(true, false);
-    item->setDSV(resource, depthStencilType, desc);
-    return item;
-}
-
-DescriptorItem *Pass::addDescriptor(bool cpuVisible, bool gpuVisible)
-{
-    descriptors_.push_back(
-        std::make_unique<DescriptorItem>(cpuVisible, gpuVisible));
-    return descriptors_.back().get();
-}
-
-DescriptorTable *Pass::addDescriptorTable(bool cpuVisible, bool gpuVisible)
-{
-    descriptorTables_.push_back(
-        std::make_unique<DescriptorTable>(cpuVisible, gpuVisible));
-    return descriptorTables_.back().get();
-}
-
-PassAggregate::PassAggregate(std::string name)
-    : name_(std::move(name)), entry_(nullptr), exit_(nullptr)
-{
-    
-}
-
-const std::string &PassAggregate::getName() const
-{
-    return name_;
-}
-
-void PassAggregate::setEntry(Vertex *entry)
-{
-    entry_ = entry;
-}
-
-void PassAggregate::setExit(Vertex *exit)
-{
-    exit_ = exit;
-}
-
-PassAggregate *PassAggregate::asAggregate()
-{
-    return this;
-}
-
-const PassAggregate *PassAggregate::asAggregate() const
-{
-    return this;
-}
-
-GraphCompiler::GraphCompiler()
+Compiler::Compiler()
     : threadCount_(0), queueCount_(0), frameCount_(0)
 {
 
 }
 
-void GraphCompiler::setThreadCount(int count)
+void Compiler::setThreadCount(int count)
 {
     threadCount_ = count;
 }
 
-void GraphCompiler::setQueueCount(int count)
+void Compiler::setQueueCount(int count)
 {
     queueCount_ = count;
 }
 
-void GraphCompiler::setFrameCount(int count)
+void Compiler::setFrameCount(int count)
 {
     frameCount_ = count;
 }
 
-InternalResource *GraphCompiler::addInternalResource(std::string name)
+InternalResource *Compiler::addInternalResource(std::string name)
 {
     const int index = static_cast<int>(resources_.size());
     auto resource = std::make_unique<InternalResource>(std::move(name), index);
@@ -503,7 +75,7 @@ InternalResource *GraphCompiler::addInternalResource(std::string name)
     return ret;
 }
 
-ExternalResource *GraphCompiler::addExternalResource(std::string name)
+ExternalResource *Compiler::addExternalResource(std::string name)
 {
     const int index = static_cast<int>(resources_.size());
     auto resource = std::make_unique<ExternalResource>(std::move(name), index);
@@ -512,7 +84,7 @@ ExternalResource *GraphCompiler::addExternalResource(std::string name)
     return ret;
 }
 
-Pass *GraphCompiler::addPass(std::string name, int thread, int queue)
+Pass *Compiler::addPass(std::string name, int thread, int queue)
 {
     const int index = static_cast<int>(passes_.size());
     passes_.push_back(std::make_unique<Pass>(std::move(name), index));
@@ -521,7 +93,7 @@ Pass *GraphCompiler::addPass(std::string name, int thread, int queue)
     return passes_.back().get();
 }
 
-PassAggregate *GraphCompiler::addAggregate(
+PassAggregate *Compiler::addAggregate(
     std::string name, Vertex *entry, Vertex *exit)
 {
     aggregates_.push_back(std::make_unique<PassAggregate>(std::move(name)));
@@ -530,22 +102,22 @@ PassAggregate *GraphCompiler::addAggregate(
     return aggregates_.back().get();
 }
 
-void GraphCompiler::addDependency(Vertex *head, Vertex *tail)
+void Compiler::addDependency(Vertex *head, Vertex *tail)
 {
     addDependencyImpl(head, tail, false);
 }
 
-void GraphCompiler::addCrossFrameDependency(Vertex *head, Vertex *tail)
+void Compiler::addCrossFrameDependency(Vertex *head, Vertex *tail)
 {
     addDependencyImpl(head, tail, true);
 }
 
-void GraphCompiler::compile(
+void Compiler::compile(
     ID3D12Device                           *device,
     ResourceManager                        &resourceManager,
     DescriptorAllocator                    &descriptorAllocator,
     std::vector<ComPtr<ID3D12CommandQueue>> allQueues,
-    GraphRuntime                           &runtime)
+    Runtime                           &runtime)
 {
     if(frameCount_ <= 0)
     {
@@ -584,11 +156,11 @@ void GraphCompiler::compile(
     for(int ti = 0; ti < threadCount_; ++ti)
     {
         runtime.threads_.emplace_back(
-            &GraphRuntime::threadEntry, &runtime, ti);
+            &Runtime::threadEntry, &runtime, ti);
     }
 }
 
-void GraphCompiler::addDependencyImpl(
+void Compiler::addDependencyImpl(
     Vertex *head, Vertex *tail, bool crossFrame)
 {
     auto getEntryPass = [](Vertex *base)
@@ -642,7 +214,7 @@ void GraphCompiler::addDependencyImpl(
     }
 }
 
-std::vector<int> GraphCompiler::sortPasses() const
+std::vector<int> Compiler::sortPasses() const
 {
     // pass index -> number of prevs
     std::vector<int> inCount(passes_.size());
@@ -683,7 +255,7 @@ std::vector<int> GraphCompiler::sortPasses() const
     return result;
 }
 
-GraphCompiler::Temps GraphCompiler::assignSectionsToThreads() const
+Compiler::Temps Compiler::assignSectionsToThreads() const
 {
     Temps result;
 
@@ -779,7 +351,7 @@ GraphCompiler::Temps GraphCompiler::assignSectionsToThreads() const
     return result;
 }
 
-void GraphCompiler::generateSectionDependencies(
+void Compiler::generateSectionDependencies(
     ID3D12Device *device,
     Temps        &temps) const
 {
@@ -877,7 +449,7 @@ void GraphCompiler::generateSectionDependencies(
     }
 }
 
-void GraphCompiler::generateResourceTransitions(Temps &temps)
+void Compiler::generateResourceTransitions(Temps &temps)
 {
     struct ResourceRecord
     {
@@ -1159,7 +731,7 @@ void GraphCompiler::generateResourceTransitions(Temps &temps)
     }
 }
 
-void GraphCompiler::generateDescriptorRecords(Temps &temps)
+void Compiler::generateDescriptorRecords(Temps &temps)
 {
     // descriptors
 
@@ -1241,8 +813,8 @@ void GraphCompiler::generateDescriptorRecords(Temps &temps)
     }
 }
 
-void GraphCompiler::fillRuntimeResources(
-    GraphRuntime    &runtime,
+void Compiler::fillRuntimeResources(
+    Runtime    &runtime,
     ResourceManager &rscMgr,
     Temps           &temps) const
 {
@@ -1274,7 +846,7 @@ void GraphCompiler::fillRuntimeResources(
                     stdstr::u8_to_wstr(resource->getName()).c_str());
             });
 
-            GraphRuntime::InternalResourceRuntime resourceRuntime;
+            Runtime::InternalResourceRuntime resourceRuntime;
             resourceRuntime.resource = std::move(actualResource);
             resourceRuntime.index    = static_cast<int>(ri);
 
@@ -1282,7 +854,7 @@ void GraphCompiler::fillRuntimeResources(
         }
         else
         {
-            GraphRuntime::ExternalResourceRuntime resourceRuntime;
+            Runtime::ExternalResourceRuntime resourceRuntime;
             resourceRuntime.index = static_cast<int>(ri);
             
             runtime.resources_[ri] = std::move(resourceRuntime);
@@ -1294,30 +866,30 @@ void GraphCompiler::fillRuntimeResources(
     for(int ti = 0; ti < threadCount_; ++ti)
     {
         static auto addDescSlot = [](
-            GraphRuntime::ResourceRuntime &r, int newSlot)
+            Runtime::ResourceRuntime &r, int newSlot)
         {
             match_variant(
                 r,
-                [&](GraphRuntime::InternalResourceRuntime &ir)
+                [&](Runtime::InternalResourceRuntime &ir)
             {
                 ir.descriptorSlots.push_back(newSlot);
             },
-                [&](GraphRuntime::ExternalResourceRuntime &er)
+                [&](Runtime::ExternalResourceRuntime &er)
             {
                 er.descriptorSlots.push_back(newSlot);
             });
         };
 
         static auto addDescRangeSlot = [](
-            GraphRuntime::ResourceRuntime &r, int newSlot)
+            Runtime::ResourceRuntime &r, int newSlot)
         {
             match_variant(
                 r,
-                [&](GraphRuntime::InternalResourceRuntime &ir)
+                [&](Runtime::InternalResourceRuntime &ir)
             {
                 ir.descriptorRangeSlots.push_back(newSlot);
             },
-                [&](GraphRuntime::ExternalResourceRuntime &er)
+                [&](Runtime::ExternalResourceRuntime &er)
             {
                 er.descriptorRangeSlots.push_back(newSlot);
             });
@@ -1342,9 +914,9 @@ void GraphCompiler::fillRuntimeResources(
     }
 }
 
-void GraphCompiler::fillRuntimeDescriptors(
+void Compiler::fillRuntimeDescriptors(
     ID3D12Device        *device,
-    GraphRuntime        &runtime,
+    Runtime        &runtime,
     DescriptorAllocator &GPUDescAlloc,
     Temps               &temps) const
 {
@@ -1618,9 +1190,9 @@ void GraphCompiler::fillRuntimeDescriptors(
     }
 }
 
-void GraphCompiler::fillRuntimeSections(
+void Compiler::fillRuntimeSections(
     ID3D12Device *device,
-    GraphRuntime &runtime,
+    Runtime &runtime,
     Temps        &temps) const
 {
     for(int ti = 0; ti < threadCount_; ++ti)
@@ -1702,9 +1274,9 @@ void GraphCompiler::fillRuntimeSections(
     }
 }
 
-void GraphCompiler::fillRuntimeCommandAllocators(
+void Compiler::fillRuntimeCommandAllocators(
     ID3D12Device *device,
-    GraphRuntime &runtime) const
+    Runtime &runtime) const
 {
     for(int ti = 0; ti < threadCount_; ++ti)
     {

@@ -21,7 +21,7 @@ class PassContext;
 
 struct DescriptorSlot;
 struct DescriptorRangeSlot;
-class GraphRuntime;
+class Runtime;
 class PassRuntime;
 
 using PassCallback = std::function<void(PassContext &)>;

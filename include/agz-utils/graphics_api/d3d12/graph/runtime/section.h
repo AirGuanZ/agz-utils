@@ -1,6 +1,6 @@
 #pragma once
 
-#include <agz-utils/graphics_api/d3d12/graph/passRuntime.h>
+#include <agz-utils/graphics_api/d3d12/graph/runtime/pass.h>
 
 AGZ_D3D12_GRAPH_BEGIN
 
