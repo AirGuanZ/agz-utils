@@ -84,6 +84,8 @@ public:
 
     const ComPtr<ID3D12Resource> &getFramebuffer() const noexcept;
 
+    const ComPtr<ID3D12Resource> &getFramebuffer(int index) const noexcept;
+
     void swapFramebuffers();
 
     int getFramebufferWidth() const noexcept;
@@ -321,6 +323,11 @@ inline int D3D12Context::getFramebufferIndex() const noexcept
 inline const ComPtr<ID3D12Resource> &D3D12Context::getFramebuffer() const noexcept
 {
     return swapChain_.getImage();
+}
+
+inline const ComPtr<ID3D12Resource> &D3D12Context::getFramebuffer(int index) const noexcept
+{
+    return swapChain_.getImage(index);
 }
 
 inline void D3D12Context::swapFramebuffers()

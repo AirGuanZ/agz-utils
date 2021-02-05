@@ -60,9 +60,11 @@ Descriptor PassContext::getDescriptor(const Resource *resource)
             "multiple descriptors are declared for " + resource->getName());
     }
 
-    assert(it->second->cpu ^ it->second->gpu);
-    return it->second->cpu ?
-        it->second->cpuDescriptor : it->second->gpuDescriptor;
+    const DescriptorSlot *slot = it->second;
+    const int index = slot->isPerFrame ? frameIndex_ : 0;
+
+    return slot->cpu ?
+        slot->frames[index].cpu : slot->frames[index].gpu;
 }
 
 Descriptor PassContext::getCPUDescriptor(const Resource *resource)
@@ -82,8 +84,10 @@ Descriptor PassContext::getCPUDescriptor(const Resource *resource)
             "multiple descriptors are declared for " + resource->getName());
     }
 
-    assert(it->second->cpu);
-    return it->second->cpuDescriptor;
+    const DescriptorSlot *slot = it->second;
+    const int index = slot->isPerFrame ? frameIndex_ : 0;
+
+    return slot->frames[index].cpu;
 }
 
 Descriptor PassContext::getGPUDescriptor(const Resource *resource)
@@ -103,8 +107,10 @@ Descriptor PassContext::getGPUDescriptor(const Resource *resource)
             "multiple descriptors are declared for " + resource->getName());
     }
 
-    assert(it->second->gpu);
-    return it->second->gpuDescriptor;
+    const DescriptorSlot *slot = it->second;
+    const int index = slot->isPerFrame ? frameIndex_ : 0;
+
+    return slot->frames[index].gpu;
 }
 
 Descriptor PassContext::getDescriptor(const DescriptorItem *item)
@@ -116,9 +122,11 @@ Descriptor PassContext::getDescriptor(const DescriptorItem *item)
             "undeclared resource descriptor");
     }
 
-    assert(it->second->cpu ^ it->second->gpu);
-    return it->second->cpu ?
-        it->second->cpuDescriptor : it->second->gpuDescriptor;
+    const DescriptorSlot *slot = it->second;
+    const int index = slot->isPerFrame ? frameIndex_ : 0;
+
+    return slot->cpu ?
+        slot->frames[index].cpu : slot->frames[index].gpu;
 }
 
 Descriptor PassContext::getCPUDescriptor(const DescriptorItem *item)
@@ -130,8 +138,10 @@ Descriptor PassContext::getCPUDescriptor(const DescriptorItem *item)
             "undeclared resource descriptor");
     }
 
-    assert(it->second->cpu);
-    return it->second->cpuDescriptor;
+    const DescriptorSlot *slot = it->second;
+    const int index = slot->isPerFrame ? frameIndex_ : 0;
+
+    return slot->frames[index].cpu;
 }
 
 Descriptor PassContext::getGPUDescriptor(const DescriptorItem *item)
@@ -143,8 +153,10 @@ Descriptor PassContext::getGPUDescriptor(const DescriptorItem *item)
             "undeclared resource descriptor");
     }
 
-    assert(it->second->gpu);
-    return it->second->gpuDescriptor;
+    const DescriptorSlot *slot = it->second;
+    const int index = slot->isPerFrame ? frameIndex_ : 0;
+
+    return slot->frames[index].gpu;
 }
 
 DescriptorRange PassContext::getDescriptorRange(const DescriptorTable *table)
@@ -156,9 +168,11 @@ DescriptorRange PassContext::getDescriptorRange(const DescriptorTable *table)
             "undeclared resource descriptor range");
     }
 
-    assert(it->second->cpu ^ it->second->gpu);
-    return it->second->cpu ?
-        it->second->cpuDescriptorRange : it->second->gpuDescriptorRange;
+    const DescriptorRangeSlot *slot = it->second;
+    const int index = slot->isPerFrame ? frameIndex_ : 0;
+
+    return slot->cpu ?
+        slot->frames[index].cpu : slot->frames[index].gpu;
 }
 
 DescriptorRange PassContext::getCPUDescriptorRange(const DescriptorTable *table)
@@ -170,8 +184,10 @@ DescriptorRange PassContext::getCPUDescriptorRange(const DescriptorTable *table)
             "undeclared resource descriptor range");
     }
 
-    assert(it->second->cpu);
-    return it->second->cpuDescriptorRange;
+    const DescriptorRangeSlot *slot = it->second;
+    const int index = slot->isPerFrame ? frameIndex_ : 0;
+
+    return slot->frames[index].cpu;
 }
 
 DescriptorRange PassContext::getGPUDescriptorRange(const DescriptorTable *table)
@@ -183,8 +199,10 @@ DescriptorRange PassContext::getGPUDescriptorRange(const DescriptorTable *table)
             "undeclared resource descriptor range");
     }
 
-    assert(it->second->gpu);
-    return it->second->gpuDescriptorRange;
+    const DescriptorRangeSlot *slot = it->second;
+    const int index = slot->isPerFrame ? frameIndex_ : 0;
+
+    return slot->frames[index].gpu;
 }
 
 AGZ_D3D12_GRAPH_END

@@ -64,6 +64,9 @@ public:
     void setExternalResource(
         ExternalResource *node, ComPtr<ID3D12Resource> rsc);
 
+    void setExternalResource(
+        ExternalResource *node, int frameIndex, ComPtr<ID3D12Resource> rsc);
+
     void clearExternalResources();
 
 private:
@@ -181,6 +184,12 @@ inline void Graph::setExternalResource(
     ExternalResource *node, ComPtr<ID3D12Resource> rsc)
 {
     runtime_->setExternalResource(node, std::move(rsc));
+}
+
+inline void Graph::setExternalResource(
+    ExternalResource *node, int frameIndex, ComPtr<ID3D12Resource> rsc)
+{
+    runtime_->setExternalResource(node, frameIndex, std::move(rsc));
 }
 
 inline void Graph::clearExternalResources()

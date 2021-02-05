@@ -50,6 +50,16 @@ const ExternalResource *Resource::asExternal() const
     return nullptr;
 }
 
+void Resource::setPerFrame(bool isPerFrame)
+{
+    isPerFrame_ = isPerFrame;
+}
+
+bool Resource::isPerFrame() const
+{
+    return isPerFrame_;
+}
+
 void Resource::setDescription(const D3D12_RESOURCE_DESC &desc)
 {
     desc_ = desc;

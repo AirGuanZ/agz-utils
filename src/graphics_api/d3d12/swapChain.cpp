@@ -108,6 +108,11 @@ const ComPtr<ID3D12Resource> &SwapChain::getImage() const noexcept
     return images_[imageIndex_];
 }
 
+const ComPtr<ID3D12Resource> &SwapChain::getImage(int index) const noexcept
+{
+    return images_[index];
+}
+
 void SwapChain::swapBuffers()
 {
     swapChain_->Present(vsync_ ? 1 : 0, 0);

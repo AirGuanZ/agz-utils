@@ -128,13 +128,15 @@ ID3D12Resource *Runtime::getRawResource(int resourceIndex)
 {
     return match_variant(
         resources_[resourceIndex],
-        [](const InternalResourceRuntime &r)
+        [this](const InternalResourceRuntime &r)
     {
-        return r.resource->resource.Get();
+        const int index = r.isPerFrame ? frameIndex_ : 0;
+        return r.resource[index]->resource.Get();
     },
-        [](const ExternalResourceRuntime &r)
+        [this](const ExternalResourceRuntime &r)
     {
-        return r.resource.Get();
+        const int index = r.isPerFrame ? frameIndex_ : 0;
+        return r.resource[index].Get();
     });
 }
 
@@ -146,6 +148,13 @@ void Runtime::setSamplerHeap(ComPtr<ID3D12DescriptorHeap> heap)
 void Runtime::setExternalResource(
     ExternalResource      *node,
     ComPtr<ID3D12Resource> resource)
+{
+    assert(!node->isPerFrame());
+    setExternalResource(node, 0, std::move(resource));
+}
+
+void Runtime::setExternalResource(
+    ExternalResource *node, int frameIndex, ComPtr<ID3D12Resource> resource)
 {
     AGZ_WHEN_DEBUG({
         auto toTie = [](const D3D12_RESOURCE_DESC &L)
@@ -176,13 +185,13 @@ void Runtime::setExternalResource(
     });
 
     auto &external = resources_[node->getIndex()].as<ExternalResourceRuntime>();
-    external.resource = std::move(resource);
+    external.resource[frameIndex] = std::move(resource);
 
     for(auto ds : external.descriptorSlots)
-        descriptorSlots_[ds].isDirty = true;
+        descriptorSlots_[ds].frames[frameIndex].isDirty = true;
 
     for(auto ds : external.descriptorRangeSlots)
-        descriptorRangeSlots_[ds].isDirty = true;
+        descriptorRangeSlots_[ds].frames[frameIndex].isDirty = true;
 }
 
 void Runtime::clearExternalResources()
@@ -190,7 +199,10 @@ void Runtime::clearExternalResources()
     for(auto &r : resources_)
     {
         if(auto external = r.as_if<ExternalResourceRuntime>())
-            external->resource.Reset();
+        {
+            for(auto &d3drsc : external->resource)
+                d3drsc.Reset();
+        }
     }
 }
 
@@ -237,61 +249,64 @@ void Runtime::reset()
 
 void Runtime::refreshDescriptor(DescriptorSlot &slot)
 {
-    if(!slot.isDirty)
-        return;
+    DescriptorSlot::PerFrame *perFrame =
+        slot.isPerFrame ? &slot.frames[frameIndex_] : &slot.frames.front();
 
+    if(!perFrame->isDirty)
+        return;
+    
     assert(!slot.view.is<std::monostate>());
 
     auto resource = getRawResource(slot.resourceIndex);
 
     assert(
         resources_[slot.resourceIndex].is<ExternalResourceRuntime>() ||
-        (!slot.cpuDescriptor && !slot.gpuDescriptor));
+        (!perFrame->cpu && !perFrame->gpu));
 
     match_variant(
         slot.view,
         [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &desc)
     {
-        if(slot.cpuDescriptor)
-            slot.freeCPUDescriptorQueue.push(slot.cpuDescriptor);
-        if(slot.gpuDescriptor)
-            slot.freeGPUDescriptorQueue.push(slot.gpuDescriptor);
+        if(perFrame->cpu)
+            perFrame->freeCPUQueue.push(perFrame->cpu);
+        if(perFrame->gpu)
+            perFrame->freeGPUQueue.push(perFrame->gpu);
 
         if(slot.cpu)
         {
-            assert(!slot.freeCPUDescriptorQueue.empty());
-            slot.cpuDescriptor = slot.freeCPUDescriptorQueue.front();
-            slot.freeCPUDescriptorQueue.pop();
+            assert(!perFrame->freeCPUQueue.empty());
+            perFrame->cpu = perFrame->freeCPUQueue.front();
+            perFrame->freeCPUQueue.pop();
 
             device_->CreateShaderResourceView(
-                resource, &desc, slot.cpuDescriptor);
+                resource, &desc, perFrame->cpu);
         }
 
         if(slot.gpu)
         {
-            assert(!slot.freeGPUDescriptorQueue.empty());
-            slot.gpuDescriptor = slot.freeGPUDescriptorQueue.front();
-            slot.freeGPUDescriptorQueue.pop();
+            assert(!perFrame->freeGPUQueue.empty());
+            perFrame->gpu = perFrame->freeGPUQueue.front();
+            perFrame->freeGPUQueue.pop();
 
             if(slot.cpu)
             {
                 device_->CopyDescriptorsSimple(
-                    1, slot.gpuDescriptor, slot.cpuDescriptor,
+                    1, perFrame->gpu, perFrame->cpu,
                     D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
             }
             else
             {
                 device_->CreateShaderResourceView(
-                    resource, &desc, slot.gpuDescriptor);
+                    resource, &desc, perFrame->gpu);
             }
         }
     },
         [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &desc)
     {
-        if(slot.cpuDescriptor)
-            slot.freeCPUDescriptorQueue.push(slot.cpuDescriptor);
-        if(slot.gpuDescriptor)
-            slot.freeGPUDescriptorQueue.push(slot.gpuDescriptor);
+        if(perFrame->cpu)
+            perFrame->freeCPUQueue.push(perFrame->cpu);
+        if(perFrame->gpu)
+            perFrame->freeGPUQueue.push(perFrame->gpu);
 
         ID3D12Resource *uavCounterResource = nullptr;
         if(slot.uavCounterResourceIndex >= 0)
@@ -299,30 +314,30 @@ void Runtime::refreshDescriptor(DescriptorSlot &slot)
 
         if(slot.cpu)
         {
-            assert(!slot.freeCPUDescriptorQueue.empty());
-            slot.cpuDescriptor = slot.freeCPUDescriptorQueue.front();
-            slot.freeCPUDescriptorQueue.pop();
+            assert(!perFrame->freeCPUQueue.empty());
+            perFrame->cpu = perFrame->freeCPUQueue.front();
+            perFrame->freeCPUQueue.pop();
 
             device_->CreateUnorderedAccessView(
-                resource, uavCounterResource, &desc, slot.cpuDescriptor);
+                resource, uavCounterResource, &desc, perFrame->cpu);
         }
 
         if(slot.gpu)
         {
-            assert(!slot.freeGPUDescriptorQueue.empty());
-            slot.gpuDescriptor = slot.freeGPUDescriptorQueue.front();
-            slot.freeGPUDescriptorQueue.pop();
+            assert(!perFrame->freeGPUQueue.empty());
+            perFrame->gpu = perFrame->freeGPUQueue.front();
+            perFrame->freeGPUQueue.pop();
 
             if(slot.cpu)
             {
                 device_->CopyDescriptorsSimple(
-                    1, slot.gpuDescriptor, slot.cpuDescriptor,
+                    1, perFrame->gpu, perFrame->cpu,
                     D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
             }
             else
             {
                 device_->CreateUnorderedAccessView(
-                    resource, uavCounterResource, &desc, slot.gpuDescriptor);
+                    resource, uavCounterResource, &desc, perFrame->gpu);
             }
         }
     },
@@ -330,45 +345,48 @@ void Runtime::refreshDescriptor(DescriptorSlot &slot)
     {
         assert(slot.cpu && !slot.gpu);
 
-        if(slot.cpuDescriptor)
-            slot.freeCPUDescriptorQueue.push(slot.cpuDescriptor);
+        if(perFrame->cpu)
+            perFrame->freeCPUQueue.push(perFrame->cpu);
 
-        assert(!slot.freeCPUDescriptorQueue.empty());
-        slot.cpuDescriptor = slot.freeCPUDescriptorQueue.front();
-        slot.freeCPUDescriptorQueue.pop();
+        assert(!perFrame->freeCPUQueue.empty());
+        perFrame->cpu = perFrame->freeCPUQueue.front();
+        perFrame->freeCPUQueue.pop();
 
-        device_->CreateRenderTargetView(resource, &desc, slot.cpuDescriptor);
+        device_->CreateRenderTargetView(resource, &desc, perFrame->cpu);
     },
         [&](const D3D12_DEPTH_STENCIL_VIEW_DESC &desc)
     {
         assert(slot.cpu && !slot.gpu);
 
-        if(slot.cpuDescriptor)
-            slot.freeCPUDescriptorQueue.push(slot.cpuDescriptor);
+        if(perFrame->cpu)
+            perFrame->freeCPUQueue.push(perFrame->cpu);
 
-        assert(!slot.freeCPUDescriptorQueue.empty());
-        slot.cpuDescriptor = slot.freeCPUDescriptorQueue.front();
-        slot.freeCPUDescriptorQueue.pop();
+        assert(!perFrame->freeCPUQueue.empty());
+        perFrame->cpu = perFrame->freeCPUQueue.front();
+        perFrame->freeCPUQueue.pop();
 
-        device_->CreateDepthStencilView(resource, &desc, slot.cpuDescriptor);
+        device_->CreateDepthStencilView(resource, &desc, perFrame->cpu);
     },
         [&](const std::monostate &)
     {
         misc::unreachable();
     });
 
-    slot.isDirty = false;
+    perFrame->isDirty = false;
 }
 
 void Runtime::refreshDescriptorRange(DescriptorRangeSlot &slot)
 {
-    if(!slot.isDirty)
+    DescriptorRangeSlot::PerFrame *perFrame =
+        slot.isPerFrame ? &slot.frames[frameIndex_] : &slot.frames.front();
+
+    if(!perFrame->isDirty)
         return;
 
-    if(slot.cpuDescriptorRange.getCount())
-        slot.freeCPUDescriptorRangeQueue.push(slot.cpuDescriptorRange);
-    if(slot.gpuDescriptorRange.getCount())
-        slot.freeGPUDescriptorRangeQueue.push(slot.gpuDescriptorRange);
+    if(perFrame->cpu.getCount())
+        perFrame->freeCPUQueue.push(perFrame->cpu);
+    if(perFrame->gpu.getCount())
+        perFrame->freeGPUQueue.push(perFrame->gpu);
 
     auto createView = [&](
         ID3D12Resource   *resource,
@@ -415,8 +433,8 @@ void Runtime::refreshDescriptorRange(DescriptorRangeSlot &slot)
 
     if(slot.cpu)
     {
-        slot.cpuDescriptorRange = slot.freeCPUDescriptorRangeQueue.front();
-        slot.freeCPUDescriptorRangeQueue.pop();
+        perFrame->cpu= perFrame->freeCPUQueue.front();
+        perFrame->freeCPUQueue.pop();
 
         for(uint32_t i = 0; i < slot.views.size(); ++i)
         {
@@ -424,22 +442,22 @@ void Runtime::refreshDescriptorRange(DescriptorRangeSlot &slot)
             createView(
                 resource,
                 slot.uavCounterResourceIndices[i],
-                slot.cpuDescriptorRange[i],
+                perFrame->cpu[i],
                 slot.views[i]);
         }
     }
 
     if(slot.gpu)
     {
-        slot.gpuDescriptorRange = slot.freeGPUDescriptorRangeQueue.front();
-        slot.freeGPUDescriptorRangeQueue.pop();
+        perFrame->gpu = perFrame->freeGPUQueue.front();
+        perFrame->freeGPUQueue.pop();
 
         if(slot.cpu)
         {
             device_->CopyDescriptorsSimple(
-                slot.gpuDescriptorRange.getCount(),
-                slot.gpuDescriptorRange[0],
-                slot.cpuDescriptorRange[0],
+                perFrame->gpu.getCount(),
+                perFrame->gpu[0],
+                perFrame->cpu[0],
                 slot.heapType);
         }
         else
@@ -450,13 +468,13 @@ void Runtime::refreshDescriptorRange(DescriptorRangeSlot &slot)
                 createView(
                     resource,
                     slot.uavCounterResourceIndices[i],
-                    slot.gpuDescriptorRange[i],
+                    perFrame->gpu[i],
                     slot.views[i]);
             }
         }
     }
 
-    slot.isDirty = false;
+    perFrame->isDirty = false;
 }
 
 AGZ_D3D12_GRAPH_END

@@ -824,7 +824,7 @@ void Compiler::generateDescriptorRecords(Temps &temps)
 }
 
 void Compiler::fillRuntimeResources(
-    Runtime    &runtime,
+    Runtime         &runtime,
     ResourceManager &rscMgr,
     Temps           &temps) const
 {
@@ -835,37 +835,48 @@ void Compiler::fillRuntimeResources(
     for(size_t ri = 0; ri < resources_.size(); ++ri)
     {
         auto resource = resources_[ri].get();
+
+        const int actualResourceCount =
+            resource->isPerFrame() ? frameCount_ : 1;
+
         if(auto internal = resource->asInternal())
         {
-            UniqueResource actualResource;
-            if(internal->clear_)
-            {
-                actualResource = rscMgr.create(
-                    internal->heapType_, internal->getDescription(),
-                    internal->initialState_, internal->clearValue_);
-            }
-            else
-            {
-                actualResource = rscMgr.create(
-                    internal->heapType_, internal->getDescription(),
-                    internal->initialState_);
-            }
-
-            AGZ_WHEN_DEBUG({
-                actualResource.get().resource->SetName(
-                    stdstr::u8_to_wstr(resource->getName()).c_str());
-            });
-
             Runtime::InternalResourceRuntime resourceRuntime;
-            resourceRuntime.resource = std::move(actualResource);
-            resourceRuntime.index    = static_cast<int>(ri);
+            resourceRuntime.isPerFrame = resource->isPerFrame();
+            resourceRuntime.index = static_cast<int>(ri);
+            resourceRuntime.resource.resize(actualResourceCount);
+
+            for(int i = 0; i < actualResourceCount; ++i)
+            {
+                UniqueResource actualResource;
+                if(internal->clear_)
+                {
+                    actualResource = rscMgr.create(
+                        internal->heapType_, internal->getDescription(),
+                        internal->initialState_, internal->clearValue_);
+                }
+                else
+                {
+                    actualResource = rscMgr.create(
+                        internal->heapType_, internal->getDescription(),
+                        internal->initialState_);
+                }
+
+                AGZ_WHEN_DEBUG({
+                    actualResource.get().resource->SetName(
+                        stdstr::u8_to_wstr(resource->getName()).c_str());
+                });
+                resourceRuntime.resource[i] = std::move(actualResource);
+            }
 
             runtime.resources_[ri] = std::move(resourceRuntime);
         }
         else
         {
             Runtime::ExternalResourceRuntime resourceRuntime;
+            resourceRuntime.isPerFrame = resource->isPerFrame();
             resourceRuntime.index = static_cast<int>(ri);
+            resourceRuntime.resource.resize(actualResourceCount);
             
             runtime.resources_[ri] = std::move(resourceRuntime);
         }
@@ -1075,40 +1086,76 @@ void Compiler::fillRuntimeDescriptors(
             threadData.descriptorSlots.push_back(d.slot);
             auto &slot = runtime.descriptorSlots_[d.slot];
 
+            bool isPerFrame = d.item->info_.resource->isPerFrame();
+            if(d.item->info_.uavCounterResource)
+                isPerFrame |= d.item->info_.uavCounterResource->isPerFrame();
+
             slot.resourceIndex = d.item->info_.resource->getIndex();
             slot.cpu           = d.item->cpu_;
             slot.gpu           = d.item->gpu_;
             slot.view          = d.item->info_.view;
-            slot.isDirty       = true;
-
+            slot.isPerFrame    = isPerFrame;
+            
             slot.uavCounterResourceIndex =
                 d.item->info_.uavCounterResource ?
                 d.item->info_.uavCounterResource->getIndex() : -1;
 
-            if(slot.view.is<D3D12_RENDER_TARGET_VIEW_DESC>())
+            if(isPerFrame)
             {
-                for(int i = 0; i < frameCount_; ++i)
-                    slot.freeCPUDescriptorQueue.push(allRTVs[rtvOffset++]);
-            }
-            else if(slot.view.is<D3D12_DEPTH_STENCIL_VIEW_DESC>())
-            {
-                for(int i = 0; i < frameCount_; ++i)
-                    slot.freeCPUDescriptorQueue.push(allDSVs[dsvOffset++]);
+                slot.frames.resize(frameCount_);
+                for(auto &frame : slot.frames)
+                {
+                    frame.isDirty = true;
+
+                    if(slot.view.is<D3D12_RENDER_TARGET_VIEW_DESC>())
+                    {
+                        frame.freeCPUQueue.push(allRTVs[rtvOffset++]);
+                    }
+                    else if(slot.view.is<D3D12_DEPTH_STENCIL_VIEW_DESC>())
+                    {
+                        frame.freeCPUQueue.push(allDSVs[dsvOffset++]);
+                    }
+                    else
+                    {
+                        if(slot.cpu)
+                            frame.freeCPUQueue.push(allCPUDescs[cpuDescOffset++]);
+                        if(slot.gpu)
+                            frame.freeGPUQueue.push(allGPUDescs[gpuDescOffset++]);
+                    }
+                }
             }
             else
             {
-                for(int i = 0; i < frameCount_; ++i)
-                {
-                    if(slot.cpu)
-                    {
-                        slot.freeCPUDescriptorQueue.push(
-                            allCPUDescs[cpuDescOffset++]);
-                    }
+                slot.frames.emplace_back();
+                auto &frame = slot.frames.front();
 
-                    if(slot.gpu)
+                frame.isDirty = true;
+
+                if(slot.view.is<D3D12_RENDER_TARGET_VIEW_DESC>())
+                {
+                    for(int i = 0; i < frameCount_; ++i)
+                        frame.freeCPUQueue.push(allRTVs[rtvOffset++]);
+                }
+                else if(slot.view.is<D3D12_DEPTH_STENCIL_VIEW_DESC>())
+                {
+                    for(int i = 0; i < frameCount_; ++i)
+                        frame.freeCPUQueue.push(allDSVs[dsvOffset++]);
+                }
+                else
+                {
+                    for(int i = 0; i < frameCount_; ++i)
                     {
-                        slot.freeGPUDescriptorQueue.push(
-                            allGPUDescs[gpuDescOffset++]);
+                        if(slot.cpu)
+                        {
+                            frame.freeCPUQueue.push(
+                                allCPUDescs[cpuDescOffset++]);
+                        }
+
+                        if(slot.gpu)
+                        {
+                            frame.freeGPUQueue.push(
+                                allGPUDescs[gpuDescOffset++]);
+                        }
                     }
                 }
             }
@@ -1153,6 +1200,7 @@ void Compiler::fillRuntimeDescriptors(
             slot.uavCounterResourceIndices.resize(recordCount);
             slot.views.resize(recordCount);
 
+            bool isRangePerFrame = false;
             for(uint32_t i = 0; i < recordCount; ++i)
             {
                 slot.resourceIndices[i] = d.table->records_[i].resource->getIndex();
@@ -1161,12 +1209,102 @@ void Compiler::fillRuntimeDescriptors(
                 slot.uavCounterResourceIndices[i] =
                     d.table->records_[i].uavCounterResource ?
                     d.table->records_[i].uavCounterResource->getIndex() : -1;
+
+                if(d.table->records_[i].resource->isPerFrame())
+                    isRangePerFrame = true;
+
+                if(d.table->records_[i].uavCounterResource &&
+                   d.table->records_[i].uavCounterResource->isPerFrame())
+                    isRangePerFrame = true;
             }
 
-            slot.heapType = viewToHeapType(d.table->records_.front().view);
-            slot.cpu      = d.table->cpu_;
-            slot.gpu      = d.table->gpu_;
-            slot.isDirty  = true;
+            slot.heapType   = viewToHeapType(d.table->records_.front().view);
+            slot.cpu        = d.table->cpu_;
+            slot.gpu        = d.table->gpu_;
+            slot.isPerFrame = isRangePerFrame;
+            
+            if(isRangePerFrame)
+            {
+                slot.frames.resize(frameCount_);
+                for(auto &frame : slot.frames)
+                {
+                    frame.isDirty = true;
+
+                    if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
+                    {
+                        frame.freeCPUQueue.push(
+                            allRTVs.getSubRange(rtvOffset, recordCount));
+                        rtvOffset += recordCount;
+                    }
+                    else if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_DSV)
+                    {
+                        frame.freeCPUQueue.push(
+                            allDSVs.getSubRange(dsvOffset, recordCount));
+                        dsvOffset += recordCount;
+                    }
+                    else
+                    {
+                        if(slot.cpu)
+                        {
+                            frame.freeCPUQueue.push(
+                                allCPUDescs.getSubRange(cpuDescOffset, recordCount));
+                            cpuDescOffset += recordCount;
+                        }
+
+                        if(slot.gpu)
+                        {
+                            frame.freeGPUQueue.push(
+                                allGPUDescs.getSubRange(gpuDescOffset, recordCount));
+                            gpuDescOffset += recordCount;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                slot.frames.emplace_back();
+                auto &frame = slot.frames.front();
+
+                frame.isDirty = true;
+
+                if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
+                {
+                    for(int i = 0; i < frameCount_; ++i)
+                    {
+                        frame.freeCPUQueue.push(
+                            allRTVs.getSubRange(rtvOffset, recordCount));
+                        rtvOffset += recordCount;
+                    }
+                }
+                else if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_DSV)
+                {
+                    for(int i = 0; i < frameCount_; ++i)
+                    {
+                        frame.freeCPUQueue.push(
+                            allDSVs.getSubRange(dsvOffset, recordCount));
+                        dsvOffset += recordCount;
+                    }
+                }
+                else
+                {
+                    for(int i = 0; i < frameCount_; ++i)
+                    {
+                        if(slot.cpu)
+                        {
+                            frame.freeCPUQueue.push(
+                                allCPUDescs.getSubRange(cpuDescOffset, recordCount));
+                            cpuDescOffset += recordCount;
+                        }
+
+                        if(slot.gpu)
+                        {
+                            frame.freeGPUQueue.push(
+                                allGPUDescs.getSubRange(gpuDescOffset, recordCount));
+                            gpuDescOffset += recordCount;
+                        }
+                    }
+                }
+            }
 
             AGZ_WHEN_DEBUG({
                 for(uint32_t i = 1; i < recordCount; ++i)
@@ -1179,44 +1317,6 @@ void Compiler::fillRuntimeDescriptors(
                     }
                 }
             });
-
-            if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
-            {
-                for(int i = 0; i < frameCount_; ++i)
-                {
-                    slot.freeCPUDescriptorRangeQueue.push(
-                        allRTVs.getSubRange(rtvOffset, recordCount));
-                    rtvOffset += recordCount;
-                }
-            }
-            else if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_DSV)
-            {
-                for(int i = 0; i < frameCount_; ++i)
-                {
-                    slot.freeCPUDescriptorRangeQueue.push(
-                        allDSVs.getSubRange(dsvOffset, recordCount));
-                    dsvOffset += recordCount;
-                }
-            }
-            else
-            {
-                for(int i = 0; i < frameCount_; ++i)
-                {
-                    if(slot.cpu)
-                    {
-                        slot.freeCPUDescriptorRangeQueue.push(
-                            allCPUDescs.getSubRange(cpuDescOffset, recordCount));
-                        cpuDescOffset += recordCount;
-                    }
-
-                    if(slot.gpu)
-                    {
-                        slot.freeGPUDescriptorRangeQueue.push(
-                            allGPUDescs.getSubRange(gpuDescOffset, recordCount));
-                        gpuDescOffset += recordCount;
-                    }
-                }
-            }
         }
     }
 }

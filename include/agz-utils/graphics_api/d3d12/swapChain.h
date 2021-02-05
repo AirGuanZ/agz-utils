@@ -42,6 +42,8 @@ public:
 
     const ComPtr<ID3D12Resource> &getImage() const noexcept;
 
+    const ComPtr<ID3D12Resource> &getImage(int index) const noexcept;
+
     void swapBuffers();
 
     int getWidth() const noexcept;

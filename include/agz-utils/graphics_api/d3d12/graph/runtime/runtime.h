@@ -10,26 +10,30 @@ AGZ_D3D12_GRAPH_BEGIN
 
 struct DescriptorSlot
 {
-    int resourceIndex = 0;
-
+    int resourceIndex           = 0;
     int uavCounterResourceIndex = 0;
 
     bool cpu = false;
     bool gpu = false;
     ResourceView view;
 
-    bool isDirty = false;
-    Descriptor cpuDescriptor;
-    Descriptor gpuDescriptor;
+    struct PerFrame
+    {
+        bool                   isDirty = false;
+        Descriptor             cpu;
+        Descriptor             gpu;
 
-    std::queue<Descriptor> freeCPUDescriptorQueue;
-    std::queue<Descriptor> freeGPUDescriptorQueue;
+        std::queue<Descriptor> freeCPUQueue;
+        std::queue<Descriptor> freeGPUQueue;
+    };
+
+    bool                  isPerFrame = false;
+    std::vector<PerFrame> frames;
 };
 
 struct DescriptorRangeSlot
 {
     std::vector<int> resourceIndices;
-
     std::vector<int> uavCounterResourceIndices;
 
     D3D12_DESCRIPTOR_HEAP_TYPE heapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -37,13 +41,19 @@ struct DescriptorRangeSlot
     bool cpu = false;
     bool gpu = false;
     std::vector<ResourceView> views;
-    
-    bool isDirty = false;
-    DescriptorRange cpuDescriptorRange;
-    DescriptorRange gpuDescriptorRange;
 
-    std::queue<DescriptorRange> freeCPUDescriptorRangeQueue;
-    std::queue<DescriptorRange> freeGPUDescriptorRangeQueue;
+    struct PerFrame
+    {
+        bool            isDirty = false;
+        DescriptorRange cpu;
+        DescriptorRange gpu;
+
+        std::queue<DescriptorRange> freeCPUQueue;
+        std::queue<DescriptorRange> freeGPUQueue;
+    };
+
+    bool                  isPerFrame = false;
+    std::vector<PerFrame> frames;
 };
 
 class Runtime : public misc::uncopyable_t
@@ -66,6 +76,9 @@ public:
 
     void setExternalResource(
         ExternalResource *node, ComPtr<ID3D12Resource> resource);
+
+    void setExternalResource(
+        ExternalResource *node, int frameIndex, ComPtr<ID3D12Resource> resource);
 
     void clearExternalResources();
 
@@ -94,7 +107,8 @@ private:
         InternalResourceRuntime &operator=(
             InternalResourceRuntime &&) noexcept = default;
 
-        UniqueResource resource;
+        bool                        isPerFrame = false;
+        std::vector<UniqueResource> resource;
     };
 
     struct ExternalResourceRuntime : ResourceRuntimeCommon
@@ -105,7 +119,8 @@ private:
         ExternalResourceRuntime &operator=(
             ExternalResourceRuntime &&) noexcept = default;
 
-        ComPtr<ID3D12Resource> resource;
+        bool                                isPerFrame = false;
+        std::vector<ComPtr<ID3D12Resource>> resource;
     };
 
     using ResourceRuntime = misc::variant_t<

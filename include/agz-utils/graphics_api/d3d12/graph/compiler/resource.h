@@ -28,6 +28,10 @@ public:
 
     virtual const ExternalResource *asExternal() const;
 
+    void setPerFrame(bool isPerFrame = true);
+
+    bool isPerFrame() const;
+
     void setDescription(const D3D12_RESOURCE_DESC &desc);
 
     const D3D12_RESOURCE_DESC &getDescription() const;
@@ -41,6 +45,8 @@ private:
 
     std::string name_;
     int         index_;
+
+    bool isPerFrame_;
 
     D3D12_RESOURCE_DESC desc_;
 };
