@@ -777,7 +777,7 @@ void Compiler::generateDescriptorRecords(Temps &temps)
         auto &passTemp = temps.passes[p->getIndex()];
         for(auto &u : p->descriptors_)
         {
-            assert(!u->view_.is<std::monostate>());
+            assert(!u->info_.view.is<std::monostate>());
             const int slot = allocateDescriptorSlot({ p->thread_, u.get() });
             passTemp.descriptors_.push_back({ u.get(), slot });
         }
@@ -1276,12 +1276,20 @@ void Compiler::fillRuntimeSections(
                     });
                 }
 
-                section.addPass(PassRuntime(
+                auto passRuntime = PassRuntime(
                     &runtime,
                     pass->callback_,
                     passTemp.stateTransitions,
                     std::move(descriptorMap),
-                    std::move(descriptorRangeMap)));
+                    std::move(descriptorRangeMap));
+
+#ifdef AGZ_DEBUG
+
+                passRuntime.setNameAndIndex(pass->name_, pass->index_);
+
+#endif
+
+                section.addPass(std::move(passRuntime));
             }
 
             for(auto &f : sectionTemp.waitFences)

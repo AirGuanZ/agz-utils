@@ -24,11 +24,26 @@ public:
         PassContext::DescriptorMap      descriptors,
         PassContext::DescriptorRangeMap descriptorRanges);
 
+    PassRuntime(PassRuntime &&) noexcept = default;
+    
+#ifdef AGZ_DEBUG
+
+    void setNameAndIndex(std::string name, int index);
+
+#endif
+
     void execute(
         int                     frameIndex,
         RawGraphicsCommandList *cmdList) const;
 
 private:
+
+#ifdef AGZ_DEBUG
+
+    std::string passName_;
+    int         passIndex_;
+
+#endif
 
     Runtime *runtime_;
 

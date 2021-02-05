@@ -37,6 +37,8 @@ Device::Device(bool graphicsQueue, bool computeQueue)
             "failed to create d3d12 graphics command queue",
             device_->CreateCommandQueue(
                 &desc, IID_PPV_ARGS(graphicsQueue_.GetAddressOf())));
+
+        graphicsQueue_->SetName(L"default_graphics_command_queue");
     }
 
     if(computeQueue)
@@ -51,6 +53,8 @@ Device::Device(bool graphicsQueue, bool computeQueue)
             "failed to create d3d12 graphics command queue",
             device_->CreateCommandQueue(
                 &desc, IID_PPV_ARGS(computeQueue_.GetAddressOf())));
+
+        computeQueue_->SetName(L"default_compute_command_queue");
     }
 
     queueWaiter_ = std::make_unique<CommandQueueWaiter>(device_.Get());

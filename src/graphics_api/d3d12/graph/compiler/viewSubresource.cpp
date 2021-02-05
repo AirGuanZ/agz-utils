@@ -32,8 +32,8 @@ namespace
         const D3D12_RESOURCE_DESC &rsc, UINT mostDetailed, UINT mipLevels)
     {
         const UINT end =
-            mipLevels > 0 ? (mostDetailed + mipLevels)
-                          : getTotalMipLevelCount(rsc);
+            0 < mipLevels && mipLevels != UINT(-1) ?
+            (mostDetailed + mipLevels) : getTotalMipLevelCount(rsc);
 
         std::vector<UINT> ret;
         for(UINT m = mostDetailed; m < end; ++m)

@@ -27,6 +27,16 @@ PassRuntime::PassRuntime(
     }
 }
 
+#ifdef AGZ_DEBUG
+
+void PassRuntime::setNameAndIndex(std::string name, int index)
+{
+    passName_ = std::move(name);
+    passIndex_ = index;
+}
+
+#endif
+
 void PassRuntime::execute(
     int                     frameIndex,
     RawGraphicsCommandList *cmdList) const
