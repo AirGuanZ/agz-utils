@@ -2,59 +2,12 @@
 
 #include <queue>
 
+#include <agz-utils/graphics_api/d3d12/graph/runtime/descriptorSlotManager.h>
 #include <agz-utils/graphics_api/d3d12/graph/runtime/section.h>
 #include <agz-utils/graphics_api/d3d12/uniqueResource.h>
 #include <agz-utils/thread.h>
 
 AGZ_D3D12_GRAPH_BEGIN
-
-struct DescriptorSlot
-{
-    int resourceIndex           = 0;
-    int uavCounterResourceIndex = 0;
-
-    bool cpu = false;
-    bool gpu = false;
-    ResourceView view;
-
-    struct PerFrame
-    {
-        bool                   isDirty = false;
-        Descriptor             cpu;
-        Descriptor             gpu;
-
-        std::queue<Descriptor> freeCPUQueue;
-        std::queue<Descriptor> freeGPUQueue;
-    };
-
-    bool                  isPerFrame = false;
-    std::vector<PerFrame> frames;
-};
-
-struct DescriptorRangeSlot
-{
-    std::vector<int> resourceIndices;
-    std::vector<int> uavCounterResourceIndices;
-
-    D3D12_DESCRIPTOR_HEAP_TYPE heapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    
-    bool cpu = false;
-    bool gpu = false;
-    std::vector<ResourceView> views;
-
-    struct PerFrame
-    {
-        bool            isDirty = false;
-        DescriptorRange cpu;
-        DescriptorRange gpu;
-
-        std::queue<DescriptorRange> freeCPUQueue;
-        std::queue<DescriptorRange> freeGPUQueue;
-    };
-
-    bool                  isPerFrame = false;
-    std::vector<PerFrame> frames;
-};
 
 class Runtime : public misc::uncopyable_t
 {
@@ -157,9 +110,7 @@ private:
 
     std::vector<ComPtr<ID3D12CommandQueue>> queues_;
 
-    std::vector<ResourceRuntime>     resources_;
-    std::vector<DescriptorSlot>      descriptorSlots_;
-    std::vector<DescriptorRangeSlot> descriptorRangeSlots_;
+    std::vector<ResourceRuntime> resources_;
 
     std::vector<PerThreadData> perThreadData_;
     std::vector<std::thread>   threads_;
@@ -170,14 +121,9 @@ private:
     int threadTrigger_ = -1;
     UINT64 fenceValue_ = 0;
 
-    DescriptorAllocator *GPUDescAlloc_ = nullptr;
-    DescriptorRange      GPUDescRange_;
-
     ComPtr<ID3D12DescriptorHeap> samplerHeap_;
 
-    DescriptorHeap CPUDescriptorHeap_;
-    DescriptorHeap RTVDescriptorHeap_;
-    DescriptorHeap DSVDescriptorHeap_;
+    DescriptorSlotManager descSlotMgr_;
 };
 
 AGZ_D3D12_GRAPH_END

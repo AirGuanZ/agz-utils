@@ -78,6 +78,21 @@ bool DescriptorItem::operator<(const DescriptorItem &rhs) const
     return std::tie(cpu_, gpu_, info_) < std::tie(rhs.cpu_, rhs.gpu_, rhs.info_);
 }
 
+const DescriptorInfo &DescriptorItem::getInfo() const
+{
+    return info_;
+}
+
+bool DescriptorItem::isOnCPU() const
+{
+    return cpu_;
+}
+
+bool DescriptorItem::isOnGPU() const
+{
+    return gpu_;
+}
+
 DescriptorTable::DescriptorTable(bool cpu, bool gpu)
     : cpu_(cpu), gpu_(gpu)
 {
@@ -119,6 +134,21 @@ bool DescriptorTable::operator<(const DescriptorTable &rhs) const
 {
     return std::tie(cpu_, gpu_, records_) <
            std::tie(rhs.cpu_, rhs.gpu_, rhs.records_);
+}
+
+misc::span<const DescriptorInfo> DescriptorTable::getRecords() const
+{
+    return { records_.data(), records_.data() + records_.size() };
+}
+
+bool DescriptorTable::isOnCPU() const
+{
+    return cpu_;
+}
+
+bool DescriptorTable::isOnGPU() const
+{
+    return gpu_;
 }
 
 AGZ_D3D12_GRAPH_END

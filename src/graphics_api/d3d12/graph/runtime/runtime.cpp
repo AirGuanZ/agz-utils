@@ -56,10 +56,10 @@ void Runtime::frameFunc(int threadIndex)
     // refresh descriptors
 
     for(int i : threadData.descriptorSlots)
-        refreshDescriptor(descriptorSlots_[i]);
+        refreshDescriptor(*descSlotMgr_.getSlot(i));
 
     for(int i : threadData.descriptorRangeSlots)
-        refreshDescriptorRange(descriptorRangeSlots_[i]);
+        refreshDescriptorRange(*descSlotMgr_.getRangeSlot(i));
 
     // reset command allocators
 
@@ -71,7 +71,7 @@ void Runtime::frameFunc(int threadIndex)
 
     // execute sections
 
-    ID3D12DescriptorHeap *heaps[2] = { GPUDescAlloc_->getHeap(), nullptr };
+    ID3D12DescriptorHeap *heaps[2] = { descSlotMgr_.getGPUHeap(), nullptr };
 
     int heapCount = 1;
     if(samplerHeap_)
@@ -188,10 +188,10 @@ void Runtime::setExternalResource(
     external.resource[frameIndex] = std::move(resource);
 
     for(auto ds : external.descriptorSlots)
-        descriptorSlots_[ds].frames[frameIndex].isDirty = true;
+        descSlotMgr_.getSlot(ds)->frames[frameIndex].isDirty = true;
 
     for(auto ds : external.descriptorRangeSlots)
-        descriptorRangeSlots_[ds].frames[frameIndex].isDirty = true;
+        descSlotMgr_.getRangeSlot(ds)->frames[frameIndex].isDirty = true;
 }
 
 void Runtime::clearExternalResources()
@@ -220,8 +220,7 @@ void Runtime::reset()
     queues_.clear();
 
     resources_.clear();
-    descriptorSlots_.clear();
-    descriptorRangeSlots_.clear();
+    descSlotMgr_.reset();
 
     perThreadData_.clear();
     threads_.clear();
@@ -230,21 +229,7 @@ void Runtime::reset()
     threadTrigger_ = -1;
     fenceValue_    = 0;
 
-    if(GPUDescAlloc_)
-    {
-        if(GPUDescRange_.getCount())
-        {
-            GPUDescAlloc_->freeRangeStatic(GPUDescRange_);
-            GPUDescRange_ = {};
-        }
-        GPUDescAlloc_ = nullptr;
-    }
-
     samplerHeap_.Reset();
-
-    CPUDescriptorHeap_.destroy();
-    RTVDescriptorHeap_.destroy();
-    DSVDescriptorHeap_.destroy();
 }
 
 void Runtime::refreshDescriptor(DescriptorSlot &slot)

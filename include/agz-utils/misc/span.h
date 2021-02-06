@@ -31,6 +31,12 @@ public:
         assert(!size || elems);
     }
 
+    span(T *beg, T *end) noexcept
+        : elems_(beg == end ? nullptr : beg), size_(end - beg)
+    {
+
+    }
+
     size_t size() const noexcept
     {
         return size_;

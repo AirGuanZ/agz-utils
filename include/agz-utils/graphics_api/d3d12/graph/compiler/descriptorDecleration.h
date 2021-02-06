@@ -57,6 +57,12 @@ public:
 
     bool operator<(const DescriptorItem &rhs) const;
 
+    const DescriptorInfo &getInfo() const;
+
+    bool isOnCPU() const;
+
+    bool isOnGPU() const;
+
 private:
 
     friend class Compiler;
@@ -93,6 +99,12 @@ public:
         const D3D12_DEPTH_STENCIL_VIEW_DESC &desc);
 
     bool operator<(const DescriptorTable &rhs) const;
+
+    misc::span<const DescriptorInfo> getRecords() const;
+
+    bool isOnCPU() const;
+
+    bool isOnGPU() const;
 
 private:
 

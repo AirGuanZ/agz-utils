@@ -5,7 +5,7 @@
 AGZ_D3D12_GRAPH_BEGIN
 
 Resource::Resource(std::string name, int index)
-    : name_(std::move(name)), index_(index), desc_{}
+    : name_(std::move(name)), index_(index), isPerFrame_(false), desc_{}
 {
     
 }

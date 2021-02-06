@@ -2,6 +2,7 @@
 
 #include <set>
 
+#include <agz-utils/graphics_api/d3d12/graph/compiler/descriptorSlotAssigner.h>
 #include <agz-utils/graphics_api/d3d12/graph/compiler/pass.h>
 #include <agz-utils/graphics_api/d3d12/graph/runtime/runtime.h>
 #include <agz-utils/graphics_api/d3d12/resourceManager.h>
@@ -90,21 +91,6 @@ private:
     {
         std::vector<int> passes;
         std::vector<int> sections;
-
-        struct DescriptorRecord
-        {
-            int                   slot;
-            const DescriptorItem *item;
-        };
-
-        struct DescriptorRangeRecord
-        {
-            int                    slot;
-            const DescriptorTable *table;
-        };
-
-        std::vector<DescriptorRecord>      descs;
-        std::vector<DescriptorRangeRecord> descRanges;
     };
 
     struct Temps
@@ -113,6 +99,8 @@ private:
         std::vector<PassTemp>    passes;
         std::vector<SectionTemp> sections;
         std::vector<ThreadTemp>  threads;
+
+        DescriptorSlotAssigner descSlotAllocator;
     };
 
     void addDependencyImpl(Vertex *head, Vertex *tail, bool crossFrame);

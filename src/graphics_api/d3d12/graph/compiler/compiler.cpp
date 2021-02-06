@@ -3,8 +3,8 @@
 #include <tuple>
 
 #include <agz-utils/graphics_api/d3d12/graph/compiler/compiler.h>
+#include <agz-utils/graphics_api/d3d12/graph/compiler/resourceStatesTracker.h>
 #include <agz-utils/graphics_api/d3d12/graph/compiler/viewComparer.h>
-#include <agz-utils/graphics_api/d3d12/graph/compiler/viewSubresource.h>
 #include <agz-utils/graphics_api/d3d12/mipmapGenerator.h>
 #include <agz-utils/string.h>
 
@@ -451,198 +451,51 @@ void Compiler::generateSectionDependencies(
 
 void Compiler::generateResourceTransitions(Temps &temps)
 {
-    struct ResourceRecord
-    {
-        struct Usage
-        {
-            int pass;
-            std::map<UINT, D3D12_RESOURCE_STATES> state;
-        };
-
-        std::vector<Usage> usages;
-    };
-
-    std::vector<ResourceRecord> resourceRecords(resources_.size());
+    std::vector<ResourceStatesTracker> trackers(resources_.size());
+    for(size_t i = 0; i < resources_.size(); ++i)
+        trackers[i] = ResourceStatesTracker(resources_[i].get());
 
     for(int pi : temps.linearPasses)
     {
         auto &p = passes_[pi];
 
-        std::map<std::pair<int, UINT>, D3D12_RESOURCE_STATES> rscStates;
-
         for(auto &pair : p->states_)
         {
-            if(pair.second.subresource != D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
-            {
-                rscStates.insert({
-                    std::make_pair(
-                        pair.first->getIndex(),
-                        pair.second.subresource),
-                    pair.second.state
-                });
-            }
-            else
-            {
-                const UINT subrscCount = getSubresourceCount(
-                    pair.first->getDescription());
+            trackers[pair.first->getIndex()].addResourceState(
+                p->getIndex(), pair.second.subresource, pair.second.state);
+        }
 
-                for(UINT i = 0; i < subrscCount; ++i)
-                {
-                    rscStates.insert({
-                        std::make_pair(pair.first->getIndex(), i),
-                        pair.second.state
-                    });
-                }
+        for(auto &desc : p->descriptors_)
+        {
+            trackers[desc->getResource()->getIndex()].addDescriptor(
+                p->getIndex(), desc->getInfo());
+
+            if(desc->getInfo().uavCounterResource)
+            {
+                trackers[desc->getInfo().uavCounterResource->getIndex()]
+                    .addResourceState(
+                        p->getIndex(), 0, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
             }
         }
 
-        auto addNewState = [&](
-            const Resource *rsc, UINT subrsc, D3D12_RESOURCE_STATES state)
+        for(auto &table : p->descriptorTables_)
         {
-            if(auto it = rscStates.find({ rsc->getIndex(), subrsc });
-               it != rscStates.end())
-                it->second |= state;
-            else
+            for(auto &descInfo : table->getRecords())
             {
-                if(subrsc != D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
-                    rscStates.insert({ { rsc->getIndex(), subrsc }, state });
-                else
-                {
-                    const UINT subrscCount = getSubresourceCount(
-                        rsc->getDescription());
-                    for(UINT i = 0; i < subrscCount; ++i)
-                        rscStates.insert({ { rsc->getIndex(), i }, state });
-                }
+                trackers[descInfo.resource->getIndex()].addDescriptor(
+                    p->getIndex(), descInfo);
             }
-        };
-
-        auto shaderResourceTypeToState = [](ShaderResourceType type)
-        {
-            switch(type)
-            {
-            case ShaderResourceType::PixelOnly:
-                return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-            case ShaderResourceType::NonPixelOnly:
-                return D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-            case ShaderResourceType::PixelAndNonPixel:
-                return D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE |
-                       D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-            }
-            misc::unreachable();
-        };
-
-        auto depthStencilTypeToState = [](DepthStencilType type)
-        {
-            switch(type)
-            {
-            case DepthStencilType::ReadOnly:
-                return D3D12_RESOURCE_STATE_DEPTH_READ;
-            case DepthStencilType::ReadAndWrite:
-                return D3D12_RESOURCE_STATE_DEPTH_WRITE;
-            }
-            misc::unreachable();
-        };
-
-        auto addNewDescDecl = [&](
-            const Resource     *resource,
-            const Resource     *uavCounterResource,
-            UINT                subrsc,
-            const ResourceView &view,
-            ShaderResourceType  shaderResourceType,
-            DepthStencilType    depthStencilType)
-        {
-            match_variant(
-                view,
-                [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &)
-            {
-                addNewState(
-                    resource, subrsc,
-                    shaderResourceTypeToState(shaderResourceType));
-            },
-                [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &)
-            {
-                addNewState(
-                    resource, subrsc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-
-                if(uavCounterResource)
-                {
-                    addNewState(
-                        uavCounterResource, 0,
-                        D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-                }
-            },
-                [&](const D3D12_RENDER_TARGET_VIEW_DESC &)
-            {
-                addNewState(
-                    resource, subrsc, D3D12_RESOURCE_STATE_RENDER_TARGET);
-            },
-                [&](const D3D12_DEPTH_STENCIL_VIEW_DESC &)
-            {
-                addNewState(
-                    resource, subrsc,
-                    depthStencilTypeToState(depthStencilType));
-            },
-                [&](const std::monostate &)
-            {
-                misc::unreachable();
-            });
-        };
-
-        for(auto &descDecl : p->descriptors_)
-        {
-            auto subrscs = viewToSubresources(
-                descDecl->info_.resource->getDescription(), descDecl->info_.view);
-
-            for(UINT s : subrscs)
-            {
-                addNewDescDecl(
-                    descDecl->info_.resource,
-                    descDecl->info_.uavCounterResource,
-                    s,
-                    descDecl->info_.view,
-                    descDecl->info_.shaderResourceType,
-                    descDecl->info_.depthStencilType);
-            }
-        }
-
-        for(auto &descTable : p->descriptorTables_)
-        {
-            for(auto &descDecl : descTable->records_)
-            {
-                auto subrscs = viewToSubresources(
-                    descDecl.resource->getDescription(), descDecl.view);
-
-                for(UINT s : subrscs)
-                {
-                    addNewDescDecl(
-                        descDecl.resource,
-                        descDecl.uavCounterResource,
-                        s,
-                        descDecl.view,
-                        descDecl.shaderResourceType,
-                        descDecl.depthStencilType);
-                }
-            }
-        }
-
-        for(auto &r : rscStates)
-        {
-            auto &record = resourceRecords[r.first.first];
-
-            if(record.usages.empty() ||
-               record.usages.back().pass != p->getIndex())
-            {
-                record.usages.push_back(
-                    { p->getIndex(), {} });
-            }
-
-            record.usages.back().state.insert({ r.first.second, r.second });
         }
     }
 
+    std::vector<std::vector<ResourceStatesTracker::Usage>> resourceRecords(
+        resources_.size());
+    for(size_t i = 0; i < resources_.size(); ++i)
+        resourceRecords[i] = trackers[i].getUsages();
+
     for(size_t ri = 0; ri < resources_.size(); ++ri)
     {
-        auto &usages = resourceRecords[ri].usages;
+        auto &usages = resourceRecords[ri];
         auto &resource = *resources_[ri];
 
         if(usages.empty())
@@ -743,82 +596,24 @@ void Compiler::generateResourceTransitions(Temps &temps)
 
 void Compiler::generateDescriptorRecords(Temps &temps)
 {
-    // descriptors
-
-    struct DescriptorKey
-    {
-        int thread = 0;
-        DescriptorItem *item = nullptr;
-        
-        bool operator<(const DescriptorKey &rhs) const
-        {
-            return std::tie(thread, *item) < std::tie(rhs.thread, *rhs.item);
-        }
-    };
-
-    std::map<DescriptorKey, int> descriptorSlotCache;
-
-    auto allocateDescriptorSlot = [&](const DescriptorKey &key)
-    {
-        const auto it = descriptorSlotCache.find(key);
-        if(it != descriptorSlotCache.end())
-            return it->second;
-
-        const int newSlot = static_cast<int>(descriptorSlotCache.size());
-        descriptorSlotCache.insert({ key, newSlot });
-
-        temps.threads[key.thread].descs.push_back({ newSlot, key.item });
-
-        return newSlot;
-    };
+    temps.descSlotAllocator = DescriptorSlotAssigner(threadCount_);
 
     for(auto &p : passes_)
     {
         auto &passTemp = temps.passes[p->getIndex()];
-        for(auto &u : p->descriptors_)
+
+        for(auto &desc : p->descriptors_)
         {
-            assert(!u->info_.view.is<std::monostate>());
-            const int slot = allocateDescriptorSlot({ p->thread_, u.get() });
-            passTemp.descriptors_.push_back({ u.get(), slot });
+            const int slot = temps.descSlotAllocator.allocateDescriptorSlot(
+                { p->thread_, desc.get() });
+            passTemp.descriptors_.push_back( { desc.get(), slot } );
         }
-    }
 
-    // descriptor ranges
-
-    struct DescriptorRangeKey
-    {
-        int thread = 0;
-        DescriptorTable *table = nullptr;
-
-        bool operator<(const DescriptorRangeKey &rhs) const
+        for(auto &table : p->descriptorTables_)
         {
-            return std::tie(thread, *table) < std::tie(rhs.thread, *rhs.table);
-        }
-    };
-
-    std::map<DescriptorRangeKey, int> descriptorRangeSlotCache;
-
-    auto allocateDescriptorRangeSlot = [&](const DescriptorRangeKey &key)
-    {
-        const auto it = descriptorRangeSlotCache.find(key);
-        if(it != descriptorRangeSlotCache.end())
-            return it->second;
-
-        const int newSlot = static_cast<int>(descriptorRangeSlotCache.size());
-        descriptorRangeSlotCache.insert({ key, newSlot });
-
-        temps.threads[key.thread].descRanges.push_back({ newSlot, key.table });
-
-        return newSlot;
-    };
-
-    for(auto &p : passes_)
-    {
-        auto &passTemp = temps.passes[p->getIndex()];
-        for(auto &t : p->descriptorTables_)
-        {
-            const int slot = allocateDescriptorRangeSlot({ p->thread_, t.get() });
-            passTemp.descriptorRanges_.push_back({ t.get(), slot });
+            const int slot = temps.descSlotAllocator.allocateDescriptorRangeSlot(
+                { p->thread_, table.get() });
+            passTemp.descriptorRanges_.push_back({ table.get(), slot });
         }
     }
 }
@@ -916,31 +711,31 @@ void Compiler::fillRuntimeResources(
             });
         };
 
-        auto &thread = temps.threads[ti];
-
-        for(auto &dr : thread.descs)
+        for(auto &record : temps.descSlotAllocator.getDescriptorSlotRecords(ti))
         {
             addDescSlot(
-                runtime.resources_[dr.item->info_.resource->getIndex()], dr.slot);
+                runtime.resources_[record.item->info_.resource->getIndex()],
+                record.slot);
 
-            if(dr.item->info_.uavCounterResource)
+            if(record.item->info_.uavCounterResource)
             {
-                const int index = dr.item->info_.uavCounterResource->getIndex();
-                addDescSlot(runtime.resources_[index], dr.slot);
+                const int index = record.item->info_.uavCounterResource->getIndex();
+                addDescSlot(runtime.resources_[index], record.slot);
             }
         }
 
-        for(auto &dr : thread.descRanges)
+        for(auto &record : temps.descSlotAllocator.getDescriptorRangeSlotRecords(ti))
         {
-            for(auto &r : dr.table->records_)
+            for(auto &descInfo : record.table->records_)
             {
                 addDescRangeSlot(
-                    runtime.resources_[r.resource->getIndex()], dr.slot);
+                    runtime.resources_[descInfo.resource->getIndex()],
+                    record.slot);
 
-                if(r.uavCounterResource)
+                if(descInfo.uavCounterResource)
                 {
-                    const int index = r.resource->getIndex();
-                    addDescRangeSlot(runtime.resources_[index], dr.slot);
+                    const int index = descInfo.resource->getIndex();
+                    addDescRangeSlot(runtime.resources_[index], record.slot);
                 }
             }
         }
@@ -949,376 +744,37 @@ void Compiler::fillRuntimeResources(
 
 void Compiler::fillRuntimeDescriptors(
     ID3D12Device        *device,
-    Runtime        &runtime,
+    Runtime             &runtime,
     DescriptorAllocator &GPUDescAlloc,
     Temps               &temps) const
 {
-    // count descs
-
-    uint32_t cpuDescCount = 0, gpuDescCount = 0, rtvCount = 0, dsvCount = 0;
-
-    size_t descSlotCount = 0, descTableSlotCount = 0;
-
-    for(auto &t : temps.threads)
-    {
-        descSlotCount      += t.descs.size();
-        descTableSlotCount += t.descRanges.size();
-
-        for(auto &descDecl : t.descs)
-        {
-            match_variant(
-                descDecl.item->info_.view,
-                [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &)
-            {
-                cpuDescCount += descDecl.item->cpu_;
-                gpuDescCount += descDecl.item->gpu_;
-            },
-                [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &)
-            {
-                cpuDescCount += descDecl.item->cpu_;
-                gpuDescCount += descDecl.item->gpu_;
-            },
-                [&](const D3D12_RENDER_TARGET_VIEW_DESC &)
-            {
-                rtvCount++;
-            },
-                [&](const D3D12_DEPTH_STENCIL_VIEW_DESC &)
-            {
-                dsvCount++;
-            },
-                [](const std::monostate &)
-            {
-                misc::unreachable();
-            });
-        }
-
-        for(auto &tableDecl : t.descRanges)
-        {
-            for(auto &record : tableDecl.table->records_)
-            {
-                match_variant(
-                    record.view,
-                    [&](const D3D12_SHADER_RESOURCE_VIEW_DESC &)
-                {
-                    cpuDescCount += tableDecl.table->cpu_;
-                    gpuDescCount += tableDecl.table->gpu_;
-                },
-                    [&](const D3D12_UNORDERED_ACCESS_VIEW_DESC &)
-                {
-                    cpuDescCount += tableDecl.table->cpu_;
-                    gpuDescCount += tableDecl.table->gpu_;
-                },
-                    [&](const D3D12_RENDER_TARGET_VIEW_DESC &)
-                {
-                    rtvCount++;
-                },
-                    [&](const D3D12_DEPTH_STENCIL_VIEW_DESC &)
-                {
-                    dsvCount++;
-                },
-                    [](const std::monostate &)
-                {
-                    misc::unreachable();
-                });
-            }
-        }
-    }
-
-    // allocate desc ranges
-
-    DescriptorRange allCPUDescs, allGPUDescs, allRTVs, allDSVs;
-    
-    if(cpuDescCount)
-    {
-        runtime.CPUDescriptorHeap_.initialize(
-            device,
-            cpuDescCount * frameCount_,
-            D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-            false);
-        allCPUDescs =
-            runtime.CPUDescriptorHeap_.allocRange(cpuDescCount * frameCount_);
-    }
-
-    runtime.GPUDescAlloc_ = &GPUDescAlloc;
-    if(gpuDescCount)
-    {
-        runtime.GPUDescRange_ = GPUDescAlloc.allocStaticRange(
-            gpuDescCount * frameCount_);
-        allGPUDescs = runtime.GPUDescRange_;
-    }
-
-    if(rtvCount)
-    {
-        runtime.RTVDescriptorHeap_.initialize(
-            device,
-            rtvCount * frameCount_,
-            D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-            false);
-        allRTVs = runtime.RTVDescriptorHeap_.allocRange(rtvCount * frameCount_);
-    }
-
-    if(dsvCount)
-    {
-        runtime.DSVDescriptorHeap_.initialize(
-            device,
-            dsvCount * frameCount_,
-            D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
-            false);
-        allDSVs = runtime.DSVDescriptorHeap_.allocRange(dsvCount * frameCount_);
-    }
-
-    // assign descs to slots
-
-    runtime.descriptorSlots_     .resize(descSlotCount);
-    runtime.descriptorRangeSlots_.resize(descTableSlotCount);
-
-    uint32_t cpuDescOffset = 0, gpuDescOffset = 0, rtvOffset = 0, dsvOffset = 0;
-
     for(int ti = 0; ti < threadCount_; ++ti)
     {
-        auto &threadTemp = temps.threads[ti];
         auto &threadData = runtime.perThreadData_[ti];
 
-        // cpu desc
+        auto &descs =
+            temps.descSlotAllocator.getDescriptorSlotRecords(ti);
+        auto &descTables =
+            temps.descSlotAllocator.getDescriptorRangeSlotRecords(ti);
 
-        for(auto &d : threadTemp.descs)
+        for(auto &descDecl : descs)
         {
-            threadData.descriptorSlots.push_back(d.slot);
-            auto &slot = runtime.descriptorSlots_[d.slot];
-
-            bool isPerFrame = d.item->info_.resource->isPerFrame();
-            if(d.item->info_.uavCounterResource)
-                isPerFrame |= d.item->info_.uavCounterResource->isPerFrame();
-
-            slot.resourceIndex = d.item->info_.resource->getIndex();
-            slot.cpu           = d.item->cpu_;
-            slot.gpu           = d.item->gpu_;
-            slot.view          = d.item->info_.view;
-            slot.isPerFrame    = isPerFrame;
-            
-            slot.uavCounterResourceIndex =
-                d.item->info_.uavCounterResource ?
-                d.item->info_.uavCounterResource->getIndex() : -1;
-
-            if(isPerFrame)
-            {
-                slot.frames.resize(frameCount_);
-                for(auto &frame : slot.frames)
-                {
-                    frame.isDirty = true;
-
-                    if(slot.view.is<D3D12_RENDER_TARGET_VIEW_DESC>())
-                    {
-                        frame.freeCPUQueue.push(allRTVs[rtvOffset++]);
-                    }
-                    else if(slot.view.is<D3D12_DEPTH_STENCIL_VIEW_DESC>())
-                    {
-                        frame.freeCPUQueue.push(allDSVs[dsvOffset++]);
-                    }
-                    else
-                    {
-                        if(slot.cpu)
-                            frame.freeCPUQueue.push(allCPUDescs[cpuDescOffset++]);
-                        if(slot.gpu)
-                            frame.freeGPUQueue.push(allGPUDescs[gpuDescOffset++]);
-                    }
-                }
-            }
-            else
-            {
-                slot.frames.emplace_back();
-                auto &frame = slot.frames.front();
-
-                frame.isDirty = true;
-
-                if(slot.view.is<D3D12_RENDER_TARGET_VIEW_DESC>())
-                {
-                    for(int i = 0; i < frameCount_; ++i)
-                        frame.freeCPUQueue.push(allRTVs[rtvOffset++]);
-                }
-                else if(slot.view.is<D3D12_DEPTH_STENCIL_VIEW_DESC>())
-                {
-                    for(int i = 0; i < frameCount_; ++i)
-                        frame.freeCPUQueue.push(allDSVs[dsvOffset++]);
-                }
-                else
-                {
-                    for(int i = 0; i < frameCount_; ++i)
-                    {
-                        if(slot.cpu)
-                        {
-                            frame.freeCPUQueue.push(
-                                allCPUDescs[cpuDescOffset++]);
-                        }
-
-                        if(slot.gpu)
-                        {
-                            frame.freeGPUQueue.push(
-                                allGPUDescs[gpuDescOffset++]);
-                        }
-                    }
-                }
-            }
+            runtime.descSlotMgr_.addDescriptor(descDecl.item);
+            threadData.descriptorSlots.push_back(descDecl.slot);
         }
 
-        // assign desc ranges to slots
-
-        static auto viewToHeapType = [](const ResourceView &view)
+        for(auto &tableDecl : descTables)
         {
-            return match_variant(
-                view,
-                [](const D3D12_SHADER_RESOURCE_VIEW_DESC &d)
-            {
-                return D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-            },
-                [](const D3D12_UNORDERED_ACCESS_VIEW_DESC &)
-            {
-                return D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-            },
-                [](const D3D12_RENDER_TARGET_VIEW_DESC &)
-            {
-                return D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-            },
-                [](const D3D12_DEPTH_STENCIL_VIEW_DESC &)
-            {
-                return D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-            },
-                [](const std::monostate &)
-            {
-                return D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-            });
-        };
-
-        for(auto &d : threadTemp.descRanges)
-        {
-            threadData.descriptorRangeSlots.push_back(d.slot);
-            auto &slot = runtime.descriptorRangeSlots_[d.slot];
-
-            const uint32_t recordCount =
-                static_cast<uint32_t>(d.table->records_.size());
-            slot.resourceIndices.resize(recordCount);
-            slot.uavCounterResourceIndices.resize(recordCount);
-            slot.views.resize(recordCount);
-
-            bool isRangePerFrame = false;
-            for(uint32_t i = 0; i < recordCount; ++i)
-            {
-                slot.resourceIndices[i] = d.table->records_[i].resource->getIndex();
-                slot.views[i]           = d.table->records_[i].view;
-
-                slot.uavCounterResourceIndices[i] =
-                    d.table->records_[i].uavCounterResource ?
-                    d.table->records_[i].uavCounterResource->getIndex() : -1;
-
-                if(d.table->records_[i].resource->isPerFrame())
-                    isRangePerFrame = true;
-
-                if(d.table->records_[i].uavCounterResource &&
-                   d.table->records_[i].uavCounterResource->isPerFrame())
-                    isRangePerFrame = true;
-            }
-
-            slot.heapType   = viewToHeapType(d.table->records_.front().view);
-            slot.cpu        = d.table->cpu_;
-            slot.gpu        = d.table->gpu_;
-            slot.isPerFrame = isRangePerFrame;
-            
-            if(isRangePerFrame)
-            {
-                slot.frames.resize(frameCount_);
-                for(auto &frame : slot.frames)
-                {
-                    frame.isDirty = true;
-
-                    if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
-                    {
-                        frame.freeCPUQueue.push(
-                            allRTVs.getSubRange(rtvOffset, recordCount));
-                        rtvOffset += recordCount;
-                    }
-                    else if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_DSV)
-                    {
-                        frame.freeCPUQueue.push(
-                            allDSVs.getSubRange(dsvOffset, recordCount));
-                        dsvOffset += recordCount;
-                    }
-                    else
-                    {
-                        if(slot.cpu)
-                        {
-                            frame.freeCPUQueue.push(
-                                allCPUDescs.getSubRange(cpuDescOffset, recordCount));
-                            cpuDescOffset += recordCount;
-                        }
-
-                        if(slot.gpu)
-                        {
-                            frame.freeGPUQueue.push(
-                                allGPUDescs.getSubRange(gpuDescOffset, recordCount));
-                            gpuDescOffset += recordCount;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                slot.frames.emplace_back();
-                auto &frame = slot.frames.front();
-
-                frame.isDirty = true;
-
-                if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
-                {
-                    for(int i = 0; i < frameCount_; ++i)
-                    {
-                        frame.freeCPUQueue.push(
-                            allRTVs.getSubRange(rtvOffset, recordCount));
-                        rtvOffset += recordCount;
-                    }
-                }
-                else if(slot.heapType == D3D12_DESCRIPTOR_HEAP_TYPE_DSV)
-                {
-                    for(int i = 0; i < frameCount_; ++i)
-                    {
-                        frame.freeCPUQueue.push(
-                            allDSVs.getSubRange(dsvOffset, recordCount));
-                        dsvOffset += recordCount;
-                    }
-                }
-                else
-                {
-                    for(int i = 0; i < frameCount_; ++i)
-                    {
-                        if(slot.cpu)
-                        {
-                            frame.freeCPUQueue.push(
-                                allCPUDescs.getSubRange(cpuDescOffset, recordCount));
-                            cpuDescOffset += recordCount;
-                        }
-
-                        if(slot.gpu)
-                        {
-                            frame.freeGPUQueue.push(
-                                allGPUDescs.getSubRange(gpuDescOffset, recordCount));
-                            gpuDescOffset += recordCount;
-                        }
-                    }
-                }
-            }
-
-            AGZ_WHEN_DEBUG({
-                for(uint32_t i = 1; i < recordCount; ++i)
-                {
-                    if(slot.heapType != viewToHeapType(d.table->records_[i].view))
-                    {
-                        throw D3D12Exception(
-                            "unmatched descriptor heap type"
-                            "in a descriptor table declaretion");
-                    }
-                }
-            });
+            runtime.descSlotMgr_.addDescriptorTable(tableDecl.table);
+            threadData.descriptorRangeSlots.push_back(tableDecl.slot);
         }
     }
+
+    runtime.descSlotMgr_.initializeDescriptorSlots(
+        device,
+        frameCount_,
+        &GPUDescAlloc,
+        &temps.descSlotAllocator);
 }
 
 void Compiler::fillRuntimeSections(
@@ -1364,7 +820,7 @@ void Compiler::fillRuntimeSections(
                 {
                     descriptorMap.insert({
                         d.item,
-                        &runtime.descriptorSlots_[d.descriptorSlot]
+                        runtime.descSlotMgr_.getSlot(d.descriptorSlot)
                     });
                 }
 
@@ -1372,7 +828,7 @@ void Compiler::fillRuntimeSections(
                 {
                     descriptorRangeMap.insert({
                         d.table,
-                        &runtime.descriptorRangeSlots_[d.descriptorRangeSlot]
+                        runtime.descSlotMgr_.getRangeSlot(d.descriptorRangeSlot)
                     });
                 }
 
