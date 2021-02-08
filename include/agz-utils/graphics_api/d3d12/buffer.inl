@@ -148,7 +148,7 @@ void IndexBuffer<Index>::initializeUpload(
     size_t           indexCount)
 {
     count_ = 0;
-    buffer_.initializeUpload(rscMgr, indexCount);
+    buffer_.initializeUpload(rscMgr, sizeof(Index) * indexCount);
     count_ = indexCount;
 }
 
