@@ -53,9 +53,9 @@ public:
         uint32_t offset,
         uint32_t cnt) const noexcept;
 
-    Descriptor getDescriptor(uint32_t idx) const noexcept;
+    Descriptor getDescriptor(size_t idx) const noexcept;
 
-    Descriptor operator[](uint32_t idx) const noexcept;
+    Descriptor operator[](size_t idx) const noexcept;
 
     uint32_t getStartIndexInRawHeap() const noexcept;
 

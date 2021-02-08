@@ -1,7 +1,5 @@
 #pragma once
 
-#include <agz-utils/misc.h>
-
 #include <agz-utils/graphics_api/d3d12/rootSignature.h>
 
 AGZ_D3D12_BEGIN

@@ -28,10 +28,10 @@ public:
     void setSamplerHeap(ComPtr<ID3D12DescriptorHeap> heap);
 
     void setExternalResource(
-        ExternalResource *node, ComPtr<ID3D12Resource> resource);
+        ExternalResource *node, ID3D12Resource *resource);
 
     void setExternalResource(
-        ExternalResource *node, int frameIndex, ComPtr<ID3D12Resource> resource);
+        ExternalResource *node, int frameIndex, ID3D12Resource *resource);
 
     void clearExternalResources();
 
@@ -72,8 +72,8 @@ private:
         ExternalResourceRuntime &operator=(
             ExternalResourceRuntime &&) noexcept = default;
 
-        bool                                isPerFrame = false;
-        std::vector<ComPtr<ID3D12Resource>> resource;
+        bool                         isPerFrame = false;
+        std::vector<ID3D12Resource*> resource;
     };
 
     using ResourceRuntime = misc::variant_t<

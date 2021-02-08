@@ -136,7 +136,7 @@ ID3D12Resource *Runtime::getRawResource(int resourceIndex)
         [this](const ExternalResourceRuntime &r)
     {
         const int index = r.isPerFrame ? frameIndex_ : 0;
-        return r.resource[index].Get();
+        return r.resource[index];
     });
 }
 
@@ -146,15 +146,14 @@ void Runtime::setSamplerHeap(ComPtr<ID3D12DescriptorHeap> heap)
 }
 
 void Runtime::setExternalResource(
-    ExternalResource      *node,
-    ComPtr<ID3D12Resource> resource)
+    ExternalResource *node, ID3D12Resource *resource)
 {
     assert(!node->isPerFrame());
     setExternalResource(node, 0, std::move(resource));
 }
 
 void Runtime::setExternalResource(
-    ExternalResource *node, int frameIndex, ComPtr<ID3D12Resource> resource)
+    ExternalResource *node, int frameIndex, ID3D12Resource *resource)
 {
     AGZ_WHEN_DEBUG({
         auto toTie = [](const D3D12_RESOURCE_DESC &L)
@@ -201,7 +200,7 @@ void Runtime::clearExternalResources()
         if(auto external = r.as_if<ExternalResourceRuntime>())
         {
             for(auto &d3drsc : external->resource)
-                d3drsc.Reset();
+                d3drsc = nullptr;
         }
     }
 }

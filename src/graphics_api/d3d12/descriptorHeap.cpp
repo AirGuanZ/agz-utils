@@ -27,14 +27,14 @@ DescriptorRange DescriptorRange::getSubRange(
     return DescriptorRange(rawHeap_, beg_ + offset, cnt);
 }
 
-Descriptor DescriptorRange::getDescriptor(uint32_t idx) const noexcept
+Descriptor DescriptorRange::getDescriptor(size_t idx) const noexcept
 {
     return Descriptor(
         rawHeap_->getCPUHandle(static_cast<int>(beg_ + idx)),
         rawHeap_->getGPUHandle(static_cast<int>(beg_ + idx)));
 }
 
-Descriptor DescriptorRange::operator[](uint32_t idx) const noexcept
+Descriptor DescriptorRange::operator[](size_t idx) const noexcept
 {
     return getDescriptor(idx);
 }

@@ -137,13 +137,14 @@ void Compiler::compile(
             "invalid thread count value: " + std::to_string(threadCount_));
     }
 
+    runtime.reset();
+
     Temps temps = assignSectionsToThreads();
 
     generateSectionDependencies(device, temps);
     generateResourceTransitions(temps);
     generateDescriptorRecords(temps);
 
-    runtime.reset();
     runtime.device_ = device;
     runtime.queues_ = std::move(allQueues);
     runtime.perThreadData_.resize(threadCount_);

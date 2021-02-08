@@ -62,10 +62,10 @@ public:
     ID3D12Resource *getRawResource(int index) noexcept;
 
     void setExternalResource(
-        ExternalResource *node, ComPtr<ID3D12Resource> rsc);
+        ExternalResource *node, ID3D12Resource *rsc);
 
     void setExternalResource(
-        ExternalResource *node, int frameIndex, ComPtr<ID3D12Resource> rsc);
+        ExternalResource *node, int frameIndex, ID3D12Resource *rsc);
 
     void clearExternalResources();
 
@@ -181,15 +181,15 @@ inline ID3D12Resource *Graph::getRawResource(int index) noexcept
 }
 
 inline void Graph::setExternalResource(
-    ExternalResource *node, ComPtr<ID3D12Resource> rsc)
+    ExternalResource *node, ID3D12Resource *rsc)
 {
-    runtime_->setExternalResource(node, std::move(rsc));
+    runtime_->setExternalResource(node, rsc);
 }
 
 inline void Graph::setExternalResource(
-    ExternalResource *node, int frameIndex, ComPtr<ID3D12Resource> rsc)
+    ExternalResource *node, int frameIndex, ID3D12Resource *rsc)
 {
-    runtime_->setExternalResource(node, frameIndex, std::move(rsc));
+    runtime_->setExternalResource(node, frameIndex, rsc);
 }
 
 inline void Graph::clearExternalResources()
