@@ -74,6 +74,9 @@ public:
 
     ComPtr<ID3D12CommandQueue> createCopyQueue() const;
 
+    ImmediateCommandList createImmediateCommandList(
+        D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT) const;
+
     // swap chain
 
     DXGI_FORMAT getFramebufferFormat() const noexcept;
@@ -303,6 +306,12 @@ inline ResourceManager D3D12Context::createResourceManager() const
 inline ComPtr<ID3D12CommandQueue> D3D12Context::createCopyQueue() const
 {
     return device_.createCopyQueue();
+}
+
+inline ImmediateCommandList D3D12Context::createImmediateCommandList(
+    D3D12_COMMAND_LIST_TYPE type) const
+{
+    return device_.createImmediateCommandList(type);
 }
 
 inline DXGI_FORMAT D3D12Context::getFramebufferFormat() const noexcept

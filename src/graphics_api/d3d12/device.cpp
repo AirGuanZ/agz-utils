@@ -115,6 +115,20 @@ ComPtr<ID3D12CommandQueue> Device::createCopyQueue() const
     return ret;
 }
 
+ImmediateCommandList Device::createImmediateCommandList(
+    D3D12_COMMAND_LIST_TYPE type) const
+{
+    if(type == D3D12_COMMAND_LIST_TYPE_DIRECT)
+        return ImmediateCommandList(graphicsQueue_);
+    if(type == D3D12_COMMAND_LIST_TYPE_COMPUTE)
+    {
+        if(!computeQueue_)
+            throw D3D12Exception("compute queue is not enabled");
+        return ImmediateCommandList(computeQueue_);
+    }
+    throw D3D12Exception("immediate copy command list is not supported");
+}
+
 AGZ_D3D12_END
 
 #endif // #ifdef AGZ_ENABLE_D3D12

@@ -66,6 +66,7 @@
 #include "./graphics_api/d3d12/device.h"
 #include "./graphics_api/d3d12/frameFence.h"
 #include "./graphics_api/d3d12/imguiIntegration.h"
+#include "./graphics_api/d3d12/immediateCommandList.h"
 #include "./graphics_api/d3d12/input.h"
 #include "./graphics_api/d3d12/mipmapGenerator.h"
 #include "./graphics_api/d3d12/pipeline.h"

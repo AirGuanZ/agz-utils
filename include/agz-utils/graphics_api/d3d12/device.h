@@ -1,7 +1,7 @@
 #pragma once
 
-#include <agz-utils/graphics_api/d3d12/raytracing/common.h>
 #include <agz-utils/graphics_api/d3d12/queueWaiter.h>
+#include <agz-utils/graphics_api/d3d12/immediateCommandList.h>
 #include <agz-utils/graphics_api/d3d12/resourceManager.h>
 
 AGZ_D3D12_BEGIN
@@ -31,6 +31,9 @@ public:
     ResourceManager createResourceManager() const { return ResourceManager(device_.Get(), adapter_.Get()); }
 
     ComPtr<ID3D12CommandQueue> createCopyQueue() const;
+
+    ImmediateCommandList createImmediateCommandList(
+        D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT) const;
 
 private:
 
