@@ -76,14 +76,12 @@ void interval_mgr_t<I>::free(I beg, I end)
     // merge new block with successor/predecessor
 
     auto next_block_it = start_to_block_.upper_bound(beg);
-    auto last_block_it = next_block_it;
-    if(last_block_it != start_to_block_.end())
-    {
-        if(last_block_it == start_to_block_.begin())
-            last_block_it = start_to_block_.end();
-        else
-            --last_block_it;
-    }
+    auto last_block_it = start_to_block_.lower_bound(beg);
+
+    if(last_block_it == start_to_block_.begin())
+        last_block_it = start_to_block_.end();
+    else
+        last_block_it = std::prev(last_block_it);
 
     if(next_block_it != start_to_block_.end() && next_block_it->first == end)
     {

@@ -27,10 +27,13 @@ I round_up(I a, I b) noexcept
 template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 void atomic_add(std::atomic<T> &original, T add_val)
 {
-    T cur_val = original.load();
+    T cur_val = original.load(std::memory_order_consume);
     const T new_val = cur_val + add_val;
-    while(!original.compare_exchange_weak(cur_val, new_val))
-        ;
+    while(!original.compare_exchange_weak(
+        cur_val, new_val, std::memory_order_release, std::memory_order_consume))
+    {
+        new_val = cur_val + add_val;
+    }
 }
     
 /**
