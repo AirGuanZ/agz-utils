@@ -28,7 +28,7 @@ template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 void atomic_add(std::atomic<T> &original, T add_val)
 {
     T cur_val = original.load(std::memory_order_consume);
-    const T new_val = cur_val + add_val;
+    T new_val = cur_val + add_val;
     while(!original.compare_exchange_weak(
         cur_val, new_val, std::memory_order_release, std::memory_order_consume))
     {
