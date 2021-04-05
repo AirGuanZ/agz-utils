@@ -16,10 +16,11 @@ template<typename T>
 using rm_rcv_t = std::remove_cv_t<std::remove_reference_t<T>>;
 
 /** @brief static array size */
-template<typename T, size_t N>
-constexpr size_t array_size(const T (&)[N]) noexcept
+template<typename R = size_t, typename T = void, size_t N = 0>
+constexpr R array_size(const T (&)[N]) noexcept
 {
-    return N;
+    static_assert(N > 0);
+    return static_cast<R>(N);
 }
 
 /** @brief 根据成员变量指针取得它在类内的字节偏移 */

@@ -27,6 +27,8 @@ public:
 
     int getHeight() const noexcept;
 
+    float getWOverH() const noexcept;
+
     void addColorBuffer(
         DXGI_FORMAT format, DXGI_FORMAT rtvFormat);
 
@@ -151,6 +153,11 @@ inline int RenderTarget::getWidth() const noexcept
 inline int RenderTarget::getHeight() const noexcept
 {
     return static_cast<int>(height_);
+}
+
+inline float RenderTarget::getWOverH() const noexcept
+{
+    return static_cast<float>(width_) / height_;
 }
 
 inline void RenderTarget::addColorBuffer(
