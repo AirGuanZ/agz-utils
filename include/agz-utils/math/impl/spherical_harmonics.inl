@@ -15,9 +15,9 @@ namespace sh_impl
         static auto eval([[maybe_unused]] const tvec3<T> &v) noexcept \
         { \
             [[maybe_unused]] constexpr T pi = agz::math::PI<T>; \
-            [[maybe_unused]] constexpr T x = v.x; \
-            [[maybe_unused]] constexpr T y = v.y; \
-            [[maybe_unused]] constexpr T z = v.z; \
+            [[maybe_unused]] const     T x = v.x; \
+            [[maybe_unused]] const     T y = v.y; \
+            [[maybe_unused]] const     T z = v.z; \
             static const T C = (COEF); \
             return C * (EXPR); \
         } \
