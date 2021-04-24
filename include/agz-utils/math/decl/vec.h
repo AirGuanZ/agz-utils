@@ -26,7 +26,7 @@ public:
 
     template<typename...As,
              typename = std::enable_if_t<
-                (D > 1 && misc::type_list_t<As...>::length == D)>>
+                (D > 1 && sizeof...(As) == D)>>
     AGZ_MATH_API tvec(As&&...args) noexcept;
 
     AGZ_MATH_API bool is_zero() const noexcept;
