@@ -14,7 +14,7 @@
 #define AGZ_MATH_BEGIN namespace agz { namespace math {
 #define AGZ_MATH_END   }}
 
-#define AGZ_MATH_API __host__ __device__
+#define AGZ_MATH_API // __host__ __device__
 
 #define AGZ_MATH_MIN (::min)
 #define AGZ_MATH_MAX (::max)
