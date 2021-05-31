@@ -22,8 +22,6 @@
 #include "decl/vec3.h"
 #include "decl/vec4.h"
 
-#ifndef __CUDACC__
-
 #include "decl/spherical_harmonics.h"
 #include "decl/tensor.h"
 #include "decl/tensor_view.h"
@@ -33,8 +31,6 @@
 #include "decl/simd/float4x4.h"
 #include "decl/simd/coord_float3.h"
 #include "decl/simd/transform_float3.h"
-
-#endif
 
 #include "impl/aabb2.inl"
 #include "impl/aabb3.inl"
@@ -55,8 +51,6 @@
 #include "impl/vec4.inl"
 #include "impl/low_discrepancy.inl"
 
-#ifndef __CUDACC__
-
 #include "impl/spherical_harmonics.inl"
 #include "impl/tensor.inl"
 #include "impl/tensor_view.inl"
@@ -66,5 +60,3 @@
 #include "impl/simd/float4x4.inl"
 #include "impl/simd/coord_float3.inl"
 #include "impl/simd/transform_float3.inl"
-
-#endif

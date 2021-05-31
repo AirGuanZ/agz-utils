@@ -14,7 +14,7 @@ namespace distribution
 template<typename T, typename F,
          typename = std::enable_if_t<
             std::is_integral_v<T> && std::is_floating_point_v<F>>>
-AGZ_MATH_API T uniform_integer(T beg, T end, F u);
+T uniform_integer(T beg, T end, F u);
 
 /**
  * @brief 基于二分搜索按离散分布律进行采样
@@ -115,7 +115,7 @@ public:
  * @brief 将[0, 1]^2上的均匀分布转换为单位球面上的均匀分布（w.r.t. solid angle）
  */
 template<typename F>
-AGZ_MATH_API std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept;
+std::pair<tvec3<F>, F> uniform_on_sphere(F u1, F u2) noexcept;
 
 /**
  * @brief 单位球面上的均匀分布对应的pdf（w.r.t. solid angle）
@@ -129,7 +129,7 @@ constexpr F uniform_on_sphere_pdf = 1 / (4 * PI<F>);
  * （+z那一侧的单位球面）
  */
 template<typename F>
-AGZ_MATH_API std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept;
+std::pair<tvec3<F>, F> uniform_on_hemisphere(F u1, F u2) noexcept;
 
 /**
  * @brief 单位半球面上的均匀分布对应的pdf（w.r.t. solid angle）
@@ -144,7 +144,7 @@ constexpr F uniform_on_hemisphere_pdf = 1 / (2 * PI<F>);
  * @param max_cos_theta 以+z为锥体中心，theta是方向向量与+z的夹角
  */
 template<typename F>
-AGZ_MATH_API std::pair<tvec3<F>, F> uniform_on_cone(
+std::pair<tvec3<F>, F> uniform_on_cone(
     F max_cos_theta, F u1, F u2) noexcept;
 
 /**
@@ -152,7 +152,7 @@ AGZ_MATH_API std::pair<tvec3<F>, F> uniform_on_cone(
  *  的均匀分布对应的pdf（w.r.t. solid angle）
  */
 template<typename F>
-AGZ_MATH_API F uniform_on_cone_pdf(F max_cos_theta) noexcept;
+F uniform_on_cone_pdf(F max_cos_theta) noexcept;
 
 /**
  * @brief 将[0, 1]^2上的均匀分布转换为单位半球面上以z为权重的分布（w.r.t. solid angle）
@@ -160,26 +160,26 @@ AGZ_MATH_API F uniform_on_cone_pdf(F max_cos_theta) noexcept;
  * （+z那一侧的单位球面）
  */
 template<typename F>
-AGZ_MATH_API std::pair<tvec3<F>, F> zweighted_on_hemisphere(
+std::pair<tvec3<F>, F> zweighted_on_hemisphere(
     F u1, F u2) noexcept;
 
 /**
  * @brief 单位半球面上以z为权重的分布对应的pdf（w.r.t. solid angle）
  */
 template<typename F>
-AGZ_MATH_API F zweighted_on_hemisphere_pdf(F z) noexcept;
+F zweighted_on_hemisphere_pdf(F z) noexcept;
 
 /**
  * @brief 将[0, 1]^2上的均匀分布转换为三角形面片上的均匀分布，返回barycentric coordinate
  */
 template<typename F>
-AGZ_MATH_API tvec2<F> uniform_on_triangle(F u1, F u2) noexcept;
+tvec2<F> uniform_on_triangle(F u1, F u2) noexcept;
 
 /**
  * @brief 将[0, 1]^2上的均匀分布转换为单位圆盘上的均匀分布
  */
 template<typename F>
-AGZ_MATH_API tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept;
+tvec2<F> uniform_on_unit_disk(F u1, F u2) noexcept;
 
 /**
  * @brief 在单位圆盘上均匀采样对应的pdf
@@ -192,7 +192,7 @@ constexpr F uniform_on_unit_disk_pdf = 1;
  *  { begin, begin + 1, ..., end - 1 } \times [0, 1]上的均匀分布
  */
 template<typename F, typename I>
-AGZ_MATH_API std::pair<I, F> extract_uniform_int(F u, I begin, I end);
+std::pair<I, F> extract_uniform_int(F u, I begin, I end);
 
 /**
  * @brief 将[0, 1]上的均匀分布转换为服从inv_cdf描述的cdf的分布
@@ -201,7 +201,7 @@ AGZ_MATH_API std::pair<I, F> extract_uniform_int(F u, I begin, I end);
  *  CDF^{-1}(1)，中间的值用最近的表项作线性插值得到
  */
 template<typename F>
-AGZ_MATH_API F sample_inv_cdf_table(
+F sample_inv_cdf_table(
     F u, const F *inv_cdf, size_t tab_size) noexcept;
 
 } // namespace distribution

@@ -19,48 +19,48 @@ public:
 
     T x, y, z;
 
-    AGZ_MATH_API constexpr tvec3()                             noexcept;
-    AGZ_MATH_API constexpr tvec3(T x, T y, T z)                noexcept;
-    AGZ_MATH_API explicit constexpr tvec3(T val)               noexcept;
-    AGZ_MATH_API explicit tvec3(uninitialized_t)     noexcept;
-    AGZ_MATH_API explicit tvec3(const tvec<T, 3> &v) noexcept;
-    AGZ_MATH_API explicit tvec3(const tcolor3<T> &c) noexcept;
+    constexpr tvec3()                             noexcept;
+    constexpr tvec3(T x, T y, T z)                noexcept;
+    explicit constexpr tvec3(T val)               noexcept;
+    explicit tvec3(uninitialized_t)     noexcept;
+    explicit tvec3(const tvec<T, 3> &v) noexcept;
+    explicit tvec3(const tcolor3<T> &c) noexcept;
 
-    AGZ_MATH_API bool is_zero() const noexcept;
+    bool is_zero() const noexcept;
 
-    AGZ_MATH_API auto length()        const noexcept;
-    AGZ_MATH_API auto length_square() const noexcept;
+    auto length()        const noexcept;
+    auto length_square() const noexcept;
 
-    AGZ_MATH_API self_t normalize() const noexcept;
+    self_t normalize() const noexcept;
 
-    AGZ_MATH_API self_t clamp(T min_v, T max_v) const noexcept;
-    AGZ_MATH_API self_t clamp_low (T min_v)     const noexcept;
-    AGZ_MATH_API self_t clamp_high(T max_v)     const noexcept;
+    self_t clamp(T min_v, T max_v) const noexcept;
+    self_t clamp_low (T min_v)     const noexcept;
+    self_t clamp_high(T max_v)     const noexcept;
 
-    AGZ_MATH_API self_t saturate() const noexcept;
+    self_t saturate() const noexcept;
 
-    AGZ_MATH_API auto sum()     const noexcept;
-    AGZ_MATH_API auto product() const noexcept;
+    auto sum()     const noexcept;
+    auto product() const noexcept;
 
-    AGZ_MATH_API T max_elem() const noexcept;
-    AGZ_MATH_API T min_elem() const noexcept;
+    T max_elem() const noexcept;
+    T min_elem() const noexcept;
 
     template<typename F>
-    AGZ_MATH_API auto map(F &&f) const noexcept;
+    auto map(F &&f) const noexcept;
 
-    AGZ_MATH_API bool operator!() const noexcept;
-    AGZ_MATH_API T       &operator[](size_t idx)       noexcept;
-    AGZ_MATH_API const T &operator[](size_t idx) const noexcept;
+    bool operator!() const noexcept;
+    T       &operator[](size_t idx)       noexcept;
+    const T &operator[](size_t idx) const noexcept;
 
-    AGZ_MATH_API self_t &operator+=(const self_t &rhs) noexcept;
-    AGZ_MATH_API self_t &operator-=(const self_t &rhs) noexcept;
-    AGZ_MATH_API self_t &operator*=(const self_t &rhs) noexcept;
-    AGZ_MATH_API self_t &operator/=(const self_t &rhs) noexcept;
+    self_t &operator+=(const self_t &rhs) noexcept;
+    self_t &operator-=(const self_t &rhs) noexcept;
+    self_t &operator*=(const self_t &rhs) noexcept;
+    self_t &operator/=(const self_t &rhs) noexcept;
 
-    AGZ_MATH_API self_t &operator+=(T rhs) noexcept;
-    AGZ_MATH_API self_t &operator-=(T rhs) noexcept;
-    AGZ_MATH_API self_t &operator*=(T rhs) noexcept;
-    AGZ_MATH_API self_t &operator/=(T rhs) noexcept;
+    self_t &operator+=(T rhs) noexcept;
+    self_t &operator-=(T rhs) noexcept;
+    self_t &operator*=(T rhs) noexcept;
+    self_t &operator/=(T rhs) noexcept;
 
     std::string to_string() const;
 
@@ -68,48 +68,48 @@ public:
 };
 
 template<typename T>
-AGZ_MATH_API tvec3<T> operator-(const tvec3<T> &vec) noexcept;
+tvec3<T> operator-(const tvec3<T> &vec) noexcept;
 
 template<typename T>
-AGZ_MATH_API tvec3<T> operator+(
+tvec3<T> operator+(
     const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T>
-AGZ_MATH_API tvec3<T> operator-(
+tvec3<T> operator-(
     const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T>
-AGZ_MATH_API tvec3<T> operator*(
+tvec3<T> operator*(
     const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T>
-AGZ_MATH_API tvec3<T> operator/(
-    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
-
-template<typename T> AGZ_MATH_API tvec3<T> operator+(const tvec3<T> &lhs, T rhs) noexcept;
-template<typename T> AGZ_MATH_API tvec3<T> operator-(const tvec3<T> &lhs, T rhs) noexcept;
-template<typename T> AGZ_MATH_API tvec3<T> operator*(const tvec3<T> &lhs, T rhs) noexcept;
-template<typename T> AGZ_MATH_API tvec3<T> operator/(const tvec3<T> &lhs, T rhs) noexcept;
-
-template<typename T> AGZ_MATH_API tvec3<T> operator+(T lhs, const tvec3<T> &rhs) noexcept;
-template<typename T> AGZ_MATH_API tvec3<T> operator*(T lhs, const tvec3<T> &rhs) noexcept;
-
-template<typename T>
-AGZ_MATH_API bool operator==(
-    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
-template<typename T>
-AGZ_MATH_API bool operator!=(
+tvec3<T> operator/(
     const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 
+template<typename T> tvec3<T> operator+(const tvec3<T> &lhs, T rhs) noexcept;
+template<typename T> tvec3<T> operator-(const tvec3<T> &lhs, T rhs) noexcept;
+template<typename T> tvec3<T> operator*(const tvec3<T> &lhs, T rhs) noexcept;
+template<typename T> tvec3<T> operator/(const tvec3<T> &lhs, T rhs) noexcept;
+
+template<typename T> tvec3<T> operator+(T lhs, const tvec3<T> &rhs) noexcept;
+template<typename T> tvec3<T> operator*(T lhs, const tvec3<T> &rhs) noexcept;
+
 template<typename T>
-AGZ_MATH_API bool operator<(
+bool operator==(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+template<typename T>
+bool operator!=(
     const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 
 template<typename T>
-AGZ_MATH_API auto dot(
+bool operator<(
+    const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
+
+template<typename T>
+auto dot(
     const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T>
-AGZ_MATH_API auto cross(
+auto cross(
     const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 template<typename T>
-AGZ_MATH_API auto cos(
+auto cos(
     const tvec3<T> &lhs, const tvec3<T> &rhs) noexcept;
 
 template<typename T> std::ostream &operator<<(

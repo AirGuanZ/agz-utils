@@ -3,20 +3,20 @@
 AGZ_MATH_BEGIN
 
 template<typename T>
-AGZ_MATH_API taabb2<T>::taabb2() noexcept
+taabb2<T>::taabb2() noexcept
 {
     
 }
 
 template<typename T>
-AGZ_MATH_API taabb2<T>::taabb2(uninitialized_t) noexcept
+taabb2<T>::taabb2(uninitialized_t) noexcept
     : low(UNINIT), high(UNINIT)
 {
     
 }
 
 template<typename T>
-AGZ_MATH_API taabb2<T>::taabb2(
+taabb2<T>::taabb2(
     const tvec2<T> &low, const tvec2<T> &high) noexcept
     : low(low), high(high)
 {
@@ -24,20 +24,20 @@ AGZ_MATH_API taabb2<T>::taabb2(
 }
 
 template<typename T>
-AGZ_MATH_API bool taabb2<T>::is_valid() const noexcept
+bool taabb2<T>::is_valid() const noexcept
 {
     return low.x <= high.x && low.y <= high.y;
 }
 
 template<typename T>
-AGZ_MATH_API bool taabb2<T>::contains(const tvec2<T> &p) const noexcept
+bool taabb2<T>::contains(const tvec2<T> &p) const noexcept
 {
     return low.x <= p.x && p.x <= high.x &&
            low.y <= p.y && p.y <= high.y;
 }
 
 template<typename T>
-AGZ_MATH_API typename taabb2<T>::self_t taabb2<T>::operator|(
+typename taabb2<T>::self_t taabb2<T>::operator|(
     const tvec2<T> &rhs) const noexcept
 {
     return self_t(tvec2<T>((std::min)(low.x, rhs.x),
@@ -47,14 +47,14 @@ AGZ_MATH_API typename taabb2<T>::self_t taabb2<T>::operator|(
 }
 
 template<typename T>
-AGZ_MATH_API typename taabb2<T>::self_t &taabb2<T>::operator|=(
+typename taabb2<T>::self_t &taabb2<T>::operator|=(
     const tvec2<T> &rhs) noexcept
 {
     return *this = *this | rhs;
 }
 
 template<typename T>
-AGZ_MATH_API typename taabb2<T>::self_t taabb2<T>::operator|(
+typename taabb2<T>::self_t taabb2<T>::operator|(
     const self_t &rhs) const noexcept
 {
     return self_t(tvec2<T>((std::min)(low.x, rhs.low.x),
@@ -64,34 +64,34 @@ AGZ_MATH_API typename taabb2<T>::self_t taabb2<T>::operator|(
 }
 
 template<typename T>
-AGZ_MATH_API typename taabb2<T>::self_t &taabb2<T>::operator|=(
+typename taabb2<T>::self_t &taabb2<T>::operator|=(
     const self_t &rhs) noexcept
 {
     return *this = *this | rhs;
 }
 
 template<typename T>
-AGZ_MATH_API typename taabb2<T>::self_t taabb2<T>::operator*(
+typename taabb2<T>::self_t taabb2<T>::operator*(
     T rhs) const noexcept
 {
     return self_t(low * rhs, high * rhs);
 }
 
 template<typename T>
-AGZ_MATH_API typename taabb2<T>::self_t &taabb2<T>::operator*=(T rhs) noexcept
+typename taabb2<T>::self_t &taabb2<T>::operator*=(T rhs) noexcept
 {
     return *this = *this * rhs;
 }
 
 template<typename T>
-AGZ_MATH_API taabb2<T> operator|(
+taabb2<T> operator|(
     const tvec2<T> &lhs, const taabb2<T> &rhs) noexcept
 {
     return rhs | lhs;
 }
 
 template<typename T>
-AGZ_MATH_API taabb2<T> operator*(T lhs, const taabb2<T> &rhs) noexcept
+taabb2<T> operator*(T lhs, const taabb2<T> &rhs) noexcept
 {
     return rhs * lhs;
 }

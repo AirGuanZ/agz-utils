@@ -20,7 +20,7 @@ public:
     /**
      * @brief clear all previous data
      */
-    AGZ_MATH_API void clear() noexcept
+    void clear() noexcept
     {
         n_ = 0;
         old_m_ = new_m_ = old_s_ = new_s_ = 0;
@@ -29,7 +29,7 @@ public:
     /**
      * @brief add a new sample value
      */
-    AGZ_MATH_API void add(F value) noexcept
+    void add(F value) noexcept
     {
         if(++n_ == 1)
         {
@@ -49,7 +49,7 @@ public:
     /**
      * @brief how many sample values are accumulated since last calling of clear
      */
-    AGZ_MATH_API I value_count() const noexcept
+    I value_count() const noexcept
     {
         return n_;
     }
@@ -57,7 +57,7 @@ public:
     /**
      * @brief (x1 + x2 + ... + xn) / n
      */
-    AGZ_MATH_API F mean() const noexcept
+    F mean() const noexcept
     {
         return new_m_;
     }
@@ -69,7 +69,7 @@ public:
      *
      * variance = ((x1 - m)^2 + (x2 - m)^2 + ... + (xn - m)^2) / (n - 1)
      */
-    AGZ_MATH_API F variance() const noexcept
+    F variance() const noexcept
     {
         return n_ > 1 ? new_s_ / (n_ - 1) : F(0);
     }

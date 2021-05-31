@@ -7,7 +7,7 @@ AGZ_MATH_BEGIN
 namespace lowd
 {
 
-AGZ_MATH_API inline float hammersleyRadicalInverse(uint32_t bits) noexcept
+inline float hammersleyRadicalInverse(uint32_t bits) noexcept
 {
     bits = (bits << 16u) | (bits >> 16u);
     bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
@@ -17,7 +17,7 @@ AGZ_MATH_API inline float hammersleyRadicalInverse(uint32_t bits) noexcept
     return bits * 2.3283064365386963e-10f;
 }
 
-AGZ_MATH_API inline vec2f hammersley2D(uint32_t i, uint32_t N) noexcept
+inline vec2f hammersley2D(uint32_t i, uint32_t N) noexcept
 {
     return vec2f(static_cast<float>(i) / N, hammersleyRadicalInverse(i));
 }

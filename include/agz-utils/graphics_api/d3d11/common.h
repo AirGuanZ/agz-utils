@@ -32,14 +32,7 @@ public:
     using runtime_error::runtime_error;
 };
 
-#define AGZ_D3D11_DECL_EVENT_MGR_HANDLER(EventMgr, EventName)                  \
-    void attach(event::receiver_t<EventName> *handler)                         \
-        { EventMgr.attach(handler); }                                          \
-    void attach(std::shared_ptr<event::receiver_t<EventName>> handler)         \
-        { EventMgr.attach(handler); }                                          \
-    void detach(event::receiver_t<EventName> *handler)                         \
-        { EventMgr.detach(handler); }                                          \
-    void detach(std::shared_ptr<event::receiver_t<EventName>> handler)         \
-        { EventMgr.detach(handler); }
+#define AGZ_D3D11_DECL_EVENT_MGR_HANDLER(EventMgr, EventName) \
+    AGZ_DECL_EVENT_SENDER_HANDLER(EventMgr, EventName)
 
 AGZ_D3D11_END

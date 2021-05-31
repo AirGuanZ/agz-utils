@@ -6,7 +6,7 @@ namespace collision_impl
 {
 
     template<typename F>
-    AGZ_MATH_API F square_dist_between_pnt_aabb(
+    F square_dist_between_pnt_aabb(
         const tvec3<F> &p, const tvec3<F> &low, const tvec3<F> &high)
     {
         F ret = 0;
@@ -24,7 +24,7 @@ namespace collision_impl
 } // namespace collision_impl
 
 template<typename F>
-AGZ_MATH_API std::pair<tvec3<F>, F> compute_bounding_sphere(
+std::pair<tvec3<F>, F> compute_bounding_sphere(
     const tvec3<F> *vertices, size_t vertex_count)
 {
     // use native algo
@@ -44,7 +44,7 @@ AGZ_MATH_API std::pair<tvec3<F>, F> compute_bounding_sphere(
 }
 
 template<typename F>
-AGZ_MATH_API bool test_sphere_aabb_collision(
+bool test_sphere_aabb_collision(
     const tvec3<F> &o, F r, const tvec3<F> &low, const tvec3<F> &high)
 {
     return collision_impl::square_dist_between_pnt_aabb(o, low, high) <= r * r;

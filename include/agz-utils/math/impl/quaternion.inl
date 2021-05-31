@@ -7,21 +7,21 @@
 AGZ_MATH_BEGIN
 
 template<typename T>
-AGZ_MATH_API tquaternion_t<T>::tquaternion_t() noexcept
+tquaternion_t<T>::tquaternion_t() noexcept
     : w(1), x(0), y(0), z(0)
 {
     
 }
 
 template<typename T>
-AGZ_MATH_API tquaternion_t<T>::tquaternion_t(T w, T x, T y, T z) noexcept
+tquaternion_t<T>::tquaternion_t(T w, T x, T y, T z) noexcept
     : w(w), x(x), y(y), z(z)
 {
     
 }
 
 template<typename T>
-AGZ_MATH_API tquaternion_t<T>::tquaternion_t(
+tquaternion_t<T>::tquaternion_t(
     const tvec3<T> &axis, T rad) noexcept
 {
     const tvec3<T> normalized_axis = axis.normalize();
@@ -35,7 +35,7 @@ AGZ_MATH_API tquaternion_t<T>::tquaternion_t(
 }
 
 template<typename T>
-AGZ_MATH_API typename tquaternion_t<T>::self_t
+typename tquaternion_t<T>::self_t
 tquaternion_t<T>::normalize() const noexcept
 {
     const T len = std::sqrt(x * x + y * y + z * z + w * w);
@@ -48,14 +48,14 @@ tquaternion_t<T>::normalize() const noexcept
 }
 
 template<typename T>
-AGZ_MATH_API typename tquaternion_t<T>::self_t
+typename tquaternion_t<T>::self_t
 tquaternion_t<T>::conjugate() const noexcept
 {
     return self_t(w, -x, -y, -z);
 }
 
 template<typename T>
-AGZ_MATH_API tvec3<T> tquaternion_t<T>::apply_to_vector(
+tvec3<T> tquaternion_t<T>::apply_to_vector(
     const tvec3<T> &rhs) const noexcept
 {
     const self_t rhs_q(0, rhs.x, rhs.y, rhs.z);
@@ -65,7 +65,7 @@ AGZ_MATH_API tvec3<T> tquaternion_t<T>::apply_to_vector(
 }
 
 template<typename T>
-AGZ_MATH_API typename tquaternion_t<T>::self_t tquaternion_t<T>::operator*(
+typename tquaternion_t<T>::self_t tquaternion_t<T>::operator*(
     const self_t &rhs) const noexcept
 {
     return self_t(w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z,
@@ -75,7 +75,7 @@ AGZ_MATH_API typename tquaternion_t<T>::self_t tquaternion_t<T>::operator*(
 }
 
 template<typename T>
-AGZ_MATH_API tquaternion_t<T> slerp(
+tquaternion_t<T> slerp(
     const tquaternion_t<T> &lhs, const tquaternion_t<T> &rhs, T interp_factor)
 {
     T cos_theta = lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
