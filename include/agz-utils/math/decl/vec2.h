@@ -46,6 +46,12 @@ public:
     template<typename F>
     auto map(F &&f) const noexcept;
 
+    template<typename U>
+    auto to() const noexcept
+    {
+        return tvec2<U>(U(x), U(y));
+    }
+
     bool operator!() const noexcept;
     T       &operator[](size_t idx)       noexcept;
     const T &operator[](size_t idx) const noexcept;

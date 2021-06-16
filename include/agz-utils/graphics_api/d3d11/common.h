@@ -15,6 +15,10 @@ using Float2 = math::vec2f;
 using Float3 = math::vec3f;
 using Float4 = math::vec4f;
 
+using Double2 = math::vec2d;
+using Double3 = math::vec3d;
+using Double4 = math::vec4d;
+
 using Color4 = math::color4f;
 
 using Int2 = math::vec2i;
