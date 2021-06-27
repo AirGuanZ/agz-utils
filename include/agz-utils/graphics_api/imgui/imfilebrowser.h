@@ -1,40 +1,13 @@
-﻿/*
-MIT License
+﻿#pragma once
 
-Copyright (c) 2019-2020 Zhuang Guan
-
-https://github.com/AirGuanZ
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
-#pragma once
-
+#include <algorithm>
 #include <array>
 #include <cstring>
 #include <filesystem>
-#include <functional>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-#include <version>
 
 #ifndef IMGUI_VERSION
 #   error "include imgui.h before this header"
@@ -109,23 +82,36 @@ namespace ImGui
         // set selected filename to empty
         void ClearSelected();
 
-        // set file type filters. eg. { ".h", ".cpp", ".hpp", ".cc", ".inl" }
-        void SetTypeFilters(const std::vector<const char*> &typeFilters);
+        // (optional) set file type filters. eg. { ".h", ".cpp", ".hpp" }
+        // ".*" matches any file types
+        void SetTypeFilters(const std::vector<std::string> &typeFilters);
+
+        // set currently applied type filter
+        // default value is 0 (the first type filter)
+        void SetCurrentTypeFilterIndex(int index);
 
     private:
-
-        class ScopeGuard
+    
+        template <class Functor>
+        struct ScopeGuard
         {
-            std::function<void()> func_;
+            ScopeGuard(Functor&& t) : func(std::move(t)) { }
 
-        public:
+            ~ScopeGuard()
+            {
+                func();
+            }
 
-            template<typename T>
-            explicit ScopeGuard(T func) : func_(std::move(func)) { }
-            ~ScopeGuard() { func_(); }
+        private:
+
+            Functor func;
         };
 
+        static std::string ToLower(const std::string &s);
+
         void SetPwdUncatched(const std::filesystem::path &pwd);
+
+        bool IsExtensionMatched(const std::filesystem::path &extension) const;
 
 #ifdef _WIN32
         static std::uint32_t GetDrivesBitMask();
@@ -152,8 +138,9 @@ namespace ImGui
 
         std::string statusStr_;
 
-        std::vector<const char*> typeFilters_;
+        std::vector<std::string> typeFilters_;
         int typeFilterIndex_;
+        bool hasAllFilter_;
 
         std::filesystem::path pwd_;
         std::set<std::filesystem::path> selectedFilenames_;
@@ -189,12 +176,14 @@ inline ImGui::FileBrowser::FileBrowser(ImGuiFileBrowserFlags flags)
         newDirNameBuf_ = std::make_unique<
                                 std::array<char, INPUT_NAME_BUF_SIZE>>();
 
-    inputNameBuf_->at(0) = '\0';
+    inputNameBuf_->front() = '\0';
+    inputNameBuf_->back() = '\0';
     SetTitle("file browser");
     SetPwd(std::filesystem::current_path());
 
     typeFilters_.clear();
     typeFilterIndex_ = 0;
+    hasAllFilter_ = false;
 
 #ifdef _WIN32
     drives_ = GetDrivesBitMask();
@@ -210,6 +199,9 @@ inline ImGui::FileBrowser::FileBrowser(const FileBrowser &copyFrom)
 inline ImGui::FileBrowser &ImGui::FileBrowser::operator=(
     const FileBrowser &copyFrom)
 {
+    width_  = copyFrom.width_;
+    height_ = copyFrom.height_;
+
     flags_ = copyFrom.flags_;
     SetTitle(copyFrom.title_);
 
@@ -219,7 +211,12 @@ inline ImGui::FileBrowser &ImGui::FileBrowser::operator=(
     ok_        = copyFrom.ok_;
     
     statusStr_ = "";
-    pwd_ = copyFrom.pwd_;
+
+    typeFilters_     = copyFrom.typeFilters_;
+    typeFilterIndex_ = copyFrom.typeFilterIndex_;
+    hasAllFilter_    = copyFrom.hasAllFilter_;
+
+    pwd_               = copyFrom.pwd_;
     selectedFilenames_ = copyFrom.selectedFilenames_;
 
     fileRecords_ = copyFrom.fileRecords_;
@@ -323,7 +320,7 @@ inline void ImGui::FileBrowser::Display()
     PushItemWidth(4 * GetFontSize());
     if(BeginCombo("##select_drive", driveStr))
     {
-        ScopeGuard guard([&] { ImGui::EndCombo(); });
+        ScopeGuard guard([&] { EndCombo(); });
         for(int i = 0; i < 26; ++i)
         {
             if(!(drives_ & (1 << i)))
@@ -429,9 +426,7 @@ inline void ImGui::FileBrowser::Display()
 
         for(auto &rsc : fileRecords_)
         {
-            if (!rsc.isDir && typeFilters_.size() > 0 &&
-                static_cast<size_t>(typeFilterIndex_) < typeFilters_.size() &&
-                !(rsc.extension == typeFilters_[typeFilterIndex_]))
+            if(!rsc.isDir && !IsExtensionMatched(rsc.extension))
                 continue;
 
             if(!rsc.name.empty() && rsc.name.c_str()[0] == '$')
@@ -474,7 +469,7 @@ inline void ImGui::FileBrowser::Display()
 #else
                             std::strncpy(inputNameBuf_->data(),
                                          u8StrToStr(rsc.name.u8string()).c_str(),
-                                         inputNameBuf_->size());
+                                         inputNameBuf_->size() - 1);
 #endif
                         }
                     }
@@ -486,11 +481,20 @@ inline void ImGui::FileBrowser::Display()
                 }
             }
 
-            if(IsItemClicked(0) && IsMouseDoubleClicked(0) && rsc.isDir)
+            if(IsItemClicked(0) && IsMouseDoubleClicked(0))
             {
-                setNewPwd = true;
-                newPwd = (rsc.name != "..") ? (pwd_ / rsc.name) :
-                                               pwd_.parent_path();
+                if(rsc.isDir)
+                {
+                    setNewPwd = true;
+                    newPwd = (rsc.name != "..") ? (pwd_ / rsc.name) :
+                                                   pwd_.parent_path();
+                }
+                else if(!(flags_ & ImGuiFileBrowserFlags_SelectDirectory))
+                {
+                    selectedFilenames_ = { rsc.name };
+                    ok_ = true;
+                    CloseCurrentPopup();
+                }
             }
         }
     }
@@ -545,12 +549,22 @@ inline void ImGui::FileBrowser::Display()
         Text("%s", statusStr_.c_str());
     }
 
-    if (!typeFilters_.empty())
+    if(!typeFilters_.empty())
     {
         SameLine();
         PushItemWidth(8 * GetFontSize());
-        Combo("##type_filters", &typeFilterIndex_,
-              typeFilters_.data(), int(typeFilters_.size()));
+        if(BeginCombo(
+            "##type_filters", typeFilters_[typeFilterIndex_].c_str()))
+        {
+            ScopeGuard guard([&] { EndCombo(); });
+
+            for(size_t i = 0; i < typeFilters_.size(); ++i)
+            {
+                bool selected = static_cast<int>(i) == typeFilterIndex_;
+                if(Selectable(typeFilters_[i].c_str(), selected) && !selected)
+                    typeFilterIndex_ = static_cast<int>(i);
+            }
+        }
         PopItemWidth();
     }
 }
@@ -614,10 +628,70 @@ inline void ImGui::FileBrowser::ClearSelected()
 }
 
 inline void ImGui::FileBrowser::SetTypeFilters(
-    const std::vector<const char*> &typeFilters)
+    const std::vector<std::string> &_typeFilters)
 {
-    typeFilters_ = typeFilters;
+    typeFilters_.clear();
+
+    // remove duplicate filter names due to case unsensitivity on windows
+
+#ifdef _WIN32
+
+    std::vector<std::string> typeFilters;
+    for(auto &rawFilter : _typeFilters)
+    {
+        std::string lowerFilter = ToLower(rawFilter);
+        if(std::find(typeFilters.begin(), typeFilters.end(), lowerFilter) ==
+           typeFilters.end())
+            typeFilters.push_back(std::move(lowerFilter));
+    }
+
+#else
+
+    auto &typeFilters = _typeFilters;
+
+#endif
+
+    // insert auto-generated filter
+
+    if(typeFilters.size() > 1)
+    {
+        hasAllFilter_  = true;
+        std::string allFiltersName = std::string();
+        for(size_t i = 0; i < typeFilters.size(); ++i)
+        {
+            if(typeFilters[i] == std::string_view(".*"))
+            {
+                hasAllFilter_ = false;
+                break;
+            }
+
+            if(i > 0)
+                allFiltersName += ",";
+            allFiltersName += typeFilters[i];
+        }
+
+        if(hasAllFilter_)
+            typeFilters_.push_back(std::move(allFiltersName));
+    }
+
+    std::copy(
+        typeFilters.begin(), typeFilters.end(),
+        std::back_inserter(typeFilters_));
+
     typeFilterIndex_ = 0;
+}
+
+inline void ImGui::FileBrowser::SetCurrentTypeFilterIndex(int index)
+{
+    typeFilterIndex_ = index;
+}
+
+inline std::string ImGui::FileBrowser::ToLower(const std::string &s)
+{
+    std::string ret = s;
+    for(char &c : ret)
+        c = static_cast<char>(std::tolower(c));
+    return ret;
 }
 
 inline void ImGui::FileBrowser::SetPwdUncatched(const std::filesystem::path &pwd)
@@ -655,6 +729,42 @@ inline void ImGui::FileBrowser::SetPwdUncatched(const std::filesystem::path &pwd
     pwd_ = absolute(pwd);
     selectedFilenames_.clear();
     (*inputNameBuf_)[0] = '\0';
+}
+
+inline bool ImGui::FileBrowser::IsExtensionMatched(
+    const std::filesystem::path &_extension) const
+{
+#ifdef _WIN32
+    std::filesystem::path extension = ToLower(_extension.string());
+#else
+    auto &extension = _extension;
+#endif
+
+    // no type filters
+    if(typeFilters_.empty())
+        return true;
+
+    // invalid type filter index
+    if(static_cast<size_t>(typeFilterIndex_) >= typeFilters_.size())
+        return true;
+
+    // all type filters
+    if(hasAllFilter_ && typeFilterIndex_ == 0)
+    {
+        for(size_t i = 1; i < typeFilters_.size(); ++i)
+        {
+            if(extension == typeFilters_[i])
+                return true;
+        }
+        return false;
+    }
+
+    // universal filter
+    if(typeFilters_[typeFilterIndex_] == std::string_view(".*"))
+        return true;
+
+    // regular filter
+    return extension == typeFilters_[typeFilterIndex_];
 }
 
 #if defined(__cpp_lib_char8_t)
