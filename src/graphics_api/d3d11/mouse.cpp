@@ -18,6 +18,11 @@ Mouse::~Mouse()
         showCursor(true);
 }
 
+void Mouse::setCursorLock(bool locked, const Int2 &lockPosition)
+{
+    setCursorLock(locked, lockPosition.x, lockPosition.y);
+}
+
 void Mouse::setCursorLock(bool locked, int lockPositionX, int lockPositionY)
 {
     isCursorLocked_ = locked;

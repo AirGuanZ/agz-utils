@@ -127,6 +127,13 @@ void alias_sampler_t<F, T>::destroy()
 }
 
 template<typename F, typename T>
+const std::vector<typename alias_sampler_t<F, T>::table_unit> &
+    alias_sampler_t<F, T>::get_table() const
+{
+    return table_;
+}
+
+template<typename F, typename T>
 bool alias_sampler_t<F, T>::available() const noexcept
 {
     return !table_.empty();

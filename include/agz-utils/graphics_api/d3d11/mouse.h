@@ -80,14 +80,16 @@ public:
     int getRelativePositionX() const noexcept { return relativeCursorX_; }
     int getRelativePositionY() const noexcept { return relativeCursorY_; }
 
+    void setCursorLock(bool locked, const Int2 &lockPosition);
     void setCursorLock(bool locked, int lockPositionX, int lockPositionY);
     void showCursor(bool show);
 
     bool isLocked()  const noexcept { return isCursorLocked_; }
     bool isVisible() const noexcept { return showCursor_; }
 
-    int getLockX() const noexcept { return lockPositionX_; }
-    int getLockY() const noexcept { return lockPositionY_; }
+    Int2 getLockXY() const noexcept { return { lockPositionX_, lockPositionY_ }; }
+    int  getLockX()  const noexcept { return lockPositionX_; }
+    int  getLockY()  const noexcept { return lockPositionY_; }
 
     void clearState();
 

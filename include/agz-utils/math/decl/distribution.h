@@ -61,15 +61,13 @@ class alias_sampler_t
 {
     static_assert(std::is_floating_point_v<F> && std::is_integral_v<T>, "");
 
+public:
+
     struct table_unit
     {
         F accept_prob;
         T another_idx;
     };
-
-    std::vector<table_unit> table_;
-
-public:
 
     using self_t = alias_sampler_t<F, T>;
 
@@ -97,6 +95,8 @@ public:
 
     void destroy();
 
+    const std::vector<table_unit> &get_table() const;
+
     /**
      * @brief 以归一化后的prob数组为分布律采样一个1到n-1间的整数
      * @param u [0, 1]间的均匀随机数
@@ -109,6 +109,10 @@ public:
      * @param u2 [0, 1]间的均匀随机数
      */
     T sample(F u1, F u2) const noexcept;
+
+private:
+
+    std::vector<table_unit> table_;
 };
 
 /**
