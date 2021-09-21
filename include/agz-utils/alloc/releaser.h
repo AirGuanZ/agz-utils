@@ -1,194 +1,132 @@
 ﻿#pragma once
 
-#include <cassert>
-#include <forward_list>
-#include <memory>
-#include <vector>
-
-#include "../misc/scope_guard.h"
-#include "../misc/uncopyable.h"
+#include "./mem_arena.h"
 
 namespace agz::alloc
 {
-    
-/**
- * @brief 用于统一管理对象生命周期
- * 
- * 可以将一个已有对象及其释放方式托管给releaser_t实例
- *
- * 也可以让一个releaser_t实例创建并持有新的对象或对象数组
- */
-class releaser_t : public misc::uncopyable_t
+
+class object_releaser_t
 {
-    struct destructor_t : uncopyable_t
+    struct obj_desctructor_t
     {
-        virtual ~destructor_t() = default;
+        obj_desctructor_t *next = nullptr;
+
+        virtual void destruct() noexcept = 0;
+
+        virtual ~obj_desctructor_t() = default;
     };
 
-    std::forward_list<destructor_t*> dtors_;
-
-    template<typename T, typename D>
-    struct deleter_caller_t : destructor_t
+    template<typename T>
+    struct obj_descructor_impl_t : obj_desctructor_t
     {
-        T *ptr;
-        explicit deleter_caller_t(T *ptr) noexcept;
-        ~deleter_caller_t();
+        T *ptr = nullptr;
+
+        explicit obj_descructor_impl_t(T *ptr) noexcept: ptr(ptr) { }
+
+        void destruct() noexcept override { ptr->~T(); }
     };
+
+    mem_arena_t &mem_arena_;
+    
+    obj_desctructor_t *destructor_entry_;
+
+    template<typename T>
+    void add_destructor(T *obj);
 
 public:
 
-    releaser_t() = default;
+    explicit object_releaser_t(mem_arena_t &mem_arena);
 
-    releaser_t(releaser_t &&move_from)            noexcept;
-    releaser_t &operator=(releaser_t &&move_from) noexcept;
+    explicit object_releaser_t(memory_resource_arena_t &mem_pool);
 
-    /** @brief 销毁时自动释放全部持有的对象 */
-    ~releaser_t();
+    ~object_releaser_t();
 
     /**
-     * @brief 托管一个已有对象
-     * 
-     * @tparam D 删除器，默认使用std::default_delete<T>
-     */
-    template<typename T, typename D = std::default_delete<T>>
-    void add(T *ptr);
-
-    /**
-     * @brief 托管一个已有对象数组
-     * 
-     * @tparam D 删除器，默认使用std::default_delete<T[]>
-     */
-    template<typename T, typename D = std::default_delete<T[]>>
-    void add_array(T *ptr);
-
-    /**
-     * @brief 创建指定类型的对象并自动托管
+     * @brief 创建指定类型的对象，参数为构造函数参数
      */
     template<typename T, typename...Args>
-    T *create(Args&&...args);
+    T *create(Args &&...args);
 
     /**
-     * @brief 创建指定类型的对象数组并自动托管
-     * 
-     * @param n 对象数量
-     * @param args 构造函数参数，参数转发时右值会被转为左值引用
+     * @brief 创建指定类型的对象，但释放时不进行析构
      */
     template<typename T, typename...Args>
-    T *create_array(size_t n, Args&&...args);
+    T *create_nodestruct(Args &&...args);
 
     /**
-     * @brief 释放全部持有的对象
+     * @brief 析构并销毁所有之前创建的对象
      */
-    void release();
+    void destroy();
 };
 
-template<typename T, typename D>
-releaser_t::deleter_caller_t<T, D>::deleter_caller_t(T *ptr) noexcept
-    : ptr(ptr)
+
+template<typename T>
+void object_releaser_t::add_destructor(T *obj)
 {
-    assert(ptr);
+    if constexpr(std::is_trivially_destructible_v<T>)
+        return;
+
+    void *destructor_mem = mem_arena_.alloc(
+        sizeof(obj_descructor_impl_t<T>), alignof(obj_descructor_impl_t<T>));
+    auto destructor = new(destructor_mem) obj_descructor_impl_t<T>(obj);
+
+    destructor->next = destructor_entry_;
+    destructor_entry_ = destructor;
 }
 
-template<typename T, typename D>
-releaser_t::deleter_caller_t<T, D>::~deleter_caller_t()
-{
-    D()(ptr);
-}
-
-inline releaser_t::releaser_t(releaser_t &&move_from) noexcept
-    : dtors_(std::move(move_from.dtors_))
+inline object_releaser_t::object_releaser_t(mem_arena_t &mem_arena)
+    : mem_arena_(mem_arena), destructor_entry_(nullptr)
 {
     
 }
 
-inline releaser_t &releaser_t::operator=(releaser_t &&move_from) noexcept
+inline object_releaser_t::object_releaser_t(memory_resource_arena_t &mem_pool)
+    : object_releaser_t(mem_pool.get_arena())
 {
-    dtors_ = std::move(move_from.dtors_);
-    return *this;
+    
 }
 
-inline releaser_t::~releaser_t()
+inline object_releaser_t::~object_releaser_t()
 {
-    release();
-}
-
-template<typename T, typename D>
-void releaser_t::add(T *ptr)
-{
-    dtors_.push_front(nullptr);
-    destructor_t *dtor;
-    try
-    {
-        dtor = new deleter_caller_t<T, D>(ptr);
-    }
-    catch(...)
-    {
-        dtors_.pop_front();
-        throw;
-    }
-    dtors_.front() = dtor;
-}
-
-template<typename T, typename D>
-void releaser_t::add_array(T* ptr)
-{
-    add<T, D>(ptr);
+    destroy();
 }
 
 template<typename T, typename...Args>
-T *releaser_t::create(Args&&...args)
+T *object_releaser_t::create(Args&&...args)
 {
-    auto ret = new T(std::forward<Args>(args)...);
-    misc::scope_guard_t guard([=] { delete ret; });
+    void *obj_mem = mem_arena_.alloc(sizeof(T), alignof(T));
+    T *obj = new(obj_mem) T(std::forward<Args>(args)...);
 
-    add(ret);
-
-    guard.dismiss();
-    return ret;
-}
-
-template<typename T, typename...Args>
-T *releaser_t::create_array(size_t n, Args&&...args)
-{
-    struct vector_holder_t : destructor_t
-    {
-        std::vector<T> vec;
-    };
-
-    assert(n);
-
-    std::vector<T> ret;
-    ret.reserve(n);
-    for(size_t i = 0; i < n; ++i)
-        ret.emplace_back(static_cast<Args&>(args)...);
-
-    dtors_.push_front(nullptr);
-    vector_holder_t *dtor;
     try
     {
-        dtor = new vector_holder_t;
-        dtor->vec = std::move(ret);
+        this->add_destructor(obj);
     }
     catch(...)
     {
-        dtors_.pop_front();
+        obj->~T();
         throw;
     }
-    dtors_.front() = dtor;
 
-    return dtor->vec.data();
+    return obj;
 }
 
-inline void releaser_t::release()
+template<typename T, typename ... Args>
+T *object_releaser_t::create_nodestruct(Args &&... args)
 {
-    for(auto dtor : dtors_)
-    {
-        assert(dtor);
-        delete dtor;
-    }
-    dtors_.clear();
+    void *obj_mem = mem_arena_.alloc(sizeof(T), alignof(T));
+    return new(obj_mem) T(std::forward<Args>(args)...);
 }
 
-using default_arena_t = releaser_t;
+inline void object_releaser_t::destroy()
+{
+    for(obj_desctructor_t *d = destructor_entry_, *nd; d; d = nd)
+    {
+        nd = d->next;
+        d->destruct();
+        // d->~obj_destructor_t();
+    }
+
+    destructor_entry_ = nullptr;
+}
 
 } // namespace agz::alloc

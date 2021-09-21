@@ -93,7 +93,7 @@ namespace variant_impl
 template<typename E, typename...Vs>
 auto match_variant(E &&e, Vs...vs)
 {
-    struct overloaded : Vs...
+    struct overloaded :  Vs...
     {
         explicit overloaded(Vs...vss) : Vs(vss)... { }
         using Vs::operator()...;
