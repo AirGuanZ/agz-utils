@@ -1,45 +1,13 @@
 ﻿#pragma once
 
-#include <functional>
-
+#include "../common/common.h"
 #include "uncopyable.h"
 
 namespace agz::misc
 {
-   
-/**
- * @brief 离开作用域时自动执行指定的功能
- */
-class scope_guard_t : public uncopyable_t
-{
-    std::function<void()> func_;
-
-public:
-
-    template<typename T, typename = std::enable_if_t<std::is_invocable_v<T>>>
-    explicit scope_guard_t(T &&func)
-        : func_(std::forward<T>(func))
-    {
-
-    }
-
-    ~scope_guard_t()
-    {
-        if(func_)
-            func_();
-    }
-
-    /**
-     * @brief 提前取消功能的执行
-     */
-    void dismiss()
-    {
-        func_ = std::function<void()>();
-    }
-};
 
 template<typename T, typename = std::enable_if_t<std::is_invocable_v<T>>>
-class fixed_scope_guard_t : public uncopyable_t
+class scope_guard_t : public uncopyable_t
 {
     bool call_ = true;
 
@@ -47,13 +15,19 @@ class fixed_scope_guard_t : public uncopyable_t
 
 public:
 
-    explicit fixed_scope_guard_t(T &&func)
-        : func_(std::forward<T>(func))
+    explicit scope_guard_t(const T &func)
+        : func_(func)
     {
         
     }
 
-    ~fixed_scope_guard_t()
+    explicit scope_guard_t(T &&func)
+        : func_(std::move(func))
+    {
+        
+    }
+
+    ~scope_guard_t()
     {
         if(call_)
             func_();
@@ -65,17 +39,70 @@ public:
     }
 };
 
-/**
- * @brief 定义一个自动命名的scope guard，离开定义作用域时自动调用指定的操作
- * 
- * 由于命名是根据行号自动进行的，很难对其调用dismiss操作。
- *  如有此需要，可显式使用 agz::scope_guard_t
- */
-#define AGZ_SCOPE_GUARD(X) \
-    AGZ_SCOPE_GUARD_IMPL0(X, __LINE__)
-#define AGZ_SCOPE_GUARD_IMPL0(X, LINE) \
-    AGZ_SCOPE_GUARD_IMPL1(X, LINE)
-#define AGZ_SCOPE_GUARD_IMPL1(X, LINE) \
-    ::agz::misc::fixed_scope_guard_t _auto_scope_guard##LINE([&] X)
+template<typename F, bool ExecuteOnException>
+class exception_scope_guard_t : public uncopyable_t
+{
+    F func_;
+
+    int exceptions_;
+
+public:
+
+    explicit exception_scope_guard_t(const F &func)
+        : func_(func), exceptions_(std::uncaught_exceptions())
+    {
+        
+    }
+
+    explicit exception_scope_guard_t(F &&func)
+        : func_(std::move(func)),
+        exceptions_(std::uncaught_exceptions())
+    {
+        
+    }
+
+    ~exception_scope_guard_t()
+    {
+        const int now_exceptions = std::uncaught_exceptions();
+        if((now_exceptions > exceptions_) == ExecuteOnException)
+        {
+            func_();
+        }
+    }
+};
+
+struct scope_guard_builder_t            {};
+struct scope_guard_on_fail_builder_t    {};
+struct scope_guard_on_success_builder_t {};
+
+template<typename Func>
+auto operator+(scope_guard_builder_t, Func &&f)
+{
+    return scope_guard_t<std::decay_t<Func>>(std::forward<Func>(f));
+}
+
+template<typename Func>
+auto operator+(scope_guard_on_fail_builder_t, Func &&f)
+{
+    return exception_scope_guard_t<std::decay_t<Func>, true>(std::forward<Func>(f));
+}
+
+template<typename Func>
+auto operator+(scope_guard_on_success_builder_t, Func &&f)
+{
+    return exception_scope_guard_t<std::decay_t<Func>, false>(std::forward<Func>(f));
+}
+
+#define AGZ_SCOPE_EXIT \
+    auto AGZ_ANONYMOUS_NAME(_agz_scope_exit) = \
+    ::agz::misc::scope_guard_builder_t{} + [&]
+
+#define AGZ_SCOPE_FAIL \
+    auto AGZ_ANONYMOUS_NAME(_agz_scope_fail) = \
+    ::agz::misc::scope_guard_on_fail_builder_t{} + [&]
+
+#define AGZ_SCOPE_SUCCESS \
+    auto AGZ_ANONYMOUS_NAME(_agz_scope_success) = \
+    ::agz::misc::scope_guard_on_success_builder_t{} + [&]
 
 } // namespace agz::misc
