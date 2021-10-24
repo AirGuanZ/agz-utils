@@ -59,7 +59,7 @@ void destroy_lib(shared_lib_handle_t *handle)
 {
     assert(handle);
     assert(handle->handle);
-    AGZ_SCOPE_GUARD({ delete handle; });
+    AGZ_SCOPE_EXIT{ delete handle; };
 
 #ifdef AGZ_OS_WIN32
 

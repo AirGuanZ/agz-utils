@@ -61,4 +61,13 @@ constexpr T upalign_to(T value, T alignto) noexcept
     return (value + alignto - 1) / alignto * alignto;
 }
 
+#define AGZ_CAT(A, B)      AGZ_CAT_IMPL(A, B)
+#define AGZ_CAT_IMPL(A, B) A##B
+
+#ifdef __COUNTER__
+#define AGZ_ANONYMOUS_NAME(STR) AGZ_CAT(STR, __COUNTER__)
+#else
+#define AGZ_ANONYMOUS_NAME(STR) AGZ_CAT(STR, __LINE__)
+#endif
+
 } // namespace agz

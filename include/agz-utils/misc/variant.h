@@ -54,6 +54,12 @@ public:
     {
         return std::get_if<T>(this);
     }
+
+    template<typename...Vs>
+    auto match(Vs...vs);
+
+    template<typename...Vs>
+    auto match(Vs...vs) const;
 };
 
 namespace variant_impl
@@ -93,13 +99,27 @@ namespace variant_impl
 template<typename E, typename...Vs>
 auto match_variant(E &&e, Vs...vs)
 {
-    struct overloaded : Vs...
+    struct overloaded :  Vs...
     {
         explicit overloaded(Vs...vss) : Vs(vss)... { }
         using Vs::operator()...;
     };
     return std::visit(
         overloaded(vs...), variant_impl::to_std_variant(std::forward<E>(e)));
+}
+
+template<typename ... Types>
+template<typename ... Vs>
+auto variant_t<Types...>::match(Vs ... vs)
+{
+    return match_variant(*this, std::move(vs)...);
+}
+
+template<typename ... Types>
+template<typename ... Vs>
+auto variant_t<Types...>::match(Vs ... vs) const
+{
+    return match_variant(*this, std::move(vs)...);
 }
 
 } // namespace agz::misc

@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <memory_resource>
 
 #include "../misc/uncopyable.h"
 
@@ -64,6 +65,40 @@ public:
      * 预分配但还未被使用的不计入其中
      */
     size_t used_bytes() const noexcept;
+};
+
+class memory_resource_arena_t final : public std::pmr::memory_resource
+{
+    mem_arena_t impl_;
+
+    void *do_allocate(size_t bytes, size_t align) override
+    {
+        return impl_.alloc(bytes, align);
+    }
+
+    void do_deallocate(void *ptr, size_t bytes, size_t align) override
+    {
+        
+    }
+
+    bool do_is_equal(const memory_resource &that) const noexcept override
+    {
+        return this == &that;
+    }
+
+public:
+
+    explicit memory_resource_arena_t(
+        size_t chunk_byte_size = 4096, size_t direct_alloc_threshold = 2048)
+        : impl_(chunk_byte_size, direct_alloc_threshold)
+    {
+        
+    }
+
+    mem_arena_t &get_arena()
+    {
+        return impl_;
+    }
 };
 
 inline void mem_arena_t::alloc_new_chunk()

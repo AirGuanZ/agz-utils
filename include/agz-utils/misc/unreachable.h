@@ -12,8 +12,9 @@ namespace agz::misc
     __assume(0);
 #elif defined(AGZ_CC_IS_GNU)
     __builtin_unreachable();
-#endif
+#else
     std::terminate();
+#endif
 }
 
 } // namespace agz::misc
