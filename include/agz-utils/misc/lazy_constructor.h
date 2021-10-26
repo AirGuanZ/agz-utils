@@ -2,6 +2,8 @@
 
 #include <type_traits>
 
+#include "../common/common.h"
+
 namespace agz::misc
 {
 
@@ -14,7 +16,7 @@ public:
 
     template<typename F, typename =
         std::enable_if_t<!std::is_same_v<
-            std::remove_cvref_t<F>, lazy_constructor_t>>>
+            rm_rcv_t<F>, lazy_constructor_t>>>
     explicit lazy_constructor_t(F &&f)
         : constructor_{ std::forward<F>(f) }
     {
@@ -36,7 +38,7 @@ public:
 template<typename F>
 auto lazy_construct(F &&f) noexcept
 {
-    return lazy_constructor_t<std::remove_cvref_t<F>>(std::forward<F>(f));
+    return lazy_constructor_t<rm_rcv_t<F>>(std::forward<F>(f));
 }
 
 #define AGZ_LAZY(EXPR) (::agz::misc::lazy_construct([&]{ return (EXPR); }))
