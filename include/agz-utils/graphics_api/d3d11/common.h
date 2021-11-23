@@ -15,6 +15,10 @@ using Float2 = math::vec2f;
 using Float3 = math::vec3f;
 using Float4 = math::vec4f;
 
+using Double2 = math::vec2d;
+using Double3 = math::vec3d;
+using Double4 = math::vec4d;
+
 using Color4 = math::color4f;
 
 using Int2 = math::vec2i;
@@ -32,14 +36,7 @@ public:
     using runtime_error::runtime_error;
 };
 
-#define AGZ_D3D11_DECL_EVENT_MGR_HANDLER(EventMgr, EventName)                  \
-    void attach(event::receiver_t<EventName> *handler)                         \
-        { EventMgr.attach(handler); }                                          \
-    void attach(std::shared_ptr<event::receiver_t<EventName>> handler)         \
-        { EventMgr.attach(handler); }                                          \
-    void detach(event::receiver_t<EventName> *handler)                         \
-        { EventMgr.detach(handler); }                                          \
-    void detach(std::shared_ptr<event::receiver_t<EventName>> handler)         \
-        { EventMgr.detach(handler); }
+#define AGZ_D3D11_DECL_EVENT_MGR_HANDLER(EventMgr, EventName) \
+    AGZ_DECL_EVENT_SENDER_HANDLER(EventMgr, EventName)
 
 AGZ_D3D11_END

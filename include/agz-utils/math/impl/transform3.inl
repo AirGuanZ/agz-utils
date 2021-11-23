@@ -3,21 +3,21 @@
 AGZ_MATH_BEGIN
 
 template<typename T, bool C>
-AGZ_MATH_API ttransform3<T, C>::ttransform3() noexcept
+ttransform3<T, C>::ttransform3() noexcept
     : mat_(mat_t::identity()), inv_(mat_t::identity())
 {
     
 }
 
 template<typename T, bool C>
-AGZ_MATH_API ttransform3<T, C>::ttransform3(const mat_t &m) noexcept
+ttransform3<T, C>::ttransform3(const mat_t &m) noexcept
     : ttransform3(m, m.inv())
 {
     
 }
 
 template<typename T, bool C>
-AGZ_MATH_API ttransform3<T, C>::ttransform3(
+ttransform3<T, C>::ttransform3(
     const mat_t &m, const mat_t &inv) noexcept
     : mat_(m), inv_(inv)
 {
@@ -25,14 +25,14 @@ AGZ_MATH_API ttransform3<T, C>::ttransform3(
 }
 
 template<typename T, bool C>
-AGZ_MATH_API ttransform3<T, C>::ttransform3(uninitialized_t) noexcept
+ttransform3<T, C>::ttransform3(uninitialized_t) noexcept
     : mat_(UNINIT), inv_(UNINIT)
 {
     
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::translate(const tvec3<T> &offset) noexcept
 {
     return self_t(
@@ -41,7 +41,7 @@ AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::translate(T x, T y, T z) noexcept
 {
     return self_t(
@@ -50,7 +50,7 @@ AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::rotate(const tvec3<T> &axis, T rad) noexcept
 {
     return self_t(
@@ -59,7 +59,7 @@ AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::rotate_x(T rad) noexcept
 {
     return self_t(
@@ -68,7 +68,7 @@ AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::rotate_y(T rad) noexcept
 {
     return self_t(
@@ -77,7 +77,7 @@ AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::rotate_z(T rad) noexcept
 {
     return self_t(
@@ -86,7 +86,7 @@ AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::scale(T x, T y, T z) noexcept
 {
     return self_t(
@@ -95,14 +95,14 @@ AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::scale(const tvec3<T> &ratio) noexcept
 {
     return scale(ratio.x, ratio.y, ratio.z);
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::operator*=(const self_t &rhs) noexcept
 {
     mat_ *= rhs.mat_;
@@ -111,7 +111,7 @@ AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_point(
+tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_point(
     const tvec3<T> &point) const noexcept
 {
     const auto p4 = mat_ * tvec4<T>(point.x, point.y, point.z, 1);
@@ -119,7 +119,7 @@ AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_point(
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_vector(
+tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_vector(
     const tvec3<T> &vector) const noexcept
 {
     const auto v4 = mat_ * tvec4<T>(vector.x, vector.y, vector.z, 0);
@@ -127,7 +127,7 @@ AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_vector(
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_normal(
+tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_normal(
     const tvec3<T> &normal) const noexcept
 {
     const auto v4 = inv_.t() * tvec4<T>(normal.x, normal.y, normal.z, 0);
@@ -135,7 +135,7 @@ AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_normal(
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API tcoord3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_coord(
+tcoord3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_coord(
     const tcoord3<T> &coord) const noexcept
 {
     return tcoord3<T>(apply_to_vector(coord.x),
@@ -144,7 +144,7 @@ AGZ_MATH_API tcoord3<T> ttransform3<T, COLUMN_MAJOR>::apply_to_coord(
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_point(
+tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_point(
     const tvec3<T> &point) const noexcept
 {
     const auto p4 = inv_ * tvec4<T>(point.x, point.y, point.z, 1);
@@ -152,7 +152,7 @@ AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_point(
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_vector(
+tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_vector(
     const tvec3<T> &vector) const noexcept
 {
     const auto v4 = inv_ * tvec4<T>(vector.x, vector.y, vector.z, 0);
@@ -160,7 +160,7 @@ AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_vector(
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_normal(
+tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_normal(
     const tvec3<T> &normal) const noexcept
 {
     const auto v4 =
@@ -169,7 +169,7 @@ AGZ_MATH_API tvec3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_normal(
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API tcoord3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_coord(
+tcoord3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_coord(
     const tcoord3<T> &coord) const noexcept
 {
     return tcoord3<T>(apply_inverse_to_vector(coord.x),
@@ -178,35 +178,35 @@ AGZ_MATH_API tcoord3<T> ttransform3<T, COLUMN_MAJOR>::apply_inverse_to_coord(
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::inv() const noexcept
 {
     return self_t(inv_, mat_);
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API typename ttransform3<T, COLUMN_MAJOR>::self_t
+typename ttransform3<T, COLUMN_MAJOR>::self_t
     ttransform3<T, COLUMN_MAJOR>::inverse() const noexcept
 {
     return inv();
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API const typename ttransform3<T, COLUMN_MAJOR>::mat_t&
+const typename ttransform3<T, COLUMN_MAJOR>::mat_t&
 ttransform3<T, COLUMN_MAJOR>::get_mat() const noexcept
 {
     return mat_;
 }
 
 template<typename T, bool COLUMN_MAJOR>
-AGZ_MATH_API const typename ttransform3<T, COLUMN_MAJOR>::mat_t&
+const typename ttransform3<T, COLUMN_MAJOR>::mat_t&
 ttransform3<T, COLUMN_MAJOR>::get_inv_mat() const noexcept
 {
     return inv_;
 }
 
 template<typename T, bool C>
-AGZ_MATH_API ttransform3<T, C> operator*(
+ttransform3<T, C> operator*(
     const ttransform3<T, C> &lhs, const ttransform3<T, C> &rhs) noexcept
 {
     return ttransform3<T>(

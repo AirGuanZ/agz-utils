@@ -3,9 +3,6 @@
 #include <type_traits>
 
 #include "../common/common.h"
-#include "../misc/scope_guard.h"
-#include "../misc/uncopyable.h"
-#include "./mem_arena.h"
 #include "./releaser.h"
 
 namespace agz::alloc
@@ -59,31 +56,8 @@ public:
  */
 class obj_arena_t : public misc::uncopyable_t
 {
-    struct obj_desctructor_t
-    {
-        obj_desctructor_t *next = nullptr;
-
-        virtual void destruct() noexcept = 0;
-
-        virtual ~obj_desctructor_t() = default;
-    };
-
-    template<typename T>
-    struct obj_descructor_impl_t : obj_desctructor_t
-    {
-        T *ptr = nullptr;
-
-        explicit obj_descructor_impl_t(T *ptr) noexcept : ptr(ptr) { }
-
-        void destruct() noexcept override { ptr->~T(); }
-    };
-
-    mem_arena_t mem_arena_;
-
-    obj_desctructor_t *destructor_entry_;
-
-    template<typename T>
-    void add_destructor(T *obj);
+    mem_arena_t       mem_arena_;
+    object_releaser_t releaser_;
 
 public:
 
@@ -203,24 +177,10 @@ void fixed_obj_arena_t<T>::release()
     remain_count_ = 0;
 }
 
-template<typename T>
-void obj_arena_t::add_destructor(T *obj)
-{
-    if constexpr(std::is_trivially_destructible_v<T>)
-        return;
-
-    void *destructor_mem = mem_arena_.alloc(
-        sizeof(obj_descructor_impl_t<T>), alignof(obj_descructor_impl_t<T>));
-    auto destructor = new(destructor_mem) obj_descructor_impl_t<T>(obj);
-
-    destructor->next = destructor_entry_;
-    destructor_entry_ = destructor;
-}
-
 inline obj_arena_t::obj_arena_t(
     size_t mem_pool_chunk_size, size_t direct_alloc_threshold)
     : mem_arena_(mem_pool_chunk_size, direct_alloc_threshold),
-      destructor_entry_(nullptr)
+      releaser_(mem_arena_)
 {
     
 }
@@ -233,39 +193,18 @@ inline obj_arena_t::~obj_arena_t()
 template<typename T, typename...Args>
 T *obj_arena_t::create(Args&&...args)
 {
-    void *obj_mem = mem_arena_.alloc(sizeof(T), alignof(T));
-    T *obj = new(obj_mem) T(std::forward<Args>(args)...);
-    
-    try
-    {
-        this->add_destructor(obj);
-    }
-    catch(...)
-    {
-        obj->~T();
-        throw;
-    }
-
-    return obj;
+    return releaser_.create<T>(std::forward<Args>(args)...);
 }
 
 template<typename T, typename ... Args>
 T *obj_arena_t::create_nodestruct(Args &&... args)
 {
-    void *obj_mem = mem_arena_.alloc(sizeof(T), alignof(T));
-    return new(obj_mem) T(std::forward<Args>(args)...);
+    return releaser_.create_nodestruct<T>(std::forward<Args>(args)...);
 }
 
 inline void obj_arena_t::release()
 {
-    for(obj_desctructor_t *d = destructor_entry_, *nd; d; d = nd)
-    {
-        nd = d->next;
-        d->destruct();
-        // d->~obj_destructor_t();
-    }
-
-    destructor_entry_ = nullptr;
+    releaser_.destroy();
     mem_arena_.free();
 }
 

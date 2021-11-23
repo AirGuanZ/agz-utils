@@ -21,41 +21,41 @@ public:
 
     using self_t = ttransform2<T, COLUMN_MAJOR>;
 
-    AGZ_MATH_API ttransform2()                                 noexcept;
-    AGZ_MATH_API ttransform2(const mat_t &m, const mat_t &inv) noexcept;
-    AGZ_MATH_API explicit ttransform2(const mat_t &m)          noexcept;
-    AGZ_MATH_API explicit ttransform2(uninitialized_t)         noexcept;
+    ttransform2()                                 noexcept;
+    ttransform2(const mat_t &m, const mat_t &inv) noexcept;
+    explicit ttransform2(const mat_t &m)          noexcept;
+    explicit ttransform2(uninitialized_t)         noexcept;
 
-    AGZ_MATH_API static self_t translate(const tvec2<T> &offset) noexcept;
-    AGZ_MATH_API static self_t translate(T x, T y)          noexcept;
+    static self_t translate(const tvec2<T> &offset) noexcept;
+    static self_t translate(T x, T y)          noexcept;
 
-    AGZ_MATH_API static self_t rotate(T rad)                     noexcept;
+    static self_t rotate(T rad)                     noexcept;
 
-    AGZ_MATH_API static self_t scale(const tvec2<T> &ratio) noexcept;
-    AGZ_MATH_API static self_t scale(T x, T y)         noexcept;
+    static self_t scale(const tvec2<T> &ratio) noexcept;
+    static self_t scale(T x, T y)         noexcept;
 
-    AGZ_MATH_API self_t operator*=(const self_t &rhs) noexcept;
+    self_t operator*=(const self_t &rhs) noexcept;
 
-    AGZ_MATH_API tvec2<T> apply_to_point (const tvec2<T> &point)   const noexcept;
-    AGZ_MATH_API tvec2<T> apply_to_vector(const tvec2<T> &vector)  const noexcept;
-    AGZ_MATH_API tvec2<T> apply_to_normal(const tvec2<T> &normal)  const noexcept;
+    tvec2<T> apply_to_point (const tvec2<T> &point)   const noexcept;
+    tvec2<T> apply_to_vector(const tvec2<T> &vector)  const noexcept;
+    tvec2<T> apply_to_normal(const tvec2<T> &normal)  const noexcept;
 
-    AGZ_MATH_API tvec2<T> apply_inverse_to_point (const tvec2<T> &point)   const noexcept;
-    AGZ_MATH_API tvec2<T> apply_inverse_to_vector(const tvec2<T> &vector)  const noexcept;
-    AGZ_MATH_API tvec2<T> apply_inverse_to_normal(const tvec2<T> &normal)  const noexcept;
+    tvec2<T> apply_inverse_to_point (const tvec2<T> &point)   const noexcept;
+    tvec2<T> apply_inverse_to_vector(const tvec2<T> &vector)  const noexcept;
+    tvec2<T> apply_inverse_to_normal(const tvec2<T> &normal)  const noexcept;
 
-    AGZ_MATH_API self_t inv()     const noexcept;
-    AGZ_MATH_API self_t inverse() const noexcept;
+    self_t inv()     const noexcept;
+    self_t inverse() const noexcept;
 
-    AGZ_MATH_API const mat_t &get_mat()     const noexcept;
-    AGZ_MATH_API const mat_t &get_inv_mat() const noexcept;
+    const mat_t &get_mat()     const noexcept;
+    const mat_t &get_inv_mat() const noexcept;
 
-    AGZ_MATH_API bool operator==(const self_t &rhs) const noexcept;
-    AGZ_MATH_API bool operator!=(const self_t &rhs) const noexcept;
+    bool operator==(const self_t &rhs) const noexcept;
+    bool operator!=(const self_t &rhs) const noexcept;
 };
 
 template<typename T, bool C>
-AGZ_MATH_API ttransform2<T, C> operator*(
+ttransform2<T, C> operator*(
     const ttransform2<T, C> &lhs, const ttransform2<T, C> &rhs) noexcept;
 
 using transform2f = ttransform2<float>;

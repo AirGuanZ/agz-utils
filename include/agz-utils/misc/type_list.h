@@ -49,8 +49,8 @@ class type_list_t
 {
 public:
 
-    static constexpr int length = type_list_impl::length<Ts...>(); // 类型列表长度
-    static constexpr int size   = length;                          // 类型列表长度
+    static constexpr int length = sizeof...(Ts); // 类型列表长度
+    static constexpr int size   = length;        // 类型列表长度
 
     template<int I>
     using at = typename type_list_impl::at_aux<I, Ts...>::type; // 用下标取类型

@@ -33,6 +33,7 @@
 #include "./graphics_api/imgui/imfilebrowser.h"
 
 #include "./graphics_api/d3d11/buffer.h"
+#include "./graphics_api/d3d11/demo.h"
 #include "./graphics_api/d3d11/device.h"
 #include "./graphics_api/d3d11/deviceContext.h"
 #include "./graphics_api/d3d11/immediate.h"

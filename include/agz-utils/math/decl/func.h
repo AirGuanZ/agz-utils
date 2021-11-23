@@ -74,6 +74,16 @@ auto sqr(T val) noexcept
     return val * val;
 }
 
+template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+auto normalize_radian_0_2pi(T val) noexcept
+{
+    while(val < 0)
+        val += 2 * PI<T>;
+    while(val > 2 * PI<T>)
+        val -= 2 * PI<T>;
+    return val;
+}
+
 template<typename T>
 auto exp(const tvec2<T> &v) noexcept
 {

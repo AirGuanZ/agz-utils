@@ -123,7 +123,7 @@ std::vector<math::byte> load_bytes_from_memory(
     if(!bytes)
         return {};
 
-    AGZ_SCOPE_GUARD({ stbi_image_free(bytes); });
+    AGZ_SCOPE_EXIT{ stbi_image_free(bytes); };
 
     *width    = w;
     *height   = h;
@@ -141,7 +141,7 @@ image_buffer<math::byte> load_gray_from_memory(const void *data, size_t byte_len
     if(!bytes)
         return image_buffer<math::byte>();
 
-    AGZ_SCOPE_GUARD({ stbi_image_free(bytes); });
+    AGZ_SCOPE_EXIT{ stbi_image_free(bytes); };
 
     assert(w > 0 && h > 0);
 
@@ -163,7 +163,7 @@ namespace img_impl
         if(!bytes)
             return image_buffer<P>();
 
-        AGZ_SCOPE_GUARD({ stbi_image_free(bytes); });
+        AGZ_SCOPE_EXIT{ stbi_image_free(bytes); };
 
         assert(w > 0 && h > 0);
 
@@ -215,7 +215,7 @@ math::tensor_t<math::color3f, 2> load_rgb_from_hdr_memory(
     if(!data)
         return image_buffer<math::color3f>();
 
-    AGZ_SCOPE_GUARD({ stbi_image_free(data); });
+    AGZ_SCOPE_EXIT{ stbi_image_free(data); };
 
     assert(w > 0 && h > 0);
 

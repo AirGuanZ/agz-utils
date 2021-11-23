@@ -15,9 +15,9 @@ namespace sh_impl
         static auto eval([[maybe_unused]] const tvec3<T> &v) noexcept \
         { \
             [[maybe_unused]] constexpr T pi = agz::math::PI<T>; \
-            [[maybe_unused]] constexpr T x = v.x; \
-            [[maybe_unused]] constexpr T y = v.y; \
-            [[maybe_unused]] constexpr T z = v.z; \
+            [[maybe_unused]] const     T x = v.x; \
+            [[maybe_unused]] const     T y = v.y; \
+            [[maybe_unused]] const     T z = v.z; \
             static const T C = (COEF); \
             return C * (EXPR); \
         } \
@@ -71,7 +71,7 @@ namespace sh_impl
     {
         static void call(const tmat3_c<T> &rot, T *coefs) noexcept
         {
-            static const T INV_C = Sqrt(4 * PI<T> / 3);
+            static const T INV_C = std::sqrt(4 * PI<T> / 3);
 
             static const tmat3_c<T> INV_A(0,     0,     INV_C,
                                           INV_C, 0,     0,
@@ -82,7 +82,10 @@ namespace sh_impl
             const auto PMN0 = spherical_harmonics::project_to_sh<1>(rot.get_col(0));
             const auto PMN1 = spherical_harmonics::project_to_sh<1>(rot.get_col(1));
             const auto PMN2 = spherical_harmonics::project_to_sh<1>(rot.get_col(2));
-            const auto S = tmat3_c<T>::from_cols(PMN0, PMN1, PMN2);
+            const auto S = tmat3_c<T>::from_cols(
+                { PMN0[0], PMN0[1], PMN0[2] },
+                { PMN1[0], PMN1[1], PMN1[2] },
+                { PMN2[0], PMN2[1], PMN2[2] });
 
             tvec3<T> x(coefs[0], coefs[1], coefs[2]);
             x = S * (INV_A * x);

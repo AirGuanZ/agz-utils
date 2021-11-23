@@ -1,3 +1,5 @@
+#ifdef AGZ_ENABLE_D3D12
+
 // dear imgui: Renderer for DirectX12
 // This needs to be used along with a Platform Binding (e.g. Win32)
 
@@ -671,3 +673,5 @@ void ImGui_ImplDX12_NewFrame()
     if (!g_pPipelineState)
         ImGui_ImplDX12_CreateDeviceObjects();
 }
+
+#endif
