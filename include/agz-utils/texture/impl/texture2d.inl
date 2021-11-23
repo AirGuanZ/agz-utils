@@ -138,6 +138,20 @@ const typename texture2d_t<T>::texel_t& texture2d_t<T>::operator()(
 }
 
 template<typename T>
+typename texture2d_t<T>::texel_t &texture2d_t<T>::operator()(
+    const math::vec2i &xy) noexcept
+{
+    return data_(xy.y, xy.x);
+}
+
+template<typename T>
+const typename texture2d_t<T>::texel_t &texture2d_t<T>::operator()(
+    const math::vec2i &xy) const noexcept
+{
+    return data_(xy.y, xy.x);
+}
+
+template<typename T>
 typename texture2d_t<T>::texel_t& texture2d_t<T>::at(int y, int x) noexcept
 {
     return data_(y, x);
@@ -148,6 +162,20 @@ const typename texture2d_t<T>::texel_t& texture2d_t<T>::at(
     int y, int x) const noexcept
 {
     return data_(y, x);
+}
+
+template<typename T>
+typename texture2d_t<T>::texel_t &texture2d_t<T>::at(
+    const math::vec2i &xy) noexcept
+{
+    return data_(xy.y, xy.x);
+}
+
+template<typename T>
+const typename texture2d_t<T>::texel_t &texture2d_t<T>::at(
+    const math::vec2i &xy) const noexcept
+{
+    return data_(xy.y, xy.x);
 }
 
 template<typename T>
