@@ -28,9 +28,9 @@ tquaternion_t<T>::tquaternion_t(
     const T half_theta = T(0.5) * rad;
     const T sin_angle = std::sin(half_theta);
     const T cos_angle = std::cos(half_theta);
-    x = sin_angle * axis.x;
-    y = sin_angle * axis.y;
-    z = sin_angle * axis.z;
+    x = sin_angle * normalized_axis.x;
+    y = sin_angle * normalized_axis.y;
+    z = sin_angle * normalized_axis.z;
     w = cos_angle;
 }
 
